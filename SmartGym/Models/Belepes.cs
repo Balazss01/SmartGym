@@ -6,6 +6,6 @@
         public int TagId { get; set; }
         public DateTime BelepesIdopont { get; set; }
 
-        public Tag Tag { get; set; } = null!;
+        public Tag Tag { get; set; }
     }
 }

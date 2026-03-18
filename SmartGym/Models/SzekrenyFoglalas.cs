@@ -9,7 +9,7 @@
         public DateTime FoglalvaKezdete { get; set; }
         public DateTime FoglalvaVege { get; set; }
 
-        public Tag Tag { get; set; } = null!;
-        public Szekreny Szekreny { get; set; } = null!;
+        public Tag Tag { get; set; }
+        public Szekreny Szekreny { get; set; }
     }
 }

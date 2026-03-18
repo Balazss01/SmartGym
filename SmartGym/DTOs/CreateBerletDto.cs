@@ -1,15 +1,11 @@
-﻿namespace GymWebApiBackend.Models
+﻿namespace GymWebApiBackend.DTOs
 {
-    public class Berlet
+    public class CreateBerletDto
     {
-        public int BerletId { get; set; }
         public int TagId { get; set; }
         public int BerletTipusId { get; set; }
         public DateTime KezdetDatum { get; set; }
         public DateTime VegeDatum { get; set; }
         public bool Aktiv { get; set; }
-
-        public Tag Tag { get; set; }
-        public BerletTipus BerletTipus { get; set; }
     }
 }
