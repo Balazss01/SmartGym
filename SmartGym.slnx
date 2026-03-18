@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GymFrontend/GymFrontend.csproj" />
+  <Project Path="SmartGym/GymWebApiBackend.csproj" />
+</Solution>
