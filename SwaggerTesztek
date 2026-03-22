@@ -1,0 +1,62 @@
+-------------------------------------------------------------------------
+Register példa:
+POST /api/auth/register
+{
+  "email": "teszt@smartgym.hu",
+  "password": "Teszt123",
+  "vezeteknev": "Kiss",
+  "keresztnev": "Péter",
+  "szuletesiDatum": "2001-05-10"
+}
+-------------------------------------------------------------------------
+ Login példa:
+POST /api/auth/login
+{
+  "email": "teszt@smartgym.hu",
+  "password": "Teszt123"
+}
+-------------------------------------------------------------------------
+Tagok lekérdezése: 
+GET /api/tagok
+-------------------------------------------------------------------------
+Bérlettípusok példa: 
+POST /api/berlettipusok
+{
+  "megnevezes": "Heti bérlet",
+  "idotartamNapok": 7,
+  "ar": 5000
+}
+-------------------------------------------------------------------------
+Bérletek példa:
+POST /api/berletek
+{
+  "tagId": 1,
+  "berletTipusId": 1,
+  "kezdetDatum": "2026-03-18T00:00:00",
+  "vegeDatum": "2026-03-19T00:00:00",
+  "aktiv": true
+}
+-------------------------------------------------------------------------
+Belépés példa:
+POST /api/belepesek
+{
+  "tagId": 1,
+  "belepesIdopont": "2026-03-18T10:30:00"
+}
+-------------------------------------------------------------------------
+Szekrény létrehozása: 
+POST /api/szekrenyek
+{
+  "szekrenySzam": 101,
+  "aktiv": true
+}
+-------------------------------------------------------------------------
+Szekrény lefoglalása: 
+POST /api/szekrenyfoglalasok
+{
+  "tagId": 1,
+  "szekrenyId": 1,
+  "zarva": false,
+  "foglalvaKezdete": "2026-03-18T10:00:00",
+  "foglalvaVege": "2026-03-18T12:00:00"
+}
