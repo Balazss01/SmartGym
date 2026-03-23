@@ -1,0 +1,30 @@
+﻿@page
+@model LoginModel
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+
+            <div class="card p-4 shadow">
+                <h3 class="text-center mb-3">Bejelentkezés</h3>
+
+                <form method="post">
+                    <div class="mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Jelszó" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Belépés
+                    </button>
+                </form>
+
+                <div asp-validation-summary="All" class="text-danger mt-3"></div>
+            </div>
+
+        </div>
+    </div>
+</div>

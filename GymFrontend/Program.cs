@@ -5,7 +5,10 @@ namespace GymFrontend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddHttpClient("Api", client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
+            });
             // Add services to the container.
             builder.Services.AddRazorPages();
 
