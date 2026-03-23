@@ -1,11 +1,13 @@
 ﻿using GymWebApiBackend.Data;
 using GymWebApiBackend.DTOs;
 using GymWebApiBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymWebApiBackend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class BelepesekController : ControllerBase
