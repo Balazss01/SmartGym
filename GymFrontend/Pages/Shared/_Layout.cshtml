@@ -236,7 +236,10 @@
             display: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             z-index: 2000;
+
         }
+
+        
 
         .notification-item {
             padding: 10px;
@@ -273,6 +276,40 @@
             display: flex !important;
             gap: 10px;
         }
+
+        
+        .topbar {
+            position: relative;
+            z-index: 2000;
+        }
+
+       
+        .notification-dropdown,
+        .profile-dropdown {
+            z-index: 3000 !important;
+        }
+
+       
+        .hero {
+            position: relative;
+            z-index: 1;
+        }
+
+        .topbar {
+            color: white !important;
+        }
+
+            .topbar i {
+                color: white !important;
+            }
+
+            .topbar .icon-btn {
+                color: white !important;
+            }
+
+                .topbar .icon-btn:hover {
+                    color: white !important;
+                }
     </style>
 </head>
 
@@ -280,7 +317,7 @@
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
-        <h4><i class="bi bi-fire"></i> <span>GymApp</span></h4>
+        <h4><i class="bi bi-fire"></i> <span>SmartGYM</span></h4>
 
         <a href="/Dashboard" id="menu-dashboard">
             <i class="bi bi-speedometer2"></i>
