@@ -48,7 +48,7 @@ public class LoginModel : PageModel
         var token = result.GetProperty("token").GetString();
 
         // ideiglenesen TempData-ba tesszük
-        TempData["JWT"] = token;
+        HttpContext.Session.SetString("JWT", token);
 
         return RedirectToPage("/Index");
     }
