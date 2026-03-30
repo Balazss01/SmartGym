@@ -2,7 +2,7 @@
 
 namespace GymWebApiBackend.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
         public string? TeljesNev { get; set; }
     }

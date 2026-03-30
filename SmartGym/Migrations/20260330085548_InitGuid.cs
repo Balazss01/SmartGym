@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GymWebApiBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIdentityTables : Migration
+    public partial class InitGuid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,8 +19,7 @@ namespace GymWebApiBackend.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -38,8 +37,7 @@ namespace GymWebApiBackend.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     TeljesNev = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -71,6 +69,57 @@ namespace GymWebApiBackend.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "berlettipusok",
+                columns: table => new
+                {
+                    berlet_tipus_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    megnevezes = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    idotartam_napok = table.Column<int>(type: "int", nullable: false),
+                    ar = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_berlettipusok", x => x.berlet_tipus_id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "szekrenyek",
+                columns: table => new
+                {
+                    szekreny_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    szekreny_szam = table.Column<int>(type: "int", nullable: false),
+                    aktiv = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_szekrenyek", x => x.szekreny_id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "tagok",
+                columns: table => new
+                {
+                    tag_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    identity_user_id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    vezeteknev = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    keresztnev = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    szuletesi_datum = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    aktiv = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tagok", x => x.tag_id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -78,8 +127,7 @@ namespace GymWebApiBackend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     ClaimType = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClaimValue = table.Column<string>(type: "longtext", nullable: true)
@@ -103,8 +151,7 @@ namespace GymWebApiBackend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     ClaimType = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClaimValue = table.Column<string>(type: "longtext", nullable: true)
@@ -132,8 +179,7 @@ namespace GymWebApiBackend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProviderDisplayName = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -151,10 +197,8 @@ namespace GymWebApiBackend.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RoleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -178,8 +222,7 @@ namespace GymWebApiBackend.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "varchar(255)", nullable: false)
@@ -195,6 +238,87 @@ namespace GymWebApiBackend.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "belepesek",
+                columns: table => new
+                {
+                    belepes_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    tag_id = table.Column<int>(type: "int", nullable: false),
+                    belepes_idopont = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_belepesek", x => x.belepes_id);
+                    table.ForeignKey(
+                        name: "FK_belepesek_tagok_tag_id",
+                        column: x => x.tag_id,
+                        principalTable: "tagok",
+                        principalColumn: "tag_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "berletek",
+                columns: table => new
+                {
+                    berlet_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    tag_id = table.Column<int>(type: "int", nullable: false),
+                    berlet_tipus_id = table.Column<int>(type: "int", nullable: false),
+                    kezdet_datum = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    vege_datum = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    aktiv = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_berletek", x => x.berlet_id);
+                    table.ForeignKey(
+                        name: "FK_berletek_berlettipusok_berlet_tipus_id",
+                        column: x => x.berlet_tipus_id,
+                        principalTable: "berlettipusok",
+                        principalColumn: "berlet_tipus_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_berletek_tagok_tag_id",
+                        column: x => x.tag_id,
+                        principalTable: "tagok",
+                        principalColumn: "tag_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "szekreny_foglalasok",
+                columns: table => new
+                {
+                    foglalas_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    tag_id = table.Column<int>(type: "int", nullable: false),
+                    szekreny_id = table.Column<int>(type: "int", nullable: false),
+                    zarva = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    foglalva_kezdete = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    foglalva_vege = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_szekreny_foglalasok", x => x.foglalas_id);
+                    table.ForeignKey(
+                        name: "FK_szekreny_foglalasok_szekrenyek_szekreny_id",
+                        column: x => x.szekreny_id,
+                        principalTable: "szekrenyek",
+                        principalColumn: "szekreny_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_szekreny_foglalasok_tagok_tag_id",
+                        column: x => x.tag_id,
+                        principalTable: "tagok",
+                        principalColumn: "tag_id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -236,7 +360,30 @@ namespace GymWebApiBackend.Migrations
                 column: "NormalizedUserName",
                 unique: true);
 
-            
+            migrationBuilder.CreateIndex(
+                name: "IX_belepesek_tag_id",
+                table: "belepesek",
+                column: "tag_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_berletek_berlet_tipus_id",
+                table: "berletek",
+                column: "berlet_tipus_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_berletek_tag_id",
+                table: "berletek",
+                column: "tag_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_szekreny_foglalasok_szekreny_id",
+                table: "szekreny_foglalasok",
+                column: "szekreny_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_szekreny_foglalasok_tag_id",
+                table: "szekreny_foglalasok",
+                column: "tag_id");
         }
 
         /// <inheritdoc />
@@ -258,11 +405,28 @@ namespace GymWebApiBackend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "belepesek");
+
+            migrationBuilder.DropTable(
+                name: "berletek");
+
+            migrationBuilder.DropTable(
+                name: "szekreny_foglalasok");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
+            migrationBuilder.DropTable(
+                name: "berlettipusok");
+
+            migrationBuilder.DropTable(
+                name: "szekrenyek");
+
+            migrationBuilder.DropTable(
+                name: "tagok");
         }
     }
 }
