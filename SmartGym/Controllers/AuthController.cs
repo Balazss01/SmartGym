@@ -34,6 +34,58 @@ namespace GymWebApiBackend.Controllers
             _configuration = configuration;
         }
 
+
+
+        [HttpPut("update")]
+        [Authorize]
+        public async Task<IActionResult> Update(UpdateUserDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+
+            user.Email = dto.Email;
+            user.UserName = dto.Email;
+            user.TeljesNev = dto.Vezeteknev + " " + dto.Keresztnev;
+
+            await _userManager.UpdateAsync(user);
+
+            var tag = await _context.Tagok
+                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
+
+            if (tag != null)
+            {
+                tag.Vezeteknev = dto.Vezeteknev;
+                tag.Keresztnev = dto.Keresztnev;
+                tag.SzuletesiDatum = dto.SzuletesiDatum;
+
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { message = "Frissítve" });
+        }
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> Me()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            var tag = await _context.Tagok
+                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
+
+            return Ok(new
+            {
+                email = user.Email,
+                teljesNev = user.TeljesNev,
+                vezeteknev = tag?.Vezeteknev,
+                keresztnev = tag?.Keresztnev,
+                szuletesiDatum = tag?.SzuletesiDatum
+            });
+        }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {

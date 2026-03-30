@@ -50,6 +50,6 @@ public class LoginModel : PageModel
         // ideiglenesen TempData-ba tesszük
         HttpContext.Session.SetString("JWT", token);
 
-        return RedirectToPage("/Index");
+        return RedirectToPage("/Dashboard");
     }
 }
