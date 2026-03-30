@@ -23,10 +23,10 @@ namespace GymWebApiBackend.Controllers
         private readonly IConfiguration _configuration;
 
         public AuthController(
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        ApplicationDbContext context,
-        IConfiguration configuration)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -61,7 +61,7 @@ namespace GymWebApiBackend.Controllers
 
             var tag = new Tag
             {
-                IdentityUserId = user.Id,
+                IdentityUserId = user.Id, // ✅ ez már Guid
                 Vezeteknev = dto.Vezeteknev,
                 Keresztnev = dto.Keresztnev,
                 SzuletesiDatum = dto.SzuletesiDatum,
@@ -78,6 +78,7 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
+
             if (user == null)
             {
                 return Unauthorized(new { message = "Hibás email vagy jelszó." });
@@ -93,11 +94,11 @@ namespace GymWebApiBackend.Controllers
             var roles = await _userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
-{
-    new Claim(ClaimTypes.NameIdentifier, user.Id),
-    new Claim(ClaimTypes.Email, user.Email ?? ""),
-    new Claim(ClaimTypes.Name, user.UserName ?? "")
-};
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), 
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim(ClaimTypes.Name, user.UserName ?? "")
+            };
 
             foreach (var role in roles)
             {
@@ -121,13 +122,13 @@ namespace GymWebApiBackend.Controllers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             var tag = await _context.Tagok
-                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
+                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id); // ✅ GUID vs GUID OK
 
             return Ok(new
             {
                 message = "Sikeres bejelentkezés.",
                 token = tokenString,
-                userId = user.Id,
+                userId = user.Id, // frontend majd stringgé alakítja ha kell
                 email = user.Email,
                 teljesNev = user.TeljesNev,
                 roles = roles,

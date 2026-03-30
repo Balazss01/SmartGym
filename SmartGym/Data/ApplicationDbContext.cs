@@ -1,11 +1,14 @@
 ﻿using GymWebApiBackend.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 
 namespace GymWebApiBackend.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+
+    public class ApplicationDbContext
+        : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -13,6 +16,7 @@ namespace GymWebApiBackend.Data
         }
 
         public DbSet<Tag> Tagok { get; set; }
+
         public DbSet<Berlet> Berletek { get; set; }
         public DbSet<BerletTipus> BerletTipusok { get; set; }
         public DbSet<Belepes> Belepesek { get; set; }

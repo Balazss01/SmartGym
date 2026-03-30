@@ -3,7 +3,7 @@
     public class Tag
     {
         public int TagId { get; set; }
-        public string? IdentityUserId { get; set; }
+        public Guid IdentityUserId { get; set; } 
         public string Vezeteknev { get; set; } = null!;
         public string Keresztnev { get; set; } = null!;
         public DateTime SzuletesiDatum { get; set; }
