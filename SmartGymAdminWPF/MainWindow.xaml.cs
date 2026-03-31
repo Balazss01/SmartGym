@@ -1,48 +1,50 @@
-﻿using SmartGymAdminWPF.Models;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using SmartGymAdminWPF.Services;
+using SmartGymAdminWPF.Views;
 
 namespace SmartGymAdminWPF
 {
     public partial class MainWindow : Window
     {
-        HttpClient client = new HttpClient();
+        public static ApiService Api = new ApiService();
 
         public MainWindow()
         {
             InitializeComponent();
-            _ = LoadUsers();
+            Init();
         }
 
-        private async Task LoadUsers()
+        private async void Init()
         {
             try
             {
-                var response = await client.GetAsync("https://localhost:5001/api/users");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-
-                    var users = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                    UsersGrid.ItemsSource = users;
-                }
-                else
-                {
-                    MessageBox.Show("API hiba");
-                }
+                await Api.Login();
+                MainFrame.Navigate(new DashboardPage());
             }
-            catch
+            catch (System.Exception ex)
             {
-                MessageBox.Show("Backend nem fut!");
+                MessageBox.Show(ex.Message);
             }
+        }
+
+        private void Dashboard_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new DashboardPage());
+        }
+
+        private void Tagok_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new TagokPage());
+        }
+
+        private void Berletek_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new BerletekPage());
+        }
+
+        private void Belepesek_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new BelepesekPage());
         }
     }
 }
