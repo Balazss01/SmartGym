@@ -1,0 +1,47 @@
+﻿<Window x:Class="SmartGymAdminWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SmartGYM Admin" Height="600" Width="1000"
+        Background="#0f172a">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <StackPanel Background="#020617">
+            <TextBlock Text="SmartGYM"
+                       Foreground="#38bdf8"
+                       FontSize="20"
+                       Margin="20"/>
+
+            <Button Content="Dashboard" Margin="10"/>
+            <Button Content="Felhasználók" Margin="10"/>
+        </StackPanel>
+
+        <!-- CONTENT -->
+        <Grid Grid.Column="1" Margin="20">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- TITLE -->
+            <TextBlock Text="Felhasználók"
+                       FontSize="24"
+                       Foreground="White"
+                       Margin="0 0 0 20"/>
+
+            <!-- DATAGRID -->
+            <DataGrid x:Name="UsersGrid"
+                      Grid.Row="1"
+                      AutoGenerateColumns="True"
+                      Background="#020617"
+                      Foreground="White"
+                      Margin="10"/>
+        </Grid>
+    </Grid>
+</Window>
