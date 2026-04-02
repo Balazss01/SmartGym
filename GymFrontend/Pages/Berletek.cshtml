@@ -1,0 +1,23 @@
+﻿@page
+@model GymFrontend.Pages.BerletekModel
+
+<h2>Bérletek</h2>
+
+@if (Model.Berletek.Count == 0)
+{
+    <p>Nincs adat</p>
+}
+
+@foreach (var b in Model.Berletek)
+{
+    <div style="border:1px solid gray; padding:10px; margin:10px;">
+        <h3>@b.Megnevezes</h3>
+        <p>@b.Ar Ft</p>
+        <input type="hidden" name="Id" value="@b.BerletTipusId" />
+
+        <form method="post">
+            <input type="hidden" name="Id" value="@b.BerletTipusId" />
+            <button type="submit">Megveszem</button>
+        </form>
+    </div>
+}
