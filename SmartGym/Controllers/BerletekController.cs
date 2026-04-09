@@ -65,26 +65,11 @@ namespace GymWebApiBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateBerletDto dto)
         {
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine(claim.Type + " = " + claim.Value);
-            }
-          
-            
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { message = "Missing or invalid user claim." });
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var berletTipusLetezik = await _context.BerletTipusok
-                .AnyAsync(bt => bt.BerletTipusId == dto.BerletTipusId);
-
-            if (!berletTipusLetezik)
-            {
-                return BadRequest(new { message = "A megadott bérlettípus nem létezik." });
-            }
-
+            // 🔥 CHECK: van-e aktív bérlet
             var vanAktiv = await _context.Berletek
-               .AnyAsync(b => b.TagId == userId && b.Aktiv);
+                .AnyAsync(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now);
 
             if (vanAktiv)
             {
@@ -93,19 +78,16 @@ namespace GymWebApiBackend.Controllers
 
             var berlet = new Berlet
             {
-                TagId = userId, // 🔥 EZ A LÉNYEG (nem dto!)
+                TagId = userId,
                 BerletTipusId = dto.BerletTipusId,
                 KezdetDatum = dto.KezdetDatum,
                 VegeDatum = dto.VegeDatum,
                 Aktiv = dto.Aktiv
             };
 
-           
-
             _context.Berletek.Add(berlet);
             await _context.SaveChangesAsync();
 
-            
             return Ok(berlet);
         }
 

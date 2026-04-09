@@ -1,33 +1,199 @@
 ﻿@page
 @model GymFrontend.Pages.SajatBerletekModel
 
-<h2 style="margin-bottom:20px;">Saját bérleteim</h2>
+<style>
+    .page-bg {
+        background: linear-gradient(135deg, #eef2f7, #f8fafc);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .card {
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        transition: 0.3s;
+    }
+
+    .value {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    /* 🔥 SZÍN ÁLLAPOTOK */
+    .green { background: linear-gradient(135deg, #4CAF50, #22c55e); color:white; }
+    .yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); color:white; }
+    .red { background: linear-gradient(135deg, #ef4444, #dc2626); color:white; }
+
+    /* 🔥 GLOW ha kevés idő */
+    .glow {
+        animation: glowPulse 1s infinite alternate;
+    }
+
+    @@keyframes glowPulse {
+        from { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+        to { box-shadow: 0 0 25px rgba(255,0,0,0.9); }
+    }
+
+    /* 🔥 PROGRESS */
+    .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top:10px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: white;
+        animation: loadBar 1s ease forwards;
+    }
+
+    @@keyframes loadBar {
+        from { width: 0%; }
+    }
+
+    /* 📊 GRID */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    /* 📋 TABLE */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #1f2937;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px;
+    }
+
+    td { color:#333; }
+
+    tr:hover { background:#f9fafb; }
+
+    .status-active {
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 8px;
+        border-radius: 999px;
+    }
+
+    .status-expired {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 4px 8px;
+        border-radius: 999px;
+    }
+
+    /* 📱 MOBILE */
+    @@media (max-width:768px){
+        .grid { grid-template-columns:1fr; }
+        table { min-width:600px; }
+        .table-card { overflow-x:auto; }
+    }
+</style>
+
+<div class="page-bg">
+<div class="container">
+
+@{
+    var aktiv = Model.Berletek.FirstOrDefault(b => b.Aktiv && b.VegeDatum > DateTime.Now);
+}
+
+@if (aktiv != null)
+{
+    var total = (aktiv.VegeDatum - aktiv.KezdetDatum).TotalDays;
+    var remaining = aktiv.VegeDatum - DateTime.Now;
+
+    var percent = (remaining.TotalDays / total) * 100;
+
+    string color = "green";
+    if (remaining.TotalDays < 7) color = "yellow";
+    if (remaining.TotalDays < 3) color = "red";
+
+    bool danger = remaining.TotalDays < 3;
+
+    <div class="card @color @(danger ? "glow" : "")">
+
+        <h3>Aktív bérlet</h3>
+
+        <div class="value">@aktiv.BerletTipusNev</div>
+
+        <p>
+            @aktiv.KezdetDatum.ToString("yyyy.MM.dd") -
+            @aktiv.VegeDatum.ToString("yyyy.MM.dd")
+        </p>
+
+        <p>
+            <strong>Hátralévő:</strong>
+            @remaining.Days nap
+            @remaining.Hours óra
+        </p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:@percent%"></div>
+        </div>
+
+        <button disabled style="margin-top:10px; padding:10px; border:none; border-radius:10px;">
+            Már van aktív bérleted
+        </button>
+
+    </div>
+}
+
+<!-- 📊 STAT -->
+<div class="grid">
+    <div class="card">
+        <h3>Összes</h3>
+        <div class="value">@Model.Berletek.Count</div>
+    </div>
+
+    <div class="card">
+        <h3>Aktív</h3>
+        <div class="value">@Model.Berletek.Count(b => b.Aktiv && b.VegeDatum > DateTime.Now)</div>
+    </div>
+
+    <div class="card">
+        <h3>Lejárt</h3>
+        <div class="value">@Model.Berletek.Count(b => !b.Aktiv || b.VegeDatum <= DateTime.Now)</div>
+    </div>
+</div>
+
+<!-- 📋 TABLE -->
+<div class="table-card">
 
 @if (Model.Berletek.Count == 0)
 {
-    <div style="padding:20px; background:#ffecec; border-radius:10px;">
-        Nincs bérleted
-    </div>
+    <div>Nincs bérleted</div>
 }
 else
 {
-    <!-- STAT KÁRTYÁK -->
-    <div style="display:flex; gap:20px; margin-bottom:30px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:200px; padding:20px; background:#4CAF50; color:white; border-radius:15px;">
-            <h3>Aktív</h3>
-            <h1>@Model.Berletek.Count(b => b.Aktiv)</h1>
-        </div>
-
-        <div style="flex:1; min-width:200px; padding:20px; background:#f44336; color:white; border-radius:15px;">
-            <h3>Lejárt</h3>
-            <h1>@Model.Berletek.Count(b => !b.Aktiv)</h1>
-        </div>
-    </div>
-
-    <!-- TÁBLA -->
-    <table style="width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden; color:black;">
-        <thead style="background:#222; color:white;">
+    <table>
+        <thead>
             <tr>
+                <th>#</th>
                 <th>Típus</th>
                 <th>Kezdet</th>
                 <th>Vége</th>
@@ -35,24 +201,36 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var b in Model.Berletek)
-            {
-                <tr style="border-bottom:1px solid #eee;">
-                    <td>@b.BerletTipusNev</td>
-                    <td>@b.KezdetDatum.ToString("yyyy.MM.dd")</td>
-                    <td>@b.VegeDatum.ToString("yyyy.MM.dd")</td>
-                    <td>
-                        @if (b.Aktiv)
-                        {
-                            <span style="color:#4CAF50; font-weight:bold;">Aktív</span>
-                        }
-                        else
-                        {
-                            <span style="color:#f44336;">Lejárt</span>
-                        }
-                    </td>
-                </tr>
-            }
+        @{
+            int i = 1;
+        }
+
+        @foreach (var b in Model.Berletek)
+        {
+            <tr>
+                <td>@i</td>
+                <td><strong>@b.BerletTipusNev</strong></td>
+                <td>@b.KezdetDatum.ToString("yyyy.MM.dd")</td>
+                <td>@b.VegeDatum.ToString("yyyy.MM.dd")</td>
+                <td>
+                    @if (b.Aktiv && b.VegeDatum > DateTime.Now)
+                    {
+                        <span class="status-active">Aktív</span>
+                    }
+                    else
+                    {
+                        <span class="status-expired">Lejárt</span>
+                    }
+                </td>
+            </tr>
+            i++;
+        }
+
         </tbody>
     </table>
 }
+
+</div>
+
+</div>
+</div>

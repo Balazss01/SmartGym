@@ -37,8 +37,11 @@ namespace GymFrontend.Pages
                 {
                     PropertyNameCaseInsensitive = true
                 }) ?? new();
+
         }
+        public bool VanAktivBerlet => Berletek.Any(b => b.Aktiv && b.VegeDatum > DateTime.Now);
     }
+
 
     public class Berlet
     {

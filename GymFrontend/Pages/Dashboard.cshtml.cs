@@ -36,8 +36,23 @@ public class DashboardModel : PageModel
             var json = await response.Content.ReadAsStringAsync();
             var data = JsonDocument.Parse(json).RootElement;
 
-            Email = data.GetProperty("email").GetString() ?? "";
-            TeljesNev = data.GetProperty("teljesNev").GetString() ?? "";
+            if (data.TryGetProperty("email", out var emailProp))
+            {
+                Email = emailProp.GetString() ?? "";
+            }
+            else
+            {
+                Email = "";
+            }
+            if(data.TryGetProperty("teljesNev", out var teljesNevProp))
+            {
+                TeljesNev = teljesNevProp.GetString() ?? "";
+            }
+            else
+            {
+                TeljesNev = "";
+            }
+            
         }
 
         return Page();
