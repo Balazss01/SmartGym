@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -16,7 +17,17 @@ namespace GymFrontend.Pages
         {
             using var client = new HttpClient();
 
+            var token = HttpContext.Session.GetString("token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+            }
+
             var res = await client.GetAsync("https://localhost:7270/api/BerletTipusok");
+
+            Console.WriteLine("GET STATUS: " + res.StatusCode);
 
             if (!res.IsSuccessStatusCode)
                 return;
@@ -30,14 +41,27 @@ namespace GymFrontend.Pages
                 }) ?? new();
         }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
+            Console.WriteLine("POST LEFUTOTT");
+
             using var client = new HttpClient();
+
+            var token = HttpContext.Session.GetString("token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+            }
+
 
             var body = new
             {
                 berletTipusId = Id,
-                vasarlasDatum = DateTime.Now
+                kezdetDatum = DateTime.Now,
+                vegeDatum = DateTime.Now.AddDays(30),
+                aktiv = true
             };
 
             var json = JsonSerializer.Serialize(body);
@@ -45,12 +69,14 @@ namespace GymFrontend.Pages
 
             var response = await client.PostAsync("https://localhost:7270/api/Berletek", content);
 
-            if (!response.IsSuccessStatusCode)
+            Console.WriteLine("POST STATUS: " + response.StatusCode);
+
+            if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Hiba a vásárlásnál");
+                TempData["success"] = "Sikeres vásárlás!";
             }
 
-            await OnGetAsync();
+            return RedirectToPage();
         }
     }
 

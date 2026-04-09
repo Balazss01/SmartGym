@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -34,66 +33,12 @@ namespace GymWebApiBackend.Controllers
             _configuration = configuration;
         }
 
-
-
-        [HttpPut("update")]
-        [Authorize]
-        public async Task<IActionResult> Update(UpdateUserDto dto)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _userManager.FindByIdAsync(userId);
-
-            user.Email = dto.Email;
-            user.UserName = dto.Email;
-            user.TeljesNev = dto.Vezeteknev + " " + dto.Keresztnev;
-
-            await _userManager.UpdateAsync(user);
-
-            var tag = await _context.Tagok
-                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
-
-            if (tag != null)
-            {
-                tag.Vezeteknev = dto.Vezeteknev;
-                tag.Keresztnev = dto.Keresztnev;
-                tag.SzuletesiDatum = dto.SzuletesiDatum;
-
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok(new { message = "Frissítve" });
-        }
-        [HttpGet("me")]
-        [Authorize]
-        public async Task<IActionResult> Me()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(userId);
-
-            var tag = await _context.Tagok
-                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
-
-            return Ok(new
-            {
-                email = user.Email,
-                teljesNev = user.TeljesNev,
-                vezeteknev = tag?.Vezeteknev,
-                keresztnev = tag?.Keresztnev,
-                szuletesiDatum = tag?.SzuletesiDatum
-            });
-        }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var letezoFelhasznalo = await _userManager.FindByEmailAsync(dto.Email);
-            if (letezoFelhasznalo != null)
-            {
-                return BadRequest(new { message = "Ez az email cím már használatban van." });
-            }
+            var letezo = await _userManager.FindByEmailAsync(dto.Email);
+            if (letezo != null)
+                return BadRequest(new { message = "Email már használatban" });
 
             var user = new ApplicationUser
             {
@@ -103,17 +48,14 @@ namespace GymWebApiBackend.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-
             if (!result.Succeeded)
-            {
                 return BadRequest(result.Errors);
-            }
 
             await _userManager.AddToRoleAsync(user, "User");
 
             var tag = new Tag
             {
-                IdentityUserId = user.Id, // ✅ ez már Guid
+                IdentityUserId = user.Id,
                 Vezeteknev = dto.Vezeteknev,
                 Keresztnev = dto.Keresztnev,
                 SzuletesiDatum = dto.SzuletesiDatum,
@@ -123,31 +65,33 @@ namespace GymWebApiBackend.Controllers
             _context.Tagok.Add(tag);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Sikeres regisztráció." });
+            return Ok(new { message = "Sikeres regisztráció" });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
-
             if (user == null)
-            {
-                return Unauthorized(new { message = "Hibás email vagy jelszó." });
-            }
+                return Unauthorized(new { message = "Hibás adatok" });
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-
             if (!result.Succeeded)
-            {
-                return Unauthorized(new { message = "Hibás email vagy jelszó." });
-            }
+                return Unauthorized(new { message = "Hibás adatok" });
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            // 🔥 TAG LEKÉRÉS
+            var tag = await _context.Tagok
+                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
+
+            if (tag == null)
+                return BadRequest(new { message = "Nincs tag rekord" });
+
+            // 🔥 HELYES CLAIM (INT!)
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), 
+                new Claim(ClaimTypes.NameIdentifier, tag.TagId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.Name, user.UserName ?? "")
             };
@@ -173,18 +117,37 @@ namespace GymWebApiBackend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
+            return Ok(new
+            {
+                message = "Sikeres login",
+                token = tokenString,
+                tagId = tag.TagId,
+                email = user.Email,
+                teljesNev = user.TeljesNev,
+                roles = roles
+            });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> Me()
+        {
+            var tagIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(tagIdStr, out var tagId))
+                return Unauthorized();
+
             var tag = await _context.Tagok
-                .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id); // ✅ GUID vs GUID OK
+                .FirstOrDefaultAsync(t => t.TagId == tagId);
+
+            if (tag == null)
+                return NotFound();
 
             return Ok(new
             {
-                message = "Sikeres bejelentkezés.",
-                token = tokenString,
-                userId = user.Id, // frontend majd stringgé alakítja ha kell
-                email = user.Email,
-                teljesNev = user.TeljesNev,
-                roles = roles,
-                tagId = tag?.TagId
+                tag.Vezeteknev,
+                tag.Keresztnev,
+                tag.SzuletesiDatum
             });
         }
     }

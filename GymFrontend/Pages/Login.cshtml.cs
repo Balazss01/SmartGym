@@ -45,11 +45,14 @@ public class LoginModel : PageModel
         var json = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<JsonElement>(json);
 
+
         var token = result.GetProperty("token").GetString();
 
-        // ideiglenesen TempData-ba tesszük
         HttpContext.Session.SetString("JWT", token);
 
-        return RedirectToPage("/Dashboard");
+        
+        HttpContext.Session.SetString("token", token);
+
+        return RedirectToPage("/SajatBerletek");
     }
 }

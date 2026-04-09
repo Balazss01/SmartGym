@@ -3,21 +3,31 @@
 
 <h2>Bérletek</h2>
 
-@if (Model.Berletek.Count == 0)
+@if (TempData["success"] != null)
 {
-    <p>Nincs adat</p>
+    <p style="color:green">@TempData["success"]</p>
 }
 
-@foreach (var b in Model.Berletek)
-{
-    <div style="border:1px solid gray; padding:10px; margin:10px;">
-        <h3>@b.Megnevezes</h3>
-        <p>@b.Ar Ft</p>
-        <input type="hidden" name="Id" value="@b.BerletTipusId" />
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
 
-        <form method="post">
-            <input type="hidden" name="Id" value="@b.BerletTipusId" />
-            <button type="submit">Megveszem</button>
-        </form>
-    </div>
-}
+    @foreach (var b in Model.Berletek)
+    {
+        <div style="width:250px; border-radius:10px; padding:15px; background:#1e1e1e; color:white;">
+        
+            <h3>@b.Megnevezes</h3>
+            <p>Időtartam: @b.IdotartamNapok nap</p>
+            <h2>@b.Ar Ft</h2>
+
+            <form method="post" asp-page-handler="">
+                <input type="hidden" name="Id" value="@b.BerletTipusId" />
+
+                <button type="submit"
+                        style="background:green; color:white; padding:10px; border:none; border-radius:5px;">
+                    Megvásárlom
+                </button>
+            </form>
+
+        </div>
+    }
+
+</div>
