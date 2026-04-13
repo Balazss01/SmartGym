@@ -1,33 +1,305 @@
 ﻿@page
 @model GymFrontend.Pages.BerletekModel
 
-<h2>Bérletek</h2>
+<style>
+    .page-header {
+        margin-bottom: 32px;
+    }
+
+    .page-tag {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #00f5c4;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #f0ede8;
+        margin: 0;
+    }
+
+    .success-banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(0,245,196,0.08);
+        border: 0.5px solid rgba(0,245,196,0.25);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #00f5c4;
+        font-size: 13.5px;
+        margin-bottom: 28px;
+    }
+
+    .berletek-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .berlet-card {
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        transition: all 0.25s;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .berlet-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .berlet-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.14);
+            transform: translateY(-4px);
+        }
+
+            .berlet-card:hover::before {
+                opacity: 1;
+            }
+
+        .berlet-card.featured {
+            border-color: rgba(0,245,196,0.3);
+            background: rgba(0,245,196,0.05);
+        }
+
+            .berlet-card.featured::before {
+                background: rgba(0,245,196,0.2);
+                opacity: 0.6;
+            }
+
+        /* Különböző színek kártyánként */
+        .berlet-card:nth-child(1)::before {
+            background: rgba(0,245,196,0.25);
+        }
+
+        .berlet-card:nth-child(2)::before {
+            background: rgba(124,106,248,0.25);
+        }
+
+        .berlet-card:nth-child(3)::before {
+            background: rgba(74,222,128,0.2);
+        }
+
+        .berlet-card:nth-child(4)::before {
+            background: rgba(251,191,36,0.2);
+        }
+
+    .featured-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(0,245,196,0.12);
+        border: 0.5px solid rgba(0,245,196,0.3);
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 10px;
+        font-weight: 500;
+        color: #00f5c4;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        width: fit-content;
+    }
+
+    .berlet-name {
+        font-family: 'Syne', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: #f0ede8;
+        margin: 0 0 6px;
+    }
+
+    .berlet-duration {
+        font-size: 12.5px;
+        color: rgba(240,237,232,0.4);
+        margin: 0 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .berlet-price-wrap {
+        margin-top: auto;
+        margin-bottom: 20px;
+        padding-top: 16px;
+        border-top: 0.5px solid rgba(255,255,255,0.07);
+    }
+
+    .berlet-price {
+        font-family: 'Syne', sans-serif;
+        font-size: 30px;
+        font-weight: 700;
+        color: #f0ede8;
+        line-height: 1;
+    }
+
+        .berlet-price span {
+            font-size: 15px;
+            font-weight: 400;
+            color: rgba(240,237,232,0.4);
+            margin-left: 3px;
+        }
+
+    .berlet-per-day {
+        font-size: 11px;
+        color: rgba(240,237,232,0.3);
+        margin-top: 4px;
+    }
+
+    .buy-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, rgba(0,245,196,0.15), rgba(124,106,248,0.15));
+        border: 0.5px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        color: #f0ede8;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .buy-btn:hover {
+            background: linear-gradient(135deg, rgba(0,245,196,0.25), rgba(124,106,248,0.25));
+            border-color: rgba(0,245,196,0.35);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .buy-btn:active {
+            transform: scale(0.98);
+        }
+
+    .berlet-card.featured .buy-btn {
+        background: linear-gradient(135deg, #00f5c4, #7c6af8);
+        border: none;
+        color: #09090f;
+        font-weight: 700;
+    }
+
+        .berlet-card.featured .buy-btn:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+    .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+        .features-list li {
+            font-size: 12.5px;
+            color: rgba(240,237,232,0.5);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+            .features-list li::before {
+                content: '';
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                background: rgba(0,245,196,0.12);
+                border: 0.5px solid rgba(0,245,196,0.3);
+                flex-shrink: 0;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%2300f5c4' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: 9px;
+            }
+</style>
+
+<div class="page-header">
+    <span class="page-tag">Tagság</span>
+    <h1 class="page-title">Válassz bérletet</h1>
+</div>
 
 @if (TempData["success"] != null)
 {
-    <p style="color:green">@TempData["success"]</p>
+    <div class="success-banner">
+        <i class="bi bi-check-circle-fill"></i>
+        @TempData["success"]
+    </div>
 }
 
-<div style="display:flex; gap:20px; flex-wrap:wrap;">
-
+<div class="berletek-grid">
     @foreach (var b in Model.Berletek)
     {
-        <div style="width:250px; border-radius:10px; padding:15px; background:#1e1e1e; color:white;">
-        
-            <h3>@b.Megnevezes</h3>
-            <p>Időtartam: @b.IdotartamNapok nap</p>
-            <h2>@b.Ar Ft</h2>
+        var featured = b.IdotartamNapok >= 30;
+        var perNap = b.IdotartamNapok > 0 ? (int)Math.Round((double)b.Ar / b.IdotartamNapok) : b.Ar;
+
+        <div class="berlet-card @(featured ? "featured" : "")">
+            @if (featured)
+            {
+                <div class="featured-badge">
+                    <i class="bi bi-star-fill" style="font-size:9px;"></i>
+                    Népszerű
+                </div>
+            }
+
+            <h3 class="berlet-name">@b.Megnevezes</h3>
+
+            <p class="berlet-duration">
+                <i class="bi bi-calendar3" style="font-size:12px;"></i>
+                @b.IdotartamNapok napos bérlet
+            </p>
+
+            <ul class="features-list">
+                <li>Korlátlan belépés</li>
+                <li>Szekrényfoglalás</li>
+                @if (b.IdotartamNapok >= 30)
+                {
+                    <li>Vendég hozatala</li>
+                    <li>Prioritásos ügyfélszolgálat</li>
+                }
+            </ul>
+
+            <div class="berlet-price-wrap">
+                <div class="berlet-price">
+                    @b.Ar.ToString("N0") <span>Ft</span>
+                </div>
+                <div class="berlet-per-day">≈ @perNap Ft / nap</div>
+            </div>
 
             <form method="post" asp-page-handler="">
                 <input type="hidden" name="Id" value="@b.BerletTipusId" />
-
-                <button type="submit"
-                        style="background:green; color:white; padding:10px; border:none; border-radius:5px;">
+                <button type="submit" class="buy-btn">
+                    <i class="bi bi-bag-check"></i>
                     Megvásárlom
                 </button>
             </form>
-
         </div>
     }
-
 </div>

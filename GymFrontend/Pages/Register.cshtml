@@ -1,46 +1,291 @@
 ﻿@page
 @model RegisterModel
 
-<div class="container mt-5">
-    <div class="col-md-6 mx-auto">
+<style>
+    .register-wrap {
+        min-height: calc(100vh - 54px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 16px;
+    }
 
-        <div class="card p-4 shadow">
-            <h3>Regisztráció</h3>
+    .register-card {
+        width: 100%;
+        max-width: 460px;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 36px 32px;
+        position: relative;
+        overflow: hidden;
+    }
 
-            <form method="post">
+    .register-card::before {
+        content: '';
+        position: absolute;
+        bottom: -60px; right: -60px;
+        width: 200px; height: 200px;
+        background: rgba(124,106,248,0.07);
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+    }
 
-                <div class="mb-3">
-                    <label>Vezetéknév</label>
-                    <input asp-for="Vezeteknev" class="form-control" />
-                </div>
+    .register-icon {
+        width: 52px; height: 52px;
+        background: linear-gradient(135deg, #00f5c4, #7c6af8);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+        margin: 0 auto 20px;
+    }
 
-                <div class="mb-3">
-                    <label>Keresztnév</label>
-                    <input asp-for="Keresztnev" class="form-control" />
-                </div>
+    .register-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #f0ede8;
+        text-align: center;
+        margin-bottom: 6px;
+    }
 
-                <div class="mb-3">
-                    <label>Születési dátum</label>
-                    <input asp-for="SzuletesiDatum" type="date" class="form-control" />
-                </div>
+    .register-subtitle {
+        font-size: 13px;
+        color: rgba(240,237,232,0.4);
+        text-align: center;
+        margin-bottom: 28px;
+    }
 
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input asp-for="Email" class="form-control" />
-                </div>
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
 
-                <div class="mb-3">
-                    <label>Jelszó</label>
-                    <input asp-for="Password" type="password" class="form-control" />
-                </div>
+    .field-group {
+        margin-bottom: 14px;
+    }
 
-                <button class="btn btn-success w-100">
-                    Regisztráció
-                </button>
-            </form>
+    .field-label {
+        font-size: 12px;
+        color: rgba(240,237,232,0.5);
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
+        display: block;
+    }
 
-            <div asp-validation-summary="All" class="text-danger mt-3"></div>
+    .field-input {
+        width: 100%;
+        background: rgba(255,255,255,0.05) !important;
+        border: 0.5px solid rgba(255,255,255,0.1) !important;
+        border-radius: 10px !important;
+        color: #f0ede8 !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 14px !important;
+        padding: 11px 14px !important;
+        transition: all 0.2s !important;
+        outline: none !important;
+        box-shadow: none !important;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    .field-input::placeholder {
+        color: rgba(240,237,232,0.25) !important;
+    }
+
+    .field-input:focus {
+        background: rgba(255,255,255,0.07) !important;
+        border-color: rgba(0,245,196,0.4) !important;
+        box-shadow: 0 0 0 3px rgba(0,245,196,0.08) !important;
+    }
+
+    /* Date input dark fix */
+    input[type="date"].field-input::-webkit-calendar-picker-indicator {
+        filter: invert(0.6);
+        cursor: pointer;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px; top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba(240,237,232,0.3);
+        cursor: pointer;
+        font-size: 15px;
+        padding: 4px;
+        transition: color 0.2s;
+        line-height: 1;
+    }
+    .password-toggle:hover { color: rgba(240,237,232,0.7); }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #00f5c4, #7c6af8) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        color: #09090f !important;
+        font-family: 'Syne', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.04em !important;
+        cursor: pointer !important;
+        transition: opacity 0.2s, transform 0.15s !important;
+        margin-top: 8px;
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: scale(0.98); }
+
+    .register-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 0;
+        color: rgba(240,237,232,0.2);
+        font-size: 12px;
+    }
+    .register-divider::before,
+    .register-divider::after {
+        content: '';
+        flex: 1;
+        height: 0.5px;
+        background: rgba(255,255,255,0.08);
+    }
+
+    .login-link {
+        display: block;
+        text-align: center;
+        font-size: 13px;
+        color: rgba(240,237,232,0.4);
+        text-decoration: none;
+    }
+    .login-link span {
+        color: #00f5c4;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+    .login-link:hover span { opacity: 0.75; }
+
+    .validation-msg {
+        margin-top: 14px;
+        padding: 10px 14px;
+        background: rgba(248,113,113,0.1);
+        border: 0.5px solid rgba(248,113,113,0.25);
+        border-radius: 10px;
+        color: #f87171;
+        font-size: 13px;
+    }
+    .validation-msg:empty { display: none; }
+
+    .step-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 24px;
+    }
+    .step-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+    }
+    .step-dot.active {
+        width: 20px;
+        border-radius: 3px;
+        background: linear-gradient(to right, #00f5c4, #7c6af8);
+    }
+</style>
+
+<div class="register-wrap">
+    <div class="register-card">
+        <div class="register-title">Csatlakozz hozzánk!</div>
+        <div class="register-subtitle">Hozz létre fiókot és kezdj el edzeni</div>
+
+        <div class="step-dots">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
         </div>
 
+        <form method="post">
+            <div class="field-row">
+                <div class="field-group">
+                    <label class="field-label">Vezetéknév</label>
+                    <input asp-for="Vezeteknev"
+                           class="field-input"
+                           placeholder="Kiss" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Keresztnév</label>
+                    <input asp-for="Keresztnev"
+                           class="field-input"
+                           placeholder="János" />
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Születési dátum</label>
+                <input asp-for="SzuletesiDatum"
+                       type="date"
+                       class="field-input" />
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Email cím</label>
+                <input asp-for="Email"
+                       class="field-input"
+                       placeholder="nev@email.hu"
+                       autocomplete="email" />
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Jelszó</label>
+                <div class="password-wrapper">
+                    <input asp-for="Password"
+                           type="password"
+                           class="field-input"
+                           placeholder="••••••••"
+                           id="passwordInput"
+                           autocomplete="new-password"
+                           style="padding-right: 42px !important;" />
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="bi bi-eye" id="pwIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Regisztráció
+            </button>
+        </form>
+
+        <div asp-validation-summary="All" class="validation-msg"></div>
+
+        <div class="register-divider">vagy</div>
+
+        <a href="/Login" class="login-link">
+            Már van fiókod? <span>Jelentkezz be</span>
+        </a>
     </div>
 </div>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById("passwordInput");
+        const icon = document.getElementById("pwIcon");
+        if (input.type === "password") {
+            input.type = "text";
+            icon.className = "bi bi-eye-slash";
+        } else {
+            input.type = "password";
+            icon.className = "bi bi-eye";
+        }
+    }
+</script>
