@@ -4,10 +4,11 @@ using GymWebApiBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace GymWebApiBackend.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,User")]
     [ApiController]
     [Route("api/[controller]")]
     public class BelepesekController : ControllerBase
@@ -19,17 +20,22 @@ namespace GymWebApiBackend.Controllers
             _context = context;
         }
 
+        // Admin: összes belépés lekérése
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var belepesek = await _context.Belepesek
                 .Include(b => b.Tag)
+                .OrderByDescending(b => b.BelepesIdopont)
                 .ToListAsync();
 
             return Ok(belepesek);
         }
 
+        // Admin: egy adott belépés lekérése
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(int id)
         {
             var belepes = await _context.Belepesek
@@ -44,28 +50,90 @@ namespace GymWebApiBackend.Controllers
             return Ok(belepes);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateBelepesDto dto)
+        // User: saját státusz lekérése
+        [HttpGet("statusz")]
+        public async Task<IActionResult> GetStatusz()
         {
-            var tagLetezik = await _context.Tagok.AnyAsync(t => t.TagId == dto.TagId);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var aktivBelepes = await _context.Belepesek
+                .FirstOrDefaultAsync(b => b.TagId == userId && b.KilepesIdopont == null);
+
+            return Ok(new
+            {
+                bentVan = aktivBelepes != null,
+                belepesId = aktivBelepes?.BelepesId
+            });
+        }
+
+        // User: belépés a konditerembe
+        [HttpPost("belep")]
+        public async Task<IActionResult> Belep()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var tagLetezik = await _context.Tagok.AnyAsync(t => t.TagId == userId);
             if (!tagLetezik)
             {
-                return BadRequest(new { message = "A megadott tag nem létezik." });
+                return BadRequest(new { message = "A tag nem létezik." });
+            }
+
+            var marBentVan = await _context.Belepesek
+                .AnyAsync(b => b.TagId == userId && b.KilepesIdopont == null);
+
+            if (marBentVan)
+            {
+                return BadRequest(new { message = "Már bent vagy a konditeremben." });
             }
 
             var belepes = new Belepes
             {
-                TagId = dto.TagId,
-                BelepesIdopont = dto.BelepesIdopont
+                TagId = userId,
+                BelepesIdopont = DateTime.Now,
+                KilepesIdopont = null
             };
 
             _context.Belepesek.Add(belepes);
             await _context.SaveChangesAsync();
 
-            return Ok(belepes);
+            return Ok(new { message = "Sikeres belépés!" });
         }
 
+        // User: kilépés a konditeremből
+        [HttpPost("kilep")]
+        public async Task<IActionResult> Kilep()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var aktivBelepes = await _context.Belepesek
+                .FirstOrDefaultAsync(b => b.TagId == userId && b.KilepesIdopont == null);
+
+            if (aktivBelepes == null)
+            {
+                return BadRequest(new { message = "Jelenleg nem vagy bent a konditeremben." });
+            }
+
+            aktivBelepes.KilepesIdopont = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Sikeres kilépés!" });
+        }
+
+        // Admin: törlés
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var belepes = await _context.Belepesek.FindAsync(id);

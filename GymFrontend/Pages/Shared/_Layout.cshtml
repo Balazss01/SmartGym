@@ -1,14 +1,43 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var token = Context.Session.GetString("JWT");
+    var bejelentkezve = !string.IsNullOrEmpty(token);
+
+    bool bentVan = false;
+
+    if (!string.IsNullOrEmpty(token))
+    {
+        try
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var res = client.GetAsync("https://localhost:7270/api/Belepesek/statusz").Result;
+
+            if (res.IsSuccessStatusCode)
+            {
+                var json = res.Content.ReadAsStringAsync().Result;
+                var data = System.Text.Json.JsonDocument.Parse(json).RootElement;
+
+                if (data.TryGetProperty("bentVan", out var bent))
+                {
+                    bentVan = bent.GetBoolean();
+                }
+            }
+        }
+        catch { }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="hu">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <title>Gym App</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
     <style>
         body {
             margin: 0;
@@ -20,7 +49,6 @@
             overflow-x: hidden;
         }
 
-        /* SIDEBAR */
         .sidebar {
             position: fixed;
             width: 260px;
@@ -32,38 +60,37 @@
             z-index: 1000;
         }
 
-            .sidebar.collapsed {
-                width: 75px;
-            }
+        .sidebar.collapsed {
+            width: 75px;
+        }
 
-            .sidebar h4 {
-                color: #38bdf8;
-                margin-bottom: 30px;
-            }
+        .sidebar h4 {
+            color: #38bdf8;
+            margin-bottom: 30px;
+        }
 
-            .sidebar a {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                color: #94a3b8;
-                text-decoration: none;
-                padding: 12px;
-                border-radius: 10px;
-                margin-bottom: 10px;
-                transition: 0.2s;
-            }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: 0.2s;
+        }
 
-                .sidebar a.active,
-                .sidebar a:hover {
-                    background: rgba(56,189,248,0.2);
-                    color: white;
-                }
+        .sidebar a.active,
+        .sidebar a:hover {
+            background: rgba(56,189,248,0.2);
+            color: white;
+        }
 
-            .sidebar.collapsed span {
-                display: none;
-            }
+        .sidebar.collapsed span {
+            display: none;
+        }
 
-        /* TOPBAR */
         .topbar {
             margin-left: 260px;
             height: 60px;
@@ -74,16 +101,25 @@
             justify-content: space-between;
             padding: 0 20px;
             transition: 0.3s;
+            position: relative;
+            z-index: 2000;
+            color: white !important;
         }
 
-            .topbar.collapsed {
-                margin-left: 75px;
-            }
+        .topbar.collapsed {
+            margin-left: 75px;
+        }
 
-        /* TOPBAR BUTTONS */
+        .topbar i,
+        .topbar .icon-btn,
+        .topbar .icon-btn:hover {
+            color: white !important;
+        }
+
         .topbar-actions {
-            display: flex;
+            display: flex !important;
             gap: 10px;
+            align-items: center;
         }
 
         .icon-btn {
@@ -95,39 +131,35 @@
             transition: 0.2s;
         }
 
-            .icon-btn:hover {
-                background: rgba(56,189,248,0.3);
-                transform: scale(1.1);
-            }
+        .icon-btn:hover {
+            background: rgba(56,189,248,0.3);
+            transform: scale(1.1);
+        }
 
-        /* CONTENT */
         .content {
             margin-left: 260px;
             padding: 25px;
             transition: 0.3s;
         }
 
-            .content.collapsed {
-                margin-left: 75px;
-            }
+        .content.collapsed {
+            margin-left: 75px;
+        }
 
-        /* MOBILE */
         @@media (max-width: 768px) {
-
             .sidebar {
                 transform: translateX(-100%);
             }
 
-                .sidebar.open {
-                    transform: translateX(0);
-                }
+            .sidebar.open {
+                transform: translateX(0);
+            }
 
             .topbar, .content {
                 margin-left: 0 !important;
             }
         }
 
-        /* OVERLAY */
         .overlay {
             position: fixed;
             top: 0;
@@ -139,73 +171,13 @@
             z-index: 999;
         }
 
-            .overlay.active {
-                display: block;
-            }
+        .overlay.active {
+            display: block;
+        }
 
         .menu-btn {
             cursor: pointer;
             font-size: 22px;
-        }
-
-        .notification-wrapper {
-            position: relative;
-        }
-
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: red;
-            color: white;
-            font-size: 10px;
-            padding: 3px 6px;
-            border-radius: 50%;
-        }
-
-        .notification-dropdown {
-            position: absolute;
-            right: 0;
-            top: 45px;
-            width: 260px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 12px;
-            padding: 10px;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: fadeIn 0.2s ease;
-            z-index: 2000;
-        }
-
-        .notification-item {
-            padding: 10px;
-            border-radius: 8px;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-            .notification-item:hover {
-                background: rgba(56,189,248,0.2);
-            }
-
-        .notification-empty {
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .notification-wrapper,
@@ -218,6 +190,7 @@
             top: -5px;
             right: -5px;
             background: red;
+            color: white;
             font-size: 10px;
             padding: 3px 6px;
             border-radius: 50%;
@@ -235,11 +208,8 @@
             padding: 10px;
             display: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 2000;
-
+            z-index: 3000 !important;
         }
-
-        
 
         .notification-item {
             padding: 10px;
@@ -247,17 +217,19 @@
             transition: 0.2s;
         }
 
-            .notification-item:hover {
-                background: rgba(56,189,248,0.2);
-            }
+        .notification-item:hover {
+            background: rgba(56,189,248,0.2);
+        }
 
         .profile-info {
             padding: 10px;
         }
 
-            .profile-info small {
-                color: #94a3b8;
-            }
+        .profile-info small {
+            color: #94a3b8;
+            display: block;
+            margin-top: 4px;
+        }
 
         .dropdown-item {
             display: block;
@@ -269,138 +241,139 @@
         }
 
         .dropdown-item:hover {
-                background: rgba(56,189,248,0.2);
-            }
-
-        .topbar-actions {
-            display: flex !important;
-            gap: 10px;
+            background: rgba(56,189,248,0.2);
         }
 
-        
-        .topbar {
-            position: relative;
-            z-index: 2000;
+        .login-link {
+            color: #38bdf8 !important;
+            font-weight: 600;
         }
 
-       
-        .notification-dropdown,
-        .profile-dropdown {
-            z-index: 3000 !important;
+        .register-link {
+            color: #22c55e !important;
+            font-weight: 600;
         }
 
-       
-        .hero {
-            position: relative;
-            z-index: 1;
+        .logout-link {
+            color: #ef4444 !important;
+            font-weight: 600;
         }
-
-        .topbar {
-            color: white !important;
-        }
-
-            .topbar i {
-                color: white !important;
-            }
-
-            .topbar .icon-btn {
-                color: white !important;
-            }
-
-                .topbar .icon-btn:hover {
-                    color: white !important;
-                }
     </style>
 </head>
-
 <body>
-
-    <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
-        <h4><i class="bi bi-fire"></i> <span>SmartGYM</span></h4>
+        <a href="/">
+            <h4><span>SmartGYM</span></h4>
+        </a>
 
         <a href="/Dashboard" id="menu-dashboard">
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
         </a>
 
-        <a href="/Berletek">
+        <a href="/Berletek" id="menu-berletek">
             <i class="bi bi-calendar-plus"></i>
             <span>Bérletek</span>
         </a>
-            
-        <a href="/SajatBerletek">
-            <i class="bi bi-calendar"></i>
-            <span>Saját bérletek</span>
-        </a>
 
-        <a href="/Profile" id="menu-profile">
-            <i class="bi bi-person-circle"></i>
-            <span>Profil</span>
-        </a>
+        @if (bejelentkezve)
+        {
+            <a href="/SajatBerletek" id="menu-sajatberletek">
+                <i class="bi bi-calendar"></i>
+                <span>Saját bérletek</span>
+            </a>
 
-        <hr />
+            <a href="/Profile" id="menu-profile">
+                <i class="bi bi-person-circle"></i>
+                <span>Profil</span>
+            </a>
 
-        <a href="/Logout" class="text-danger">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Kijelentkezés</span>
-        </a>
+            <a href="/Belepes" id="menu-belepes">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Belépés / Kilépés</span>
+            </a>
+
+            @if (bentVan)
+            {
+                <a href="/SzekrenyFoglalas" id="menu-szekreny">
+                    <i class="bi bi-lock"></i>
+                    <span>Szekrények</span>
+                </a>
+            }
+
+            <hr />
+
+            <a href="/Logout" class="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Kijelentkezés</span>
+            </a>
+        }
+        else
+        {
+            <hr />
+
+            <a href="/Login" class="login-link" id="menu-login">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Bejelentkezés</span>
+            </a>
+
+            <a href="/Register" class="register-link" id="menu-register">
+                <i class="bi bi-person-plus"></i>
+                <span>Regisztráció</span>
+            </a>
+        }
     </div>
 
-    <!-- OVERLAY (mobilhoz) -->
     <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
 
-    <!-- TOPBAR -->
-    <!-- TOPBAR -->
     <div id="topbar" class="topbar">
-
         <span class="menu-btn" onclick="toggleSidebar()">
             <i class="bi bi-list"></i>
         </span>
 
         <div class="topbar-actions">
+            @if (bejelentkezve)
+            {
+                <div class="notification-wrapper">
+                    <button type="button" class="icon-btn position-relative" onclick="toggleNotifications()">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge">2</span>
+                    </button>
 
-            <!-- Értesítés rész -->
-            <div class="notification-wrapper">
-                <button class="icon-btn position-relative" onclick="toggleNotifications()">
-                    <i class="bi bi-bell"></i>
-                    <span class="badge">3</span>
-                </button>
-
-                <div id="notificationDropdown" class="notification-dropdown">
-                    <div class="notification-item">💪 Új edzés</div>
-                    <div class="notification-item">📅 Bérlet lejár</div>
-                </div>
-            </div>
-
-            <!-- Profil rész -->
-            <div class="profile-wrapper">
-                <button class="icon-btn" onclick="toggleProfileMenu()">
-                    <i class="bi bi-person-circle"></i>
-                </button>
-
-                <div id="profileDropdown" class="profile-dropdown">
-                    <div class="profile-info">
-                        <strong>Felhasználó</strong>
-                        <small>email@email.com</small>
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="notification-item">💪 Új edzés</div>
+                        <div class="notification-item">📅 Bérlet lejár</div>
                     </div>
-
-                    <hr />
-
-                    <a href="/Profile" class="dropdown-item">
-                        <i class="bi bi-person"></i> Profil
-                    </a>
-
-                    <a href="/Logout" class="dropdown-item text-danger">
-                        <i class="bi bi-box-arrow-right"></i> Kijelentkezés
-                    </a>
                 </div>
-            </div>
 
+                <div class="profile-wrapper">
+                    <button type="button" class="icon-btn" onclick="toggleProfileMenu()">
+                        <i class="bi bi-person-circle"></i>
+                    </button>
+
+                    <div id="profileDropdown" class="profile-dropdown">
+                        <div class="profile-info">
+                            <strong>Felhasználó</strong>
+                            <small>Bejelentkezve</small>
+                        </div>
+                        <hr />
+                        <a href="/Profile" class="dropdown-item">
+                            <i class="bi bi-person"></i> Profil
+                        </a>
+                        <a href="/Logout" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right"></i> Kijelentkezés
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a href="/Login" class="btn btn-outline-info btn-sm">Bejelentkezés</a>
+                <a href="/Register" class="btn btn-success btn-sm">Regisztráció</a>
+            }
         </div>
     </div>
 
-    <!-- CONTENT -->
     <div id="content" class="content">
         @RenderBody()
     </div>
@@ -425,59 +398,70 @@
             document.getElementById("overlay").classList.remove("active");
         }
 
-        const path = window.location.pathname.toLowerCase();
-
-        if (path.includes("dashboard")) {
-            document.getElementById("menu-dashboard")?.classList.add("active");
-        }
-
-        if (path.includes("profile")) {
-            document.getElementById("menu-profile")?.classList.add("active");
-        }
-
-         
-
-        
-        document.addEventListener("click", function (e) {
-            const dropdown = document.getElementById("notificationDropdown");
-            const wrapper = document.querySelector(".notification-wrapper");
-
-            if (!wrapper.contains(e.target)) {
-                dropdown.style.display = "none";
-            }
-        });
-                function toggleNotifications() {
+        function toggleNotifications() {
             const n = document.getElementById("notificationDropdown");
             const p = document.getElementById("profileDropdown");
-
-            p.style.display = "none";
-            n.style.display = n.style.display === "block" ? "none" : "block";
+            if (p) p.style.display = "none";
+            if (n) n.style.display = n.style.display === "block" ? "none" : "block";
         }
 
         function toggleProfileMenu() {
             const p = document.getElementById("profileDropdown");
             const n = document.getElementById("notificationDropdown");
-
-            n.style.display = "none";
-            p.style.display = p.style.display === "block" ? "none" : "block";
+            if (n) n.style.display = "none";
+            if (p) p.style.display = p.style.display === "block" ? "none" : "block";
         }
-
 
         document.addEventListener("click", function (e) {
             const notif = document.querySelector(".notification-wrapper");
             const profile = document.querySelector(".profile-wrapper");
 
-            if (!notif.contains(e.target)) {
-                document.getElementById("notificationDropdown").style.display = "none";
+            if (notif && !notif.contains(e.target)) {
+                const dropdown = document.getElementById("notificationDropdown");
+                if (dropdown) dropdown.style.display = "none";
             }
 
-            if (!profile.contains(e.target)) {
-                document.getElementById("profileDropdown").style.display = "none";
+            if (profile && !profile.contains(e.target)) {
+                const dropdown = document.getElementById("profileDropdown");
+                if (dropdown) dropdown.style.display = "none";
             }
         });
-        const count = document.querySelectorAll(".notification-item").length;
-        document.querySelector(".badge").innerText = count;
-    </script>
 
+        const path = window.location.pathname.toLowerCase();
+
+        if (path.includes("dashboard")) {
+            document.getElementById("menu-dashboard")?.classList.add("active");
+        }
+        if (path.includes("berletek")) {
+            document.getElementById("menu-berletek")?.classList.add("active");
+        }
+        if (path.includes("sajatberletek")) {
+            document.getElementById("menu-sajatberletek")?.classList.add("active");
+        }
+        if (path.includes("profile")) {
+            document.getElementById("menu-profile")?.classList.add("active");
+        }
+        if (path.includes("szekreny")) {
+            document.getElementById("menu-szekreny")?.classList.add("active");
+        }
+        if (path.includes("login")) {
+            document.getElementById("menu-login")?.classList.add("active");
+        }
+        if (path.includes("register")) {
+            document.getElementById("menu-register")?.classList.add("active");
+        }
+
+        const badge = document.querySelector(".badge");
+        const items = document.querySelectorAll(".notification-item");
+        if (badge) {
+            badge.innerText = items.length;
+        }
+
+
+        if (path.includes("belepes")) {
+            document.getElementById("menu-belepes")?.classList.add("active");
+        }
+
+    </script>
 </body>
 </html>
