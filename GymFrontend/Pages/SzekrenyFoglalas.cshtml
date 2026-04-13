@@ -1,0 +1,53 @@
+﻿@page
+@model GymFrontend.Pages.SzekrenyFoglalasModel
+
+<h2>Szekrények</h2>
+
+@if (TempData["Siker"] != null)
+{
+    <div style="color: green">@TempData["Siker"]</div>
+}
+
+@if (TempData["Hiba"] != null)
+{
+    <div style="color: red">@TempData["Hiba"]</div>
+}
+
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:15px;">
+
+    @foreach (var sz in Model.Szekrenyek)
+    {
+        <div style="
+            padding:15px;
+            border-radius:10px;
+            text-align:center;
+            color:white;
+            font-weight:bold;
+
+            @(sz.Enyem ? "background:blue;" :
+                       sz.Foglalt ? "background:red;" :
+                       "background:green;")
+            ">
+            y
+            <div>#@sz.SzekrenySzam</div>
+
+            @if (!sz.Foglalt)
+            {
+                <form method="post" asp-page-handler="Foglal">
+                    <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
+                    <button type="submit">Foglalás</button>
+                </form>
+            }
+            else if (sz.Enyem)
+            {
+                <div>@(sz.Zarva ? "🔒 Zárva" : "🔓 Nyitva")</div>
+            }
+            else
+            {
+                <div>Foglalt</div>
+            }
+
+        </div>
+    }
+
+</div>

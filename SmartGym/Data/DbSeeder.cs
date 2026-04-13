@@ -7,10 +7,11 @@ namespace GymWebApiBackend.Data
     {
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>(); 
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
+           
             string[] roles = { "Admin", "User" };
 
             foreach (var role in roles)
@@ -21,6 +22,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
+          
             var adminEmail = "admin@smartgym.hu";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -33,14 +35,14 @@ namespace GymWebApiBackend.Data
                     TeljesNev = "Rendszergazda"
                 };
 
-                var adminResult = await userManager.CreateAsync(adminUser, "Admin123!");
-
-                if (adminResult.Succeeded)
+                var result = await userManager.CreateAsync(adminUser, "Admin123!");
+                if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
             }
 
+        
             var userEmail = "user@smartgym.hu";
             var normalUser = await userManager.FindByEmailAsync(userEmail);
 
@@ -53,9 +55,8 @@ namespace GymWebApiBackend.Data
                     TeljesNev = "Teszt Felhasználó"
                 };
 
-                var userResult = await userManager.CreateAsync(normalUser, "User123!");
-
-                if (userResult.Succeeded)
+                var result = await userManager.CreateAsync(normalUser, "User123!");
+                if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(normalUser, "User");
 
@@ -71,6 +72,24 @@ namespace GymWebApiBackend.Data
                     dbContext.Tagok.Add(ujTag);
                     await dbContext.SaveChangesAsync();
                 }
+            }
+
+
+            if (!dbContext.Szekrenyek.Any())
+            {
+                var szekrenyek = new List<Szekreny>();
+
+                for (int i = 1; i <= 50; i++)
+                {
+                    szekrenyek.Add(new Szekreny
+                    {
+                        SzekrenySzam = i,   
+                        Aktiv = true      
+                    });
+                }
+
+                dbContext.Szekrenyek.AddRange(szekrenyek);
+                await dbContext.SaveChangesAsync();
             }
         }
     }

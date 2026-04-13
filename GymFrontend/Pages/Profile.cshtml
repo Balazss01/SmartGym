@@ -2,121 +2,412 @@
 @model ProfileModel
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: all 0.25s ease;
+    /* ── PROFIL OLDAL STÍLUSOK ── */
+
+    .profil-wrapper {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 0.5rem 0 2rem;
     }
 
-        .glass-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        }
+    /* ── AVATAR SZEKCIÓ ── */
+    .avatar-szekció {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 2rem;
+    }
 
-    .form-control {
-        background: rgba(255,255,255,0.08);
+    .avatar-kör {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, var(--accent2), #3a2fb8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-head);
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .avatar-online-jelző {
+        position: absolute;
+        bottom: -3px;
+        right: -3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2.5px solid var(--bg);
+    }
+
+    .avatar-nev {
+        font-family: var(--font-head);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.02em;
+    }
+
+    .avatar-alfelirat {
+        font-size: 12px;
+        color: var(--accent);
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .avatar-pont {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: inline-block;
+        animation: villog 2s infinite;
+    }
+
+    @@keyframes villog {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
+    }
+
+    /* ── SZEKCIÓ KÁRTYÁK ── */
+    .szekció-kártya {
+        background: var(--bg-card);
+        border: 0.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 14px;
+        transition: border-color 0.2s;
+    }
+
+    .szekció-kártya:hover {
+        border-color: var(--border-hover);
+    }
+
+    .szekció-cím {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        font-family: var(--font-head);
+    }
+
+    /* ── MEZŐK ── */
+    .mezősor {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .mezősor.teljes {
+        grid-template-columns: 1fr;
+    }
+
+    .mezőcsoport {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .mező-cimke {
+        font-size: 11px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .mező-input {
+        background: rgba(255,255,255,0.06);
+        border: 0.5px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        padding: 9px 12px;
+        outline: none;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .mező-input:focus {
+        border-color: rgba(0, 245, 196, 0.4);
+        background: rgba(0, 245, 196, 0.05);
+        box-shadow: 0 0 0 3px rgba(0, 245, 196, 0.06);
+    }
+
+    .mező-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    /* ── MENTÉS GOMB ── */
+    .mentes-gomb {
+        width: 100%;
+        padding: 11px;
+        border-radius: var(--radius-sm);
         border: none;
-        color: white;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: #09090f;
+        font-family: var(--font-head);
+        font-size: 13.5px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.15s;
+        margin-bottom: 10px;
     }
 
-        .form-control:focus {
-            background: rgba(255,255,255,0.12);
-            color: white;
-            box-shadow: 0 0 8px #6c63ff;
-        }
-
-    .input-group-text {
-        background: rgba(255,255,255,0.08);
-        border: none;
-        color: #aaa;
+    .mentes-gomb:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
     }
 
-    .btn-modern {
-        background: linear-gradient(45deg, #6c63ff, #00c6ff);
-        border: none;
-        transition: 0.2s;
+    .mentes-gomb:active {
+        transform: scale(0.98);
     }
 
-        .btn-modern:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 12px #6c63ff;
-        }
-
-
-    .card-anim {
-        opacity: 0;
-        transform: scale(0.97);
-        animation: smoothIn 0.35s ease forwards;
+    /* ── VISSZA / KIJELENTKEZÉS GOMBOK ── */
+    .gombsor {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
     }
 
-    @@keyframes smoothIn {
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+    .vissza-gomb {
+        flex: 1;
+        padding: 9px 12px;
+        border-radius: var(--radius-sm);
+        border: 0.5px solid var(--border);
+        background: transparent;
+        color: var(--text-muted);
+        font-family: var(--font-body);
+        font-size: 13px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .vissza-gomb:hover {
+        border-color: var(--border-hover);
+        color: var(--text);
+        background: var(--bg-card-hover);
+    }
+
+    .kijelentkezes-gomb {
+        flex: 1;
+        padding: 9px 12px;
+        border-radius: var(--radius-sm);
+        border: 0.5px solid rgba(248, 113, 113, 0.25);
+        background: transparent;
+        color: rgba(248, 113, 113, 0.7);
+        font-family: var(--font-body);
+        font-size: 13px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .kijelentkezes-gomb:hover {
+        background: rgba(248, 113, 113, 0.08);
+        color: #f87171;
+        border-color: rgba(248, 113, 113, 0.5);
+    }
+
+    /* ── EGYÉB ── */
+    .jelszo-tipp {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 6px;
+    }
+
+    .hibak-listaja {
+        font-size: 12px;
+        color: #f87171;
+        margin-top: 10px;
+    }
+
+    /* ── FLATPICKR TÉMA ILLESZTÉS ── */
+    .flatpickr-calendar {
+        background: #0f0f1a !important;
+        border: 0.5px solid var(--border) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.5) !important;
+    }
+
+    .flatpickr-day.selected {
+        background: var(--accent) !important;
+        border-color: var(--accent) !important;
+        color: #09090f !important;
+    }
+
+    .flatpickr-day:hover {
+        background: var(--accent-glow) !important;
     }
 </style>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+@{
+    /*Teljes név összeállítása a modellből */
+    var elsoNev   = Model.Vezeteknev  ?? "";
+    var utolsoNev = Model.Keresztnev  ?? "";
 
-            <div class="glass-card p-4 shadow-lg card-anim">
+    var initialek = "";
+    if (!string.IsNullOrEmpty(elsoNev))   initialek += elsoNev[0];
+    if (!string.IsNullOrEmpty(utolsoNev)) initialek += utolsoNev[0];
+    if (string.IsNullOrEmpty(initialek))  initialek = "FH";
+    initialek = initialek.ToUpper();
 
-                <h3 class="text-center mb-4">Profil</h3>
+    var teljesNev = string.IsNullOrEmpty((elsoNev + utolsoNev).Trim())
+        ? "Felhasználó"
+        : (elsoNev + " " + utolsoNev).Trim();
+}
 
-                <form method="post">
+<div class="profil-wrapper">
 
-                    <div class="mb-3 input-group">
-                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        <input asp-for="Vezeteknev" placeholder="Vezetéknév" class="form-control" />
-                    </div>
-
-                    <div class="mb-3 input-group">
-                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                        <input asp-for="Keresztnev" placeholder="Keresztnév" class="form-control" />
-                    </div>
-
-                    <div class="mb-3 input-group">
-                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                        <input asp-for="SzuletesiDatum" id="datePicker" class="form-control" />
-                    </div>
-
-                    <div class="mb-3 input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input asp-for="Email" placeholder="Email" class="form-control" />
-                    </div>
-
-                    <button class="btn btn-modern w-100 mt-3">
-                        Mentés
-                    </button>
-
-                </form>
-
-                <div asp-validation-summary="All" class="text-danger mt-3"></div>
-
-                <div class="d-flex justify-content-between mt-4">
-                    <a href="/Dashboard" class="btn btn-outline-light">← Vissza</a>
-                    <a href="/Logout" class="btn btn-danger">Kijelentkezés</a>
-                </div>
-
+    <!-- Avatar szekció->
+    <div class="avatar-szekció">
+        <div class="avatar-kör">
+            @initialek
+            <div class="avatar-online-jelző"></div>
+        </div>
+        <div>
+            <div class="avatar-nev">@teljesNev</div>
+            <div class="avatar-alfelirat">
+                <span class="avatar-pont"></span> Aktív tag
             </div>
-
         </div>
     </div>
+
+    <form method="post">
+
+        <!-- Személyes adatok szekció -->
+        <div class="szekció-kártya">
+            <div class="szekció-cím">Személyes adatok</div>
+
+            <div class="mezősor">
+                <div class="mezőcsoport">
+                    <label class="mező-cimke" asp-for="Vezeteknev">
+                        <i class="bi bi-person"></i> Vezetéknév
+                    </label>
+                    <input asp-for="Vezeteknev" class="mező-input" placeholder="Kiss" />
+                </div>
+                <div class="mezőcsoport">
+                    <label class="mező-cimke" asp-for="Keresztnev">
+                        <i class="bi bi-person-fill"></i> Keresztnév
+                    </label>
+                    <input asp-for="Keresztnev" class="mező-input" placeholder="Anna" />
+                </div>
+            </div>
+
+            <div class="mezősor teljes">
+                <div class="mezőcsoport">
+                    <label class="mező-cimke" asp-for="Email">
+                        <i class="bi bi-envelope"></i> E-mail cím
+                    </label>
+                    <input asp-for="Email" class="mező-input" placeholder="pelda@email.com" />
+                </div>
+            </div>
+
+            <div class="mezősor teljes" style="margin-bottom:0">
+                <div class="mezőcsoport">
+                    <label class="mező-cimke" asp-for="SzuletesiDatum">
+                        <i class="bi bi-calendar"></i> Születési dátum
+                    </label>
+                    <input asp-for="SzuletesiDatum" id="datumValaszto" class="mező-input" placeholder="1990-01-01" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Jelszó módosítás szekció -->
+        <div class="szekció-kártya">
+            <div class="szekció-cím">Jelszó módosítása</div>
+
+            <div class="mezősor teljes" style="margin-bottom:10px">
+                <div class="mezőcsoport">
+                    <label class="mező-cimke">
+                        <i class="bi bi-lock"></i> Jelenlegi jelszó
+                    </label>
+                    <input type="password" name="JelenlegiJelszo" class="mező-input" placeholder="••••••••" />
+                </div>
+            </div>
+
+            <div class="mezősor">
+                <div class="mezőcsoport">
+                    <label class="mező-cimke">
+                        <i class="bi bi-lock-fill"></i> Új jelszó
+                    </label>
+                    <input type="password" name="UjJelszo" class="mező-input" placeholder="••••••••" />
+                </div>
+                <div class="mezőcsoport">
+                    <label class="mező-cimke">
+                        <i class="bi bi-shield-check"></i> Megerősítés
+                    </label>
+                    <input type="password" name="UjJelszoMegerosites" class="mező-input" placeholder="••••••••" />
+                </div>
+            </div>
+
+            <div class="jelszo-tipp">
+                Minimum 8 karakter, legalább egy szám és egy nagybetű.
+            </div>
+        </div>
+
+        <!-- Validációs hibaüzenetek -->
+        <div asp-validation-summary="All" class="hibak-listaja"></div>
+
+        <!-- Mentés gomb -->
+        <button type="submit" class="mentes-gomb">Módosítások mentése</button>
+
+    </form>
+
+    <!-- Vissza és kijelentkezés gombok -->
+    <div class="gombsor">
+        <a href="/Dashboard" class="vissza-gomb">
+            <i class="bi bi-arrow-left" style="font-size:13px"></i> Vissza
+        </a>
+        <a href="/Logout" class="kijelentkezes-gomb">
+            <i class="bi bi-box-arrow-right" style="font-size:13px"></i> Kijelentkezés
+        </a>
+    </div>
+
 </div>
 
-<!-- DATE PICKER -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    flatpickr("#datePicker", {
+    flatpickr("#datumValaszto", {
         dateFormat: "Y-m-d",
-        maxDate: "today"
+        maxDate: "today",
+        locale: {
+            firstDayOfWeek: 1,
+            weekdays: {
+                shorthand: ["V", "H", "K", "Sze", "Cs", "P", "Szo"],
+                longhand: ["Vasárnap", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat"]
+            },
+            months: {
+                shorthand: ["Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Szep", "Okt", "Nov", "Dec"],
+                longhand: ["Január", "Február", "Március", "Április", "Május", "Június",
+                           "Július", "Augusztus", "Szeptember", "Október", "November", "December"]
+            }
+        }
     });
 </script>
