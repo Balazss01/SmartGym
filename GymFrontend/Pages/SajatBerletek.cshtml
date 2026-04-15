@@ -1,236 +1,446 @@
 ﻿@page
 @model GymFrontend.Pages.SajatBerletekModel
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 <style>
-    .page-bg {
-        background: linear-gradient(135deg, #eef2f7, #f8fafc);
-        min-height: 100vh;
-        padding: 20px;
-    }
-
-    .container {
-        max-width: 1100px;
-        margin: 0 auto;
-    }
-
+    /* Kártya alap */
     .card {
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-        transition: 0.3s;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        color: #f0ede8;
     }
 
-    .value {
-        font-size: 22px;
-        font-weight: bold;
+    .card:hover {
+        border-color: rgba(255, 255, 255, 0.14);
     }
 
-    /* 🔥 SZÍN ÁLLAPOTOK */
-    .green { background: linear-gradient(135deg, #4CAF50, #22c55e); color:white; }
-    .yellow { background: linear-gradient(135deg, #f59e0b, #fbbf24); color:white; }
-    .red { background: linear-gradient(135deg, #ef4444, #dc2626); color:white; }
-
-    /* 🔥 GLOW ha kevés idő */
-    .glow {
-        animation: glowPulse 1s infinite alternate;
-    }
-
-    @@keyframes glowPulse {
-        from { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
-        to { box-shadow: 0 0 25px rgba(255,0,0,0.9); }
-    }
-
-    /* 🔥 PROGRESS */
-    .progress-bar {
-        width: 100%;
-        height: 10px;
-        background: rgba(255,255,255,0.3);
-        border-radius: 999px;
+    /* Aktív bérlet kártya tetején futó csík */
+    .aktiv-kartya {
+        position: relative;
         overflow: hidden;
-        margin-top:10px;
     }
 
-    .progress-fill {
-        height: 100%;
-        background: white;
-        animation: loadBar 1s ease forwards;
+    .aktiv-kartya::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #00f5c4, #7c6af8);
+        border-radius: 14px 14px 0 0;
     }
 
-    @@keyframes loadBar {
-        from { width: 0%; }
+    .aktiv-kartya.figyelmezteto::before {
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+        animation: csik-villog 1.5s infinite alternate;
     }
 
-    /* 📊 GRID */
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+    @@keyframes csik-villog {
+        from { opacity: 0.55; }
+        to   { opacity: 1; }
     }
 
-    /* 📋 TABLE */
-    .table-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
+    /* Statisztika érték */
+    .stat-ertek {
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1;
+        color: #f0ede8;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .stat-ertek.zold  { color: #00f5c4; }
+    .stat-ertek.piros { color: #f87171; }
+
+    /* Kis caps feliratok */
+    .szekciocim {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(240, 237, 232, 0.4);
+        margin-bottom: 8px;
     }
 
-    thead {
-        background: #1f2937;
-        color: white;
+    /* Státusz badge-ek */
+    .badge-aktiv {
+        background: rgba(0, 245, 196, 0.1);
+        border: 1px solid rgba(0, 245, 196, 0.25);
+        color: #00f5c4;
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
-    th, td {
-        padding: 12px;
+    .badge-figyelmeztet {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        color: #f59e0b;
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
-    td { color:#333; }
+    .badge-veszik {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #f87171;
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
 
-    tr:hover { background:#f9fafb; }
+    /* Villogó pont */
+    .villogo-pont {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+        animation: pont-villog 2s infinite;
+        flex-shrink: 0;
+    }
 
-    .status-active {
-        background: #dcfce7;
-        color: #166534;
-        padding: 4px 8px;
+    @@keyframes pont-villog {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.25; }
+    }
+
+    /* Progress bar */
+    .progress {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.07);
         border-radius: 999px;
     }
 
-    .status-expired {
-        background: #fee2e2;
-        color: #991b1b;
-        padding: 4px 8px;
-        border-radius: 999px;
+    .progress-bar.normalis { background: linear-gradient(90deg, #00f5c4, #7c6af8); }
+    .progress-bar.figyelem { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+    /* Táblázat */
+    .table {
+        color: #f0ede8;
+        margin-bottom: 0;
     }
 
-    /* 📱 MOBILE */
-    @@media (max-width:768px){
-        .grid { grid-template-columns:1fr; }
-        table { min-width:600px; }
-        .table-card { overflow-x:auto; }
+    .table thead th {
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(240, 237, 232, 0.4);
+        font-weight: 500;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 11px 16px;
+        background: transparent;
     }
+
+    .table tbody td {
+        padding: 13px 16px;
+        font-size: 13.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+        color: #f0ede8;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Táblázat sor státusz pill-ek */
+    .pill-aktiv {
+        background: rgba(0, 245, 196, 0.08);
+        color: #00f5c4;
+        border: 1px solid rgba(0, 245, 196, 0.18);
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .pill-lejart {
+        background: rgba(248, 113, 113, 0.07);
+        color: rgba(248, 113, 113, 0.65);
+        border: 1px solid rgba(248, 113, 113, 0.18);
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Táblázat fejléc belső sor */
+    .tablazat-fejlec {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .darabszam-pill {
+        font-size: 11px;
+        color: rgba(240, 237, 232, 0.4);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 2px 10px;
+    }
+
+    /* Üres állapot */
+    .ures-allapot {
+        padding: 50px 20px;
+        text-align: center;
+        color: rgba(240, 237, 232, 0.35);
+    }
+
+    .ures-ikon {
+        font-size: 38px;
+        opacity: 0.25;
+        margin-bottom: 14px;
+    }
+
+    /* Bérlet vásárlás gomb */
+    .btn-berlet-vasarlas {
+        background: rgba(0, 245, 196, 0.1);
+        border: 1px solid rgba(0, 245, 196, 0.28);
+        color: #00f5c4;
+        font-size: 13px;
+        padding: 8px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s;
+    }
+
+    .btn-berlet-vasarlas:hover {
+        background: rgba(0, 245, 196, 0.17);
+        border-color: rgba(0, 245, 196, 0.45);
+        color: #00f5c4;
+    }
+
+    /* Halvány szöveg */
+    .halvany { color: rgba(240, 237, 232, 0.4); }
+
+    /* Oldal cím */
+    .oldal-cim {
+        font-size: 21px;
+        font-weight: 700;
+        color: #f0ede8;
+        letter-spacing: 0.01em;
+    }
+
+    .oldal-alcim {
+        font-size: 13px;
+        color: rgba(240, 237, 232, 0.4);
+    }
+
+
+ 
+body {
+    background-color: #0f111a; 
+    color: #f0ede8;
+    margin: 0;
+    padding: 20px;
+}
+
+.container-fluid {
+    background: transparent;
+}
+
+
+.table {
+    --bs-table-bg: transparent !important;
+    background-color: transparent !important;
+}
+
+.table tbody tr td {
+    background-color: transparent !important;
+    color: #f0ede8 !important;
+}
 </style>
 
-<div class="page-bg">
-<div class="container">
-
 @{
-    var aktiv = Model.Berletek.FirstOrDefault(b => b.Aktiv && b.VegeDatum > DateTime.Now);
+    /* Aktív bérlet keresése */
+    var aktivBerlet = Model.Berletek.FirstOrDefault(b => b.Aktiv && b.VegeDatum > DateTime.Now);
+
+    /* Alap statisztikák */
+    int osszesBerlet = Model.Berletek.Count;
+    int aktivDb      = Model.Berletek.Count(b => b.Aktiv && b.VegeDatum > DateTime.Now);
+    int lejartDb     = Model.Berletek.Count(b => !b.Aktiv || b.VegeDatum <= DateTime.Now);
 }
 
-@if (aktiv != null)
-{
-    var total = (aktiv.VegeDatum - aktiv.KezdetDatum).TotalDays;
-    var remaining = aktiv.VegeDatum - DateTime.Now;
+<div class="sb-container container-fluid px-0" style="max-width: 980px;">
 
-    var percent = (remaining.TotalDays / total) * 100;
+    <!-- Oldal cím -->
+    <div class="mb-4">
+        <div class="oldal-cim">Saját bérletek</div>
+        <div class="oldal-alcim">Bérleteid áttekintése és aktuális állapota</div>
+    </div>
 
-    string color = "green";
-    if (remaining.TotalDays < 7) color = "yellow";
-    if (remaining.TotalDays < 3) color = "red";
+    <!-- Aktív bérlet kártya (csak ha van) -->
+    @if (aktivBerlet != null)
+    {
+        var teljesNapok   = (aktivBerlet.VegeDatum - aktivBerlet.KezdetDatum).TotalDays;
+        var hatralevo     = aktivBerlet.VegeDatum - DateTime.Now;
+        var szazalek      = Math.Max(0, Math.Min(100, (hatralevo.TotalDays / teljesNapok) * 100));
 
-    bool danger = remaining.TotalDays < 3;
+        bool figyelmeztet = hatralevo.TotalDays < 7;
+        bool veszelyes    = hatralevo.TotalDays < 3;
 
-    <div class="card @color @(danger ? "glow" : "")">
+        string badgeOsztaly = veszelyes ? "badge-veszik" : (figyelmeztet ? "badge-figyelmeztet" : "badge-aktiv");
+        string badgeSzoveg  = veszelyes ? "Hamarosan lejár" : (figyelmeztet ? "Kevés idő van hátra" : "Aktív");
+        string savOsztaly   = (veszelyes || figyelmeztet) ? "figyelem" : "normalis";
 
-        <h3>Aktív bérlet</h3>
+        <div class="card aktiv-kartya @(figyelmeztet ? "figyelmezteto" : "") p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <div class="fw-bold fs-5">@aktivBerlet.BerletTipusNev</div>
+                    <div class="halvany mt-1" style="font-size: 12.5px;">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        @aktivBerlet.KezdetDatum.ToString("yyyy.MM.dd") –
+                        @aktivBerlet.VegeDatum.ToString("yyyy.MM.dd")
+                    </div>
+                </div>
+                <span class="@badgeOsztaly">
+                    <span class="villogo-pont"></span>
+                    @badgeSzoveg
+                </span>
+            </div>
 
-        <div class="value">@aktiv.BerletTipusNev</div>
+            <!-- Hátralévő idő -->
+            <div class="d-flex align-items-center gap-2 mb-3 halvany" style="font-size: 13px;">
+                <i class="bi bi-hourglass-split"></i>
+                Hátralévő:
+                <span class="fw-semibold" style="color: #f0ede8; font-size: 15px;">
+                    @hatralevo.Days nap @hatralevo.Hours óra
+                </span>
+            </div>
 
-        <p>
-            @aktiv.KezdetDatum.ToString("yyyy.MM.dd") -
-            @aktiv.VegeDatum.ToString("yyyy.MM.dd")
-        </p>
+            <!-- Haladásjelző sáv -->
+            <div class="progress">
+                <div class="progress-bar @savOsztaly"
+                     role="progressbar"
+                     style="width: @szazalek.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)%">
+                </div>
+            </div>
+        </div>
+    }
 
-        <p>
-            <strong>Hátralévő:</strong>
-            @remaining.Days nap
-            @remaining.Hours óra
-        </p>
+    <!-- Statisztika kártyák -->
+    <div class="row g-3 mb-3">
+        <div class="col-4">
+            <div class="card p-3">
+                <div class="szekciocim">
+                    <i class="bi bi-collection me-1"></i>Összes
+                </div>
+                <div class="stat-ertek">@osszesBerlet</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card p-3">
+                <div class="szekciocim">
+                    <i class="bi bi-check-circle me-1"></i>Aktív
+                </div>
+                <div class="stat-ertek zold">@aktivDb</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card p-3">
+                <div class="szekciocim">
+                    <i class="bi bi-x-circle me-1"></i>Lejárt
+                </div>
+                <div class="stat-ertek piros">@lejartDb</div>
+            </div>
+        </div>
+    </div>
 
-        <div class="progress-bar">
-            <div class="progress-fill" style="width:@percent%"></div>
+    <!-- Bérletek táblázat -->
+    <div class="card">
+        <div class="tablazat-fejlec">
+            <span class="szekciocim mb-0">Bérlet előzmények</span>
+            <span class="darabszam-pill">@osszesBerlet db</span>
         </div>
 
-        <button disabled style="margin-top:10px; padding:10px; border:none; border-radius:10px;">
-            Már van aktív bérleted
-        </button>
-
-    </div>
-}
-
-<!-- 📊 STAT -->
-<div class="grid">
-    <div class="card">
-        <h3>Összes</h3>
-        <div class="value">@Model.Berletek.Count</div>
-    </div>
-
-    <div class="card">
-        <h3>Aktív</h3>
-        <div class="value">@Model.Berletek.Count(b => b.Aktiv && b.VegeDatum > DateTime.Now)</div>
-    </div>
-
-    <div class="card">
-        <h3>Lejárt</h3>
-        <div class="value">@Model.Berletek.Count(b => !b.Aktiv || b.VegeDatum <= DateTime.Now)</div>
-    </div>
-</div>
-
-<!-- 📋 TABLE -->
-<div class="table-card">
-
-@if (Model.Berletek.Count == 0)
-{
-    <div>Nincs bérleted</div>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Típus</th>
-                <th>Kezdet</th>
-                <th>Vége</th>
-                <th>Állapot</th>
-            </tr>
-        </thead>
-        <tbody>
-        @{
-            int i = 1;
-        }
-
-        @foreach (var b in Model.Berletek)
+        @if (Model.Berletek.Count == 0)
         {
-            <tr>
-                <td>@i</td>
-                <td><strong>@b.BerletTipusNev</strong></td>
-                <td>@b.KezdetDatum.ToString("yyyy.MM.dd")</td>
-                <td>@b.VegeDatum.ToString("yyyy.MM.dd")</td>
-                <td>
-                    @if (b.Aktiv && b.VegeDatum > DateTime.Now)
-                    {
-                        <span class="status-active">Aktív</span>
-                    }
-                    else
-                    {
-                        <span class="status-expired">Lejárt</span>
-                    }
-                </td>
-            </tr>
-            i++;
+            <div class="ures-allapot">
+                <div class="ures-ikon"><i class="bi bi-calendar-x"></i></div>
+                <div class="mb-3" style="font-size: 14px;">Még nincs bérleted</div>
+                <a href="/Berletek" class="btn-berlet-vasarlas">
+                    <i class="bi bi-plus-circle"></i> Bérlet vásárlása
+                </a>
+            </div>
         }
-
-        </tbody>
-    </table>
-}
+        else
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Típus</th>
+                            <th>Kezdet</th>
+                            <th>Vége</th>
+                            <th>Állapot</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @{
+                        int sorszam = 1;
+                    }
+                    @foreach (var berlet in Model.Berletek)
+                    {
+                        bool sorAktiv = berlet.Aktiv && berlet.VegeDatum > DateTime.Now;
+                        <tr>
+                            <td class="halvany" style="font-size: 12px;">@sorszam</td>
+                            <td><strong>@berlet.BerletTipusNev</strong></td>
+                            <td class="halvany">@berlet.KezdetDatum.ToString("yyyy.MM.dd")</td>
+                            <td class="halvany">@berlet.VegeDatum.ToString("yyyy.MM.dd")</td>
+                            <td>
+                                @if (sorAktiv)
+                                {
+                                    <span class="pill-aktiv">
+                                        <i class="bi bi-circle-fill" style="font-size: 5px;"></i> Aktív
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="pill-lejart">
+                                        <i class="bi bi-circle" style="font-size: 5px;"></i> Lejárt
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                        sorszam++;
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 
 </div>
 
-</div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
