@@ -110,7 +110,7 @@ namespace GymWebApiBackend.Controllers
 
             if (!vanAktivBerlet)
             {
-                return BadRequest(new { message = "Nincs érvényes bérleted, nem léphetsz be!" });
+                return BadRequest("Nincs érvényes bérleted, nem léphetsz be!");
             }
 
             var marBentVan = await _context.Belepesek
