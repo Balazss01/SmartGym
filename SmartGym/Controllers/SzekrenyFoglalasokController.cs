@@ -43,7 +43,7 @@ namespace GymFrontend.Pages
             }
         }
 
-        // 🔥 FOGLALÁS = SZEKRÉNY FELVÉTEL
+        // FOGLALÁS = SZEKRÉNY FELVÉTEL
         public async Task<IActionResult> OnPostFoglalAsync(int szekrenyId)
         {
             using var client = new HttpClient();
@@ -76,7 +76,7 @@ namespace GymFrontend.Pages
             return RedirectToPage();
         }
 
-        // 🔥 NYIT / ZÁR
+        // NYIT / ZÁR
         public async Task<IActionResult> OnPostToggleAsync(int foglalasId, bool zarva)
         {
             using var client = new HttpClient();

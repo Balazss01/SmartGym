@@ -81,32 +81,34 @@ namespace GymWebApiBackend.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // 🔥 TAG LEKÉRÉS
+            // tagok lekerese
             var tag = await _context.Tagok
                 .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
 
             if (tag == null)
                 return BadRequest(new { message = "Nincs tag rekord" });
 
-            // 🔥 HELYES CLAIM (INT!)
+            // tokenne alakitas
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, tag.TagId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.Name, user.UserName ?? "")
             };
-
+            // role hozzaadas
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-
+            // jwt kulcs eloallitasa
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
             );
 
+            // alairas
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // token letrehozasa
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -117,6 +119,7 @@ namespace GymWebApiBackend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
+            //valasz
             return Ok(new
             {
                 message = "Sikeres login",

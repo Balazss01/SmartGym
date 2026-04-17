@@ -67,7 +67,7 @@ namespace GymWebApiBackend.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            // 🔥 CHECK: van-e aktív bérlet
+            //van-e aktív bérlet
             var vanAktiv = await _context.Berletek
                 .AnyAsync(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now);
 

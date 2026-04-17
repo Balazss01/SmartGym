@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GymWebApiBackend.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class BerletTipusokController : ControllerBase
