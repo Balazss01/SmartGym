@@ -10,6 +10,9 @@ namespace GymFrontend.Pages
     {
         public List<SzekrenyView> Szekrenyek { get; set; } = new();
 
+        // NEW: holds the current user's ID (null when not authenticated)
+        public int? AktualisFelhasznaloId { get; set; }
+
         public async Task OnGetAsync()
         {
             Szekrenyek = new List<SzekrenyView>(); // 🔥 fontos: mindig nullázd
@@ -21,6 +24,8 @@ namespace GymFrontend.Pages
             // 🔥 ha nincs token → minden szabad
             if (string.IsNullOrEmpty(token))
             {
+                AktualisFelhasznaloId = null;
+
                 for (int i = 1; i <= 50; i++)
                 {
                     Szekrenyek.Add(new SzekrenyView
@@ -29,7 +34,8 @@ namespace GymFrontend.Pages
                         SzekrenySzam = i,
                         Foglalt = false,
                         Enyem = false,
-                        Zarva = false
+                        Zarva = false,
+                        FelhasznaloId = null
                     });
                 }
                 return;
@@ -43,6 +49,8 @@ namespace GymFrontend.Pages
             // 🔥 ha API hiba → fallback
             if (!res.IsSuccessStatusCode)
             {
+                AktualisFelhasznaloId = null;
+
                 for (int i = 1; i <= 50; i++)
                 {
                     Szekrenyek.Add(new SzekrenyView
@@ -51,7 +59,8 @@ namespace GymFrontend.Pages
                         SzekrenySzam = i,
                         Foglalt = false,
                         Enyem = false,
-                        Zarva = false
+                        Zarva = false,
+                        FelhasznaloId = null
                     });
                 }
                 return;
@@ -66,6 +75,7 @@ namespace GymFrontend.Pages
                 }) ?? new List<Foglalas>();
 
             var userId = GetUserIdFromToken(token);
+            AktualisFelhasznaloId = userId;
 
             // 🔥 1–50 szekrény felépítése
             for (int i = 1; i <= 50; i++)
@@ -83,7 +93,10 @@ namespace GymFrontend.Pages
                     // 🔥 csak vizuál (ha kell később)
                     Enyem = foglalas != null && foglalas.TagId == userId,
 
-                    Zarva = foglalas?.Zarva ?? false
+                    Zarva = foglalas?.Zarva ?? false,
+
+                    // NEW: map the reservation owner (nullable)
+                    FelhasznaloId = foglalas?.TagId
                 });
             }
         }
@@ -179,6 +192,9 @@ namespace GymFrontend.Pages
         public bool Foglalt { get; set; }
         public bool Enyem { get; set; }
         public bool Zarva { get; set; } // 🔥 ÚJ
+
+        // NEW: nullable owner id for the reservation
+        public int? FelhasznaloId { get; set; }
     }
 
     public class Foglalas
