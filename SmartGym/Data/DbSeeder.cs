@@ -11,7 +11,7 @@ namespace GymWebApiBackend.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-           
+
             string[] roles = { "Admin", "User" };
 
             foreach (var role in roles)
@@ -22,7 +22,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
-          
+
             var adminEmail = "admin@smartgym.hu";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -42,7 +42,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
-        
+
             var userEmail = "user@smartgym.hu";
             var normalUser = await userManager.FindByEmailAsync(userEmail);
 
@@ -73,6 +73,45 @@ namespace GymWebApiBackend.Data
                     await dbContext.SaveChangesAsync();
                 }
             }
+            if (!dbContext.BerletTipusok.Any())
+            {
+                var berletTipusok = new[]
+                {
+                    new BerletTipus
+                    {
+                        Megnevezes = "Napijegy",
+                        Ar = 1500,
+                        IdotartamNapok = 1
+                    },
+                    new BerletTipus
+                    {
+                        Megnevezes = "Heti bérlet",
+                        Ar = 7000,
+                        IdotartamNapok = 7
+                    },
+                    new BerletTipus
+                    {
+                        Megnevezes = "Havi bérlet",
+                        Ar = 20000,
+                        IdotartamNapok = 30
+                    },
+                    new BerletTipus
+                    {
+                        Megnevezes = "Féléves bérlet",
+                        Ar = 100000,
+                        IdotartamNapok = 180
+                    },
+                    new BerletTipus
+                    {
+                        Megnevezes = "Éves bérlet",
+                        Ar = 180000,
+                        IdotartamNapok = 365
+                    }
+                };
+
+                dbContext.BerletTipusok.AddRange(berletTipusok);
+                dbContext.SaveChanges();
+            }
 
 
             if (!dbContext.Szekrenyek.Any())
@@ -83,14 +122,15 @@ namespace GymWebApiBackend.Data
                 {
                     szekrenyek.Add(new Szekreny
                     {
-                        SzekrenySzam = i,   
-                        Aktiv = true      
+                        SzekrenySzam = i,
+                        Aktiv = true
                     });
                 }
 
                 dbContext.Szekrenyek.AddRange(szekrenyek);
                 await dbContext.SaveChangesAsync();
             }
+
         }
     }
 }
