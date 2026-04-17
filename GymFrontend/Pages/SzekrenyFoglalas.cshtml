@@ -5,49 +5,78 @@
 
 @if (TempData["Siker"] != null)
 {
-    <div style="color: green">@TempData["Siker"]</div>
+    <div style="color: green; margin-bottom: 10px;">
+        @TempData["Siker"]
+    </div>
 }
 
 @if (TempData["Hiba"] != null)
 {
-    <div style="color: red">@TempData["Hiba"]</div>
+    <div style="color: red; margin-bottom: 10px;">
+        @TempData["Hiba"]
+    </div>
 }
 
-<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:15px;">
-
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:15px;">
     @foreach (var sz in Model.Szekrenyek)
     {
-        <div style="
-            padding:15px;
-            border-radius:10px;
-            text-align:center;
-            color:white;
-            font-weight:bold;
-
-            @(sz.Enyem ? "background:blue;" :
-                       sz.Foglalt ? "background:red;" :
-                       "background:green;")
-            ">
-            y
-            <div>#@sz.SzekrenySzam</div>
-
+        <div>
             @if (!sz.Foglalt)
             {
-                <form method="post" asp-page-handler="Foglal">
+                <!-- SZABAD SZEKRÉNY -->
+                <form method="post" asp-page-handler="Toggle">
                     <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
-                    <button type="submit">Foglalás</button>
+                    <button type="submit"
+                            style="
+                                        width:100%;
+                                        padding:20px;
+                                        border:none;
+                                        border-radius:10px;
+                                        color:white;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        background:green;">
+                        <div>#@sz.SzekrenySzam</div>
+                        <div style="margin-top:8px; font-size:13px;">Foglalás</div>
+                    </button>
                 </form>
             }
             else if (sz.Enyem)
             {
-                <div>@(sz.Zarva ? "🔒 Zárva" : "🔓 Nyitva")</div>
+                <!-- SAJÁT FOGLALÁS -->
+                <form method="post" asp-page-handler="Toggle">
+                    <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
+                    <button type="submit"
+                            style="
+                                        width:100%;
+                                        padding:20px;
+                                        border:none;
+                                        border-radius:10px;
+                                        color:white;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        background:blue;">
+                        <div>#@sz.SzekrenySzam</div>
+                        <div style="margin-top:8px; font-size:13px;">Feloldás</div>
+                    </button>
+                </form>
             }
             else
             {
-                <div>Foglalt</div>
+                <!-- MÁS FOGLALTA -->
+                <div style="
+                            width:100%;
+                            padding:20px;
+                            border:none;
+                            border-radius:10px;
+                            color:white;
+                            font-weight:bold;
+                            text-align:center;
+                            background:red;">
+                    <div>#@sz.SzekrenySzam</div>
+                    <div style="margin-top:8px; font-size:13px;">Foglalt</div>
+                </div>
             }
-
         </div>
     }
-
 </div>

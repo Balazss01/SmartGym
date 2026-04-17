@@ -302,16 +302,24 @@ body {
     <!-- Aktív bérlet kártya (csak ha van) -->
     @if (aktivBerlet != null)
     {
-        var teljesNapok   = (aktivBerlet.VegeDatum - aktivBerlet.KezdetDatum).TotalDays;
-        var hatralevo     = aktivBerlet.VegeDatum - DateTime.Now;
-        var szazalek      = Math.Max(0, Math.Min(100, (hatralevo.TotalDays / teljesNapok) * 100));
+        var teljesIdo = aktivBerlet.VegeDatum - aktivBerlet.KezdetDatum;
+        var hatralevo = aktivBerlet.VegeDatum - DateTime.Now;
 
-        bool figyelmeztet = hatralevo.TotalDays < 7;
-        bool veszelyes    = hatralevo.TotalDays < 3;
+        var szazalek = Math.Max(0, Math.Min(100,
+        (hatralevo.TotalSeconds / teljesIdo.TotalSeconds) * 100));
 
-        string badgeOsztaly = veszelyes ? "badge-veszik" : (figyelmeztet ? "badge-figyelmeztet" : "badge-aktiv");
-        string badgeSzoveg  = veszelyes ? "Hamarosan lejár" : (figyelmeztet ? "Kevés idő van hátra" : "Aktív");
-        string savOsztaly   = (veszelyes || figyelmeztet) ? "figyelem" : "normalis";
+        bool figyelmeztet = szazalek <= 30;
+        bool veszelyes = szazalek <= 10;
+
+        string badgeOsztaly = veszelyes ? "badge-veszik"
+        : (figyelmeztet ? "badge-figyelmeztet"
+        : "badge-aktiv");
+
+        string badgeSzoveg = veszelyes ? "Hamarosan lejár"
+        : (figyelmeztet ? "Kevés idő van hátra"
+        : "Aktív");
+
+        string savOsztaly = (veszelyes || figyelmeztet) ? "figyelem" : "normalis";
 
         <div class="card aktiv-kartya @(figyelmeztet ? "figyelmezteto" : "") p-4 mb-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
@@ -323,13 +331,13 @@ body {
                         @aktivBerlet.VegeDatum.ToString("yyyy.MM.dd")
                     </div>
                 </div>
+
                 <span class="@badgeOsztaly">
                     <span class="villogo-pont"></span>
                     @badgeSzoveg
                 </span>
             </div>
 
-            <!-- Hátralévő idő -->
             <div class="d-flex align-items-center gap-2 mb-3 halvany" style="font-size: 13px;">
                 <i class="bi bi-hourglass-split"></i>
                 Hátralévő:
@@ -338,13 +346,13 @@ body {
                 </span>
             </div>
 
-            <!-- Haladásjelző sáv -->
             <div class="progress">
                 <div class="progress-bar @savOsztaly"
                      role="progressbar"
                      style="width: @szazalek.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)%">
                 </div>
             </div>
+  
         </div>
     }
 

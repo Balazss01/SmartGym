@@ -1,140 +1,74 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+﻿using GymWebApiBackend.Data;
+using GymWebApiBackend.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
-namespace GymFrontend.Pages
+namespace GymWebApiBackend.Controllers
 {
-    public class SzekrenyFoglalasModel : PageModel
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class SzekrenyFoglalasokController : ControllerBase
     {
-        public List<SzekrenyView> Szekrenyek { get; set; } = new();
+        private readonly ApplicationDbContext _context;
 
-        public async Task OnGetAsync()
+        public SzekrenyFoglalasokController(ApplicationDbContext context)
         {
-            using var client = new HttpClient();
-            var token = HttpContext.Session.GetString("token");
+            _context = context;
+        }
 
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+        // Összes foglalás lekérdezése
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var foglalasok = await _context.SzekrenyFoglalasok.ToListAsync();
+            return Ok(foglalasok);
+        }
 
-            var res = await client.GetAsync("https://localhost:7270/api/SzekrenyFoglalasok");
-            var json = await res.Content.ReadAsStringAsync();
+        // Foglalás / feloldás
+        [HttpPost("toggle/{szekrenyId}")]
+        public async Task<IActionResult> Toggle(int szekrenyId)
+        {
+            var tagId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (!res.IsSuccessStatusCode) return;
+            // Megnézzük, hogy az adott szekrény foglalt-e
+            var foglalas = await _context.SzekrenyFoglalasok
+                .FirstOrDefaultAsync(x => x.SzekrenyId == szekrenyId);
 
-            var foglalasok = JsonSerializer.Deserialize<List<Foglalas>>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-
-            var userId = GetUserIdFromToken(token);
-
-            for (int i = 1; i <= 50; i++)
+            // Ha nincs foglalva -> foglaljuk
+            if (foglalas == null)
             {
-                var foglalas = foglalasok.FirstOrDefault(f => f.SzekrenyId == i);
-
-                Szekrenyek.Add(new SzekrenyView
+                var ujFoglalas = new SzekrenyFoglalas
                 {
-                    SzekrenyId = i,
-                    SzekrenySzam = i,
-                    Foglalt = foglalas != null,
-                    Enyem = foglalas != null && foglalas.TagId == userId,
-                    Zarva = foglalas != null && foglalas.Zarva
-                });
+                    TagId = tagId,
+                    SzekrenyId = szekrenyId,
+                    Zarva = true,
+                    FoglalvaKezdete = DateTime.Now,
+                    FoglalvaVege = DateTime.MinValue
+                };
+
+                _context.SzekrenyFoglalasok.Add(ujFoglalas);
+                await _context.SaveChangesAsync();
+
+                return Ok("Szekrény lefoglalva!");
             }
-        }
 
-        // FOGLALÁS = SZEKRÉNY FELVÉTEL
-        public async Task<IActionResult> OnPostFoglalAsync(int szekrenyId)
-        {
-            using var client = new HttpClient();
-            var token = HttpContext.Session.GetString("token");
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
-
-            var dto = new
+            // Ha saját foglalás -> feloldás
+            if (foglalas.TagId == tagId)
             {
-                SzekrenyId = szekrenyId,
-                Zarva = true,
-                FoglalvaKezdete = DateTime.Now,
-                FoglalvaVege = DateTime.Now.AddHours(8)
-            };
+                foglalas.Zarva = false;
+                foglalas.FoglalvaVege = DateTime.Now;
 
-            var content = new StringContent(
-                JsonSerializer.Serialize(dto),
-                Encoding.UTF8,
-                "application/json"
-            );
+                _context.SzekrenyFoglalasok.Remove(foglalas);
+                await _context.SaveChangesAsync();
 
-            var res = await client.PostAsync("https://localhost:7270/api/SzekrenyFoglalasok", content);
+                return Ok("Szekrény feloldva!");
+            }
 
-            if (res.IsSuccessStatusCode)
-                TempData["Siker"] = "Szekrény lefoglalva!";
-            else
-                TempData["Hiba"] = "Nem sikerült!";
-
-            return RedirectToPage();
+            // Ha más foglalta
+            return BadRequest("Ez a szekrény már foglalt!");
         }
-
-        // NYIT / ZÁR
-        public async Task<IActionResult> OnPostToggleAsync(int foglalasId, bool zarva)
-        {
-            using var client = new HttpClient();
-            var token = HttpContext.Session.GetString("token");
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
-
-            var dto = new
-            {
-                Zarva = !zarva
-            };
-
-            var content = new StringContent(
-                JsonSerializer.Serialize(dto),
-                Encoding.UTF8,
-                "application/json"
-            );
-
-            await client.PutAsync($"https://localhost:7270/api/SzekrenyFoglalasok/{foglalasId}", content);
-
-            return RedirectToPage();
-        }
-
-        private int GetUserIdFromToken(string token)
-        {
-            var parts = token.Split('.');
-            var payload = parts[1];
-
-            var jsonBytes = Convert.FromBase64String(
-                payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=')
-                .Replace('-', '+')
-                .Replace('_', '/'));
-
-            var json = Encoding.UTF8.GetString(jsonBytes);
-            var data = JsonSerializer.Deserialize<JsonElement>(json);
-
-            return int.Parse(
-                data.GetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
-                .GetString()
-            );
-        }
-    }
-
-    public class SzekrenyView
-    {
-        public int SzekrenyId { get; set; }
-        public int SzekrenySzam { get; set; }
-        public bool Foglalt { get; set; }
-        public bool Enyem { get; set; }
-        public bool Zarva { get; set; }
-    }
-
-    public class Foglalas
-    {
-        public int FoglalasId { get; set; }
-        public int SzekrenyId { get; set; }
-        public int TagId { get; set; }
-        public bool Zarva { get; set; }
     }
 }
