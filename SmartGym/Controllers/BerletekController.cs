@@ -67,7 +67,7 @@ namespace GymWebApiBackend.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            //van-e aktív bérlet
+            // aktiv berlet-e
             var vanAktiv = await _context.Berletek
                 .AnyAsync(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now);
 
@@ -76,13 +76,26 @@ namespace GymWebApiBackend.Controllers
                 return BadRequest(new { message = "Már van aktív bérleted!" });
             }
 
+            // berlet letezik-e
+            var tipus = await _context.BerletTipusok
+                .FirstOrDefaultAsync(t => t.BerletTipusId == dto.BerletTipusId);
+
+            if (tipus == null)
+            {
+                return BadRequest(new { message = "Érvénytelen bérlet típus!" });
+            }
+
+            //datum letrehozasa
+            var kezdet = DateTime.Now;
+            var vege = kezdet.AddDays(tipus.IdotartamNapok);
+
             var berlet = new Berlet
             {
                 TagId = userId,
-                BerletTipusId = dto.BerletTipusId,
-                KezdetDatum = dto.KezdetDatum,
-                VegeDatum = dto.VegeDatum,
-                Aktiv = dto.Aktiv
+                BerletTipusId = tipus.BerletTipusId,
+                KezdetDatum = kezdet,
+                VegeDatum = vege,
+                Aktiv = true
             };
 
             _context.Berletek.Add(berlet);
