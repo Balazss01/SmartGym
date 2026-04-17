@@ -86,7 +86,22 @@ namespace GymWebApiBackend.Controllers
                 return BadRequest(new { message = "A tag nem létezik." });
             }
 
-            // 🔥 AKTÍV BÉRLET ELLENŐRZÉS
+            // 🔥 LEJÁRT BÉRLETEK AUTOMATIKUS INAKTIVÁLÁSA
+            var lejartBerletek = await _context.Berletek
+                .Where(b => b.TagId == userId && b.Aktiv && b.VegeDatum <= DateTime.Now)
+                .ToListAsync();
+
+            foreach (var berlet in lejartBerletek)
+            {
+                berlet.Aktiv = false;
+            }
+
+            if (lejartBerletek.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            // 🔥 VAN-E AKTÍV BÉRLET?
             var vanAktivBerlet = await _context.Berletek
                 .AnyAsync(b =>
                     b.TagId == userId &&
@@ -95,7 +110,7 @@ namespace GymWebApiBackend.Controllers
 
             if (!vanAktivBerlet)
             {
-                return BadRequest("Nincs érvényes bérleted, nem léphetsz be!");
+                return BadRequest(new { message = "Nincs érvényes bérleted, nem léphetsz be!" });
             }
 
             var marBentVan = await _context.Belepesek

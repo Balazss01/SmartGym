@@ -67,41 +67,37 @@ namespace GymWebApiBackend.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            // aktiv berlet-e
-            var vanAktiv = await _context.Berletek
-                .AnyAsync(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now);
+            // 🔥 régi aktív bérlet keresése
+            var regiAktivBerlet = await _context.Berletek
+                .FirstOrDefaultAsync(b =>
+                    b.TagId == userId &&
+                    b.Aktiv &&
+                    b.VegeDatum > DateTime.Now);
 
-            if (vanAktiv)
+            // 🔥 ha van, inaktiváljuk
+            if (regiAktivBerlet != null)
             {
-                return BadRequest(new { message = "Már van aktív bérleted!" });
+                regiAktivBerlet.Aktiv = false;
             }
 
-            // berlet letezik-e
-            var tipus = await _context.BerletTipusok
-                .FirstOrDefaultAsync(t => t.BerletTipusId == dto.BerletTipusId);
-
-            if (tipus == null)
-            {
-                return BadRequest(new { message = "Érvénytelen bérlet típus!" });
-            }
-
-            //datum letrehozasa
-            var kezdet = DateTime.Now;
-            var vege = kezdet.AddDays(tipus.IdotartamNapok);
-
+            // 🔥 új bérlet létrehozása
             var berlet = new Berlet
             {
                 TagId = userId,
-                BerletTipusId = tipus.BerletTipusId,
-                KezdetDatum = kezdet,
-                VegeDatum = vege,
+                BerletTipusId = dto.BerletTipusId,
+                KezdetDatum = dto.KezdetDatum,
+                VegeDatum = dto.VegeDatum,
                 Aktiv = true
             };
 
             _context.Berletek.Add(berlet);
             await _context.SaveChangesAsync();
 
-            return Ok(berlet);
+            return Ok(new
+            {
+                message = "Bérlet sikeresen megvásárolva!",
+                berlet = berlet
+            });
         }
 
         [HttpPut("{id}")]
