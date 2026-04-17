@@ -10,23 +10,22 @@ namespace GymFrontend.Pages
     {
         public List<SzekrenyView> Szekrenyek { get; set; } = new();
 
-        // NEW: holds the current user's ID (null when not authenticated)
         public int? AktualisFelhasznaloId { get; set; }
 
         public async Task OnGetAsync()
         {
-            Szekrenyek = new List<SzekrenyView>(); // 🔥 fontos: mindig nullázd
+            Szekrenyek = new List<SzekrenyView>();
 
             using var client = new HttpClient();
 
             var token = HttpContext.Session.GetString("token");
 
-            // 🔥 ha nincs token → minden szabad
+           
             if (string.IsNullOrEmpty(token))
             {
                 AktualisFelhasznaloId = null;
 
-                for (int i = 1; i <= 50; i++)
+                for (int i = 1; i <= 100; i++)
                 {
                     Szekrenyek.Add(new SzekrenyView
                     {
@@ -46,12 +45,12 @@ namespace GymFrontend.Pages
 
             var res = await client.GetAsync("https://localhost:7270/api/SzekrenyFoglalasok");
 
-            // 🔥 ha API hiba → fallback
+           
             if (!res.IsSuccessStatusCode)
             {
                 AktualisFelhasznaloId = null;
 
-                for (int i = 1; i <= 50; i++)
+                for (int i = 1; i <= 100; i++)
                 {
                     Szekrenyek.Add(new SzekrenyView
                     {
@@ -77,8 +76,8 @@ namespace GymFrontend.Pages
             var userId = GetUserIdFromToken(token);
             AktualisFelhasznaloId = userId;
 
-            // 🔥 1–50 szekrény felépítése
-            for (int i = 1; i <= 50; i++)
+            //  100 szekrény felépítése
+            for (int i = 1; i <= 100; i++)
             {
                 var foglalas = foglalasok.FirstOrDefault(f => f.SzekrenyId == i);
 
@@ -87,15 +86,14 @@ namespace GymFrontend.Pages
                     SzekrenyId = i,
                     SzekrenySzam = i,
 
-                    // 🔥 EZ A LÉNYEG
+                    
                     Foglalt = foglalas != null,
 
-                    // 🔥 csak vizuál (ha kell később)
                     Enyem = foglalas != null && foglalas.TagId == userId,
 
                     Zarva = foglalas?.Zarva ?? false,
 
-                    // NEW: map the reservation owner (nullable)
+                    
                     FelhasznaloId = foglalas?.TagId
                 });
             }
@@ -109,7 +107,7 @@ namespace GymFrontend.Pages
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
-            // 🔥 foglalás elküldése
+            //  foglalás elküldése
             var dto = new
             {
                 SzekrenyId = szekrenyId,
@@ -129,7 +127,7 @@ namespace GymFrontend.Pages
                 content
             );
 
-            // 🔥 ha hiba → ne próbálj JSON-t olvasni!
+      
             if (!postRes.IsSuccessStatusCode)
             {
                 var error = await postRes.Content.ReadAsStringAsync();
@@ -141,7 +139,7 @@ namespace GymFrontend.Pages
             return RedirectToPage();
         }
 
-        // 🔥 ZÁR / NYIT
+        //  ZÁR / NYIT
         public async Task<IActionResult> OnPostToggleAsync(int szekrenyId)
         {
             using var client = new HttpClient();
@@ -191,9 +189,9 @@ namespace GymFrontend.Pages
         public int SzekrenySzam { get; set; }
         public bool Foglalt { get; set; }
         public bool Enyem { get; set; }
-        public bool Zarva { get; set; } // 🔥 ÚJ
+        public bool Zarva { get; set; } 
 
-        // NEW: nullable owner id for the reservation
+
         public int? FelhasznaloId { get; set; }
     }
 
@@ -202,6 +200,6 @@ namespace GymFrontend.Pages
         public int FoglalasId { get; set; }
         public int SzekrenyId { get; set; }
         public int TagId { get; set; }
-        public bool Zarva { get; set; } // 🔥 FONTOS
+        public bool Zarva { get; set; } 
     }
 }

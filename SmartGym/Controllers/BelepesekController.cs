@@ -86,6 +86,18 @@ namespace GymWebApiBackend.Controllers
                 return BadRequest(new { message = "A tag nem létezik." });
             }
 
+            // 🔥 AKTÍV BÉRLET ELLENŐRZÉS
+            var vanAktivBerlet = await _context.Berletek
+                .AnyAsync(b =>
+                    b.TagId == userId &&
+                    b.Aktiv &&
+                    b.VegeDatum > DateTime.Now);
+
+            if (!vanAktivBerlet)
+            {
+                return BadRequest("Nincs érvényes bérleted, nem léphetsz be!");
+            }
+
             var marBentVan = await _context.Belepesek
                 .AnyAsync(b => b.TagId == userId && b.KilepesIdopont == null);
 
