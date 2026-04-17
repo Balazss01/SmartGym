@@ -118,7 +118,7 @@ namespace GymWebApiBackend.Data
             {
                 var szekrenyek = new List<Szekreny>();
 
-                for (int i = 1; i <= 50; i++)
+                for (int i = 1; i <= 100; i++)
                 {
                     szekrenyek.Add(new Szekreny
                     {
