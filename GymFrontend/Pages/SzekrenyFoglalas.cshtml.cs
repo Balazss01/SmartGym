@@ -12,14 +12,35 @@ namespace GymFrontend.Pages
 
         public async Task OnGetAsync()
         {
+            Szekrenyek = new List<SzekrenyView>(); // 🔥 fontos: mindig nullázd
+
             using var client = new HttpClient();
 
             var token = HttpContext.Session.GetString("token");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // 🔥 ha nincs token → minden szabad
+            if (string.IsNullOrEmpty(token))
+            {
+                for (int i = 1; i <= 50; i++)
+                {
+                    Szekrenyek.Add(new SzekrenyView
+                    {
+                        SzekrenyId = i,
+                        SzekrenySzam = i,
+                        Foglalt = false,
+                        Enyem = false,
+                        Zarva = false
+                    });
+                }
+                return;
+            }
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
             var res = await client.GetAsync("https://localhost:7270/api/SzekrenyFoglalasok");
-            var json = await res.Content.ReadAsStringAsync();
 
+            // 🔥 ha API hiba → fallback
             if (!res.IsSuccessStatusCode)
             {
                 for (int i = 1; i <= 50; i++)
@@ -36,11 +57,17 @@ namespace GymFrontend.Pages
                 return;
             }
 
+            var json = await res.Content.ReadAsStringAsync();
+
             var foglalasok = JsonSerializer.Deserialize<List<Foglalas>>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? new List<Foglalas>();
 
             var userId = GetUserIdFromToken(token);
 
+            // 🔥 1–50 szekrény felépítése
             for (int i = 1; i <= 50; i++)
             {
                 var foglalas = foglalasok.FirstOrDefault(f => f.SzekrenyId == i);
@@ -49,9 +76,14 @@ namespace GymFrontend.Pages
                 {
                     SzekrenyId = i,
                     SzekrenySzam = i,
+
+                    // 🔥 EZ A LÉNYEG
                     Foglalt = foglalas != null,
+
+                    // 🔥 csak vizuál (ha kell később)
                     Enyem = foglalas != null && foglalas.TagId == userId,
-                    Zarva = foglalas != null && foglalas.Zarva
+
+                    Zarva = foglalas?.Zarva ?? false
                 });
             }
         }
@@ -97,25 +129,24 @@ namespace GymFrontend.Pages
         }
 
         // 🔥 ZÁR / NYIT
-        public async Task<IActionResult> OnPostToggleAsync(int foglalasId, bool zarva)
+        public async Task<IActionResult> OnPostToggleAsync(int szekrenyId)
         {
             using var client = new HttpClient();
 
             var token = HttpContext.Session.GetString("token");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var dto = new
-            {
-                Zarva = !zarva
-            };
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
-            var content = new StringContent(
-                JsonSerializer.Serialize(dto),
-                Encoding.UTF8,
-                "application/json"
+            var res = await client.PostAsync(
+                $"https://localhost:7270/api/SzekrenyFoglalasok/toggle/{szekrenyId}",
+                null
             );
 
-            await client.PutAsync($"https://localhost:7270/api/SzekrenyFoglalasok/{foglalasId}", content);
+            if (res.IsSuccessStatusCode)
+                TempData["Siker"] = await res.Content.ReadAsStringAsync();
+            else
+                TempData["Hiba"] = await res.Content.ReadAsStringAsync();
 
             return RedirectToPage();
         }

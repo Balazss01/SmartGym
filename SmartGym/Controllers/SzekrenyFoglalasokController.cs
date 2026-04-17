@@ -33,14 +33,26 @@ namespace GymWebApiBackend.Controllers
         {
             var tagId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            // Megnézzük, hogy az adott szekrény foglalt-e
+            // 🔥 VAN-E MÁR FOGLALÁSA ENNEK A USERNEK?
+            var sajatFoglalas = await _context.SzekrenyFoglalasok
+                .FirstOrDefaultAsync(x => x.TagId == tagId);
+
+            // 🔥 MEGNÉZZÜK A KATTINTOTT SZEKRÉNYT
             var foglalas = await _context.SzekrenyFoglalasok
                 .FirstOrDefaultAsync(x => x.SzekrenyId == szekrenyId);
 
-            // Ha nincs foglalva -> foglaljuk
+            // =========================
+            // 1. HA NINCS FOGLALVA → FOGLALÁS
+            // =========================
             if (foglalas == null)
             {
-                var ujFoglalas = new SzekrenyFoglalas
+                // ❌ már van másik szekrénye
+                if (sajatFoglalas != null)
+                {
+                    return BadRequest("Már van lefoglalt szekrényed!");
+                }
+
+                var uj = new SzekrenyFoglalas
                 {
                     TagId = tagId,
                     SzekrenyId = szekrenyId,
@@ -49,25 +61,28 @@ namespace GymWebApiBackend.Controllers
                     FoglalvaVege = DateTime.MinValue
                 };
 
-                _context.SzekrenyFoglalasok.Add(ujFoglalas);
+                _context.SzekrenyFoglalasok.Add(uj);
                 await _context.SaveChangesAsync();
 
-                return Ok("Szekrény lefoglalva!");
+                return Ok("Lefoglalva");
             }
 
-            // Ha saját foglalás -> feloldás
+            // =========================
+            // 2. HA SAJÁT → FELOLDÁS
+            // =========================
             if (foglalas.TagId == tagId)
             {
-                foglalas.Zarva = false;
                 foglalas.FoglalvaVege = DateTime.Now;
 
                 _context.SzekrenyFoglalasok.Remove(foglalas);
                 await _context.SaveChangesAsync();
 
-                return Ok("Szekrény feloldva!");
+                return Ok("Feloldva");
             }
 
-            // Ha más foglalta
+            // =========================
+            // 3. HA MÁSÉ
+            // =========================
             return BadRequest("Ez a szekrény már foglalt!");
         }
     }

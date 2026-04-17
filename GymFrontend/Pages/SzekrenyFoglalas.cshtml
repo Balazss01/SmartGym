@@ -20,63 +20,29 @@
 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:15px;">
     @foreach (var sz in Model.Szekrenyek)
     {
-        <div>
-            @if (!sz.Foglalt)
-            {
-                <!-- SZABAD SZEKRÉNY -->
-                <form method="post" asp-page-handler="Toggle">
-                    <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
-                    <button type="submit"
-                            style="
-                                        width:100%;
-                                        padding:20px;
-                                        border:none;
-                                        border-radius:10px;
-                                        color:white;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        background:green;">
-                        <div>#@sz.SzekrenySzam</div>
-                        <div style="margin-top:8px; font-size:13px;">Foglalás</div>
-                    </button>
-                </form>
-            }
-            else if (sz.Enyem)
-            {
-                <!-- SAJÁT FOGLALÁS -->
-                <form method="post" asp-page-handler="Toggle">
-                    <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
-                    <button type="submit"
-                            style="
-                                        width:100%;
-                                        padding:20px;
-                                        border:none;
-                                        border-radius:10px;
-                                        color:white;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        background:blue;">
-                        <div>#@sz.SzekrenySzam</div>
-                        <div style="margin-top:8px; font-size:13px;">Feloldás</div>
-                    </button>
-                </form>
-            }
-            else
-            {
-                <!-- MÁS FOGLALTA -->
-                <div style="
+        <form method="post" asp-page-handler="Toggle">
+            <input type="hidden" name="szekrenyId" value="@sz.SzekrenyId" />
+
+            <button type="submit"
+                    style="
                             width:100%;
-                            padding:20px;
+                            padding:25px;
                             border:none;
-                            border-radius:10px;
+                            border-radius:12px;
                             color:white;
                             font-weight:bold;
-                            text-align:center;
-                            background:red;">
-                    <div>#@sz.SzekrenySzam</div>
-                    <div style="margin-top:8px; font-size:13px;">Foglalt</div>
+                            font-size:16px;
+                            cursor:pointer;
+                            transition:0.2s;
+                            @(sz.Foglalt ? "background:red;" : "background:green;")">
+
+                <div>#@sz.SzekrenySzam</div>
+
+                <div style="margin-top:10px; font-size:14px;">
+                    @(sz.Foglalt ? "Foglalt" : "Szabad")
                 </div>
-            }
-        </div>
+
+            </button>
+        </form>
     }
 </div>
