@@ -1,11 +1,14 @@
 ﻿<Page x:Class="SmartGymAdminWPF.Views.BelepesekPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="BelepesekPage"
-      Background="#1e293b">
+      Background="{StaticResource BgBrush}">
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="15"/>
             <RowDefinition Height="*"/>
@@ -14,28 +17,83 @@
         <TextBlock Text="Belépések"
                    FontSize="28"
                    FontWeight="Bold"
-                   Foreground="White"
-                   Margin="5,0,0,0"/>
+                   Foreground="White"/>
 
+        <!-- STATOK -->
+        <UniformGrid Grid.Row="2" Columns="3">
+            <Border Background="{StaticResource CardBrush}" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Összes belépés" Foreground="{StaticResource SubTextBrush}"/>
+                    <TextBlock x:Name="OsszesText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource CardBrush}" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Ma" Foreground="{StaticResource SubTextBrush}"/>
+                    <TextBlock x:Name="MaiText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource CardBrush}" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Jelenleg bent" Foreground="{StaticResource SubTextBrush}"/>
+                    <TextBlock x:Name="BentText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- SZŰRŐK -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="KeresesTextBox"
+                     Style="{StaticResource ModernTextBoxStyle}"
+                     TextChanged="FilterChanged"/>
+
+            <CheckBox x:Name="CsakMaCheckBox"
+                      Grid.Column="2"
+                      Foreground="White"
+                      Content="Csak mai"
+                      Checked="FilterChanged"
+                      Unchecked="FilterChanged"/>
+
+            <CheckBox x:Name="CsakBentCheckBox"
+                      Grid.Column="4"
+                      Foreground="White"
+                      Content="Csak bent"
+                      Checked="FilterChanged"
+                      Unchecked="FilterChanged"/>
+
+            <Button Grid.Column="6"
+                    Content="Frissítés"
+                    Width="120"
+                    Height="38"
+                    Style="{StaticResource ModernButtonStyle}"
+                    Click="FrissitesButton_Click"/>
+        </Grid>
+
+        <!-- TÁBLA -->
         <DataGrid x:Name="BelepesekGrid"
-                  Grid.Row="2"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  Background="#0f172a"
-                  Foreground="White"
-                  RowBackground="#1e293b"
-                  AlternatingRowBackground="#111827"
-                  BorderBrush="#334155"
-                  GridLinesVisibility="Horizontal"
-                  HeadersVisibility="Column">
+                  Grid.Row="6"
+                  Style="{StaticResource ModernDataGridStyle}"
+                  AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Belépés ID" Binding="{Binding BelepesId}" Width="*"/>
+                <DataGridTextColumn Header="ID" Binding="{Binding BelepesId}" Width="*"/>
                 <DataGridTextColumn Header="Tag ID" Binding="{Binding TagId}" Width="*"/>
                 <DataGridTextColumn Header="Név" Binding="{Binding TeljesNev}" Width="2*"/>
-                <DataGridTextColumn Header="Belépés időpont" Binding="{Binding BelepesIdopont}" Width="2*"/>
-                <DataGridTextColumn Header="Kilépés időpont" Binding="{Binding KilepesIdopont}" Width="2*"/>
+                <DataGridTextColumn Header="Belépés" Binding="{Binding BelepesIdopont, StringFormat=yyyy.MM.dd HH:mm}" Width="2*"/>
+                <DataGridTextColumn Header="Kilépés" Binding="{Binding KilepesIdopont, StringFormat=yyyy.MM.dd HH:mm}" Width="2*"/>
             </DataGrid.Columns>
         </DataGrid>
+
     </Grid>
 </Page>

@@ -23,11 +23,6 @@ namespace SmartGymAdminWPF
             MainFrame.Navigate(new LoginPage());
         }
 
-        private void Login_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new LoginPage());
-        }
-
         private void Dashboard_Click(object sender, RoutedEventArgs e)
         {
             if (!IsLoggedIn())
@@ -37,6 +32,17 @@ namespace SmartGymAdminWPF
             }
 
             MainFrame.Navigate(new DashboardPage());
+        }
+
+        private void Tagok_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoggedIn())
+            {
+                RequireLogin();
+                return;
+            }
+
+            MainFrame.Navigate(new TagokPage());
         }
 
         private void Berletek_Click(object sender, RoutedEventArgs e)

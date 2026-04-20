@@ -97,5 +97,67 @@ namespace GymWebApiBackend.Controllers
         }
 
 
+        [HttpGet("bent-levok")]
+        public async Task<IActionResult> GetBentLevok()
+        {
+            var lista = await _context.Belepesek
+                .Include(b => b.Tag)
+                .Where(b => b.KilepesIdopont == null)
+                .OrderByDescending(b => b.BelepesIdopont)
+                .Select(b => new
+                {
+                    BelepesId = b.BelepesId,
+                    TagId = b.TagId,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
+                    BelepesIdopont = b.BelepesIdopont
+                })
+                .ToListAsync();
+
+            return Ok(lista);
+        }
+
+        [HttpGet("heti-belepesek")]
+        public async Task<IActionResult> GetHetiBelepesek()
+        {
+            var kezdoNap = DateTime.Today.AddDays(-6);
+
+            var adatok = await _context.Belepesek
+                .Where(b => b.BelepesIdopont.Date >= kezdoNap)
+                .GroupBy(b => b.BelepesIdopont.Date)
+                .Select(g => new
+                {
+                    Datum = g.Key,
+                    Darab = g.Count()
+                })
+                .ToListAsync();
+
+            var eredmeny = Enumerable.Range(0, 7)
+                .Select(i => kezdoNap.AddDays(i))
+                .Select(nap => new
+                {
+                    Datum = nap.ToString("MM.dd"),
+                    Darab = adatok.FirstOrDefault(x => x.Datum == nap.Date)?.Darab ?? 0
+                })
+                .ToList();
+
+            return Ok(eredmeny);
+        }
+
+        [HttpGet("berlet-megoszlas")]
+        public async Task<IActionResult> GetBerletMegoszlas()
+        {
+            var most = DateTime.Now;
+
+            var aktiv = await _context.Berletek.CountAsync(b => b.Aktiv && b.VegeDatum > most);
+            var lejart = await _context.Berletek.CountAsync(b => !b.Aktiv || b.VegeDatum <= most);
+
+            return Ok(new
+            {
+                Aktiv = aktiv,
+                Lejart = lejart
+            });
+        }
+
+
     }
 }

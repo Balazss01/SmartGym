@@ -1,0 +1,139 @@
+﻿<Page x:Class="SmartGymAdminWPF.Views.TagokPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#1e293b">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Tagok"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="White"/>
+
+        <UniformGrid Grid.Row="2" Columns="3">
+            <Border Background="#0f172a" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Összes tag" Foreground="#94a3b8" FontSize="14"/>
+                    <TextBlock x:Name="OsszesTagText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#0f172a" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Aktív tag" Foreground="#94a3b8" FontSize="14"/>
+                    <TextBlock x:Name="AktivTagText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#0f172a" CornerRadius="12" Margin="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Inaktív tag" Foreground="#94a3b8" FontSize="14"/>
+                    <TextBlock x:Name="InaktivTagText" Text="0" Foreground="White" FontSize="28" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="KeresesTextBox"
+                     Height="38"
+                     Padding="10,0"
+                     VerticalContentAlignment="Center"
+                     FontSize="14"
+                     TextChanged="KeresesTextBox_TextChanged"/>
+
+            <CheckBox x:Name="CsakAktivCheckBox"
+                      Grid.Column="2"
+                      VerticalAlignment="Center"
+                      Foreground="White"
+                      FontSize="14"
+                      Content="Csak aktív"
+                      Checked="CsakAktivCheckBox_Changed"
+                      Unchecked="CsakAktivCheckBox_Changed"/>
+
+            <Button Grid.Column="4"
+                    Content="Frissítés"
+                    Width="120"
+                    Height="38"
+                    Click="FrissitesButton_Click"/>
+        </Grid>
+
+        <DataGrid x:Name="TagokGrid"
+                  Grid.Row="6"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  CanUserAddRows="False"
+                  Background="#0f172a"
+                  Foreground="White"
+                  RowBackground="#1e293b"
+                  AlternatingRowBackground="#111827"
+                  BorderBrush="#334155"
+                  GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#111827"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="BorderBrush" Value="#334155"/>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"
+                                    Binding="{Binding TagId}"
+                                    IsReadOnly="True"
+                                    Width="*"/>
+
+                <DataGridTextColumn Header="Név"
+                                    Binding="{Binding TeljesNev}"
+                                    IsReadOnly="True"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Vezetéknév"
+                                    Binding="{Binding Vezeteknev}"
+                                    IsReadOnly="True"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Keresztnév"
+                                    Binding="{Binding Keresztnev}"
+                                    IsReadOnly="True"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Születési dátum"
+                                    Binding="{Binding SzuletesiDatum, StringFormat=yyyy.MM.dd}"
+                                    IsReadOnly="True"
+                                    Width="2*"/>
+
+                <DataGridTemplateColumn Header="Aktív" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Aktiv}"
+                                      HorizontalAlignment="Center"
+                                      Checked="AktivChanged"
+                                      Unchecked="AktivChanged"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

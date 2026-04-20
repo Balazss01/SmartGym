@@ -1,19 +1,27 @@
 ﻿using SmartGymAdminWPF.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace SmartGymAdminWPF.Views
 {
     public partial class DashboardPage : Page
     {
+        private readonly DispatcherTimer _timer = new DispatcherTimer();
+
         public DashboardPage()
         {
             InitializeComponent();
             Loaded += DashboardPage_Loaded;
+            Unloaded += DashboardPage_Unloaded;
+
+            _timer.Interval = TimeSpan.FromSeconds(15);
+            _timer.Tick += Timer_Tick;
         }
 
         private async void DashboardPage_Loaded(object sender, RoutedEventArgs e)
@@ -25,8 +33,28 @@ namespace SmartGymAdminWPF.Views
                 return;
             }
 
+            await ReloadAll();
+        }
+
+        private void DashboardPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _timer.Stop();
+        }
+
+        private async void Timer_Tick(object? sender, EventArgs e)
+        {
+            await ReloadAll();
+        }
+
+        private async Task ReloadAll()
+        {
             await LoadStats();
+            await LoadBentLevok();
             await LoadUtolsoBelepesek();
+            await LoadHetiBelepesek();
+            await LoadBerletMegoszlas();
+
+            FrissitveText.Text = $"Utolsó frissítés: {DateTime.Now:yyyy.MM.dd HH:mm:ss}";
         }
 
         private async Task LoadStats()
@@ -37,13 +65,9 @@ namespace SmartGymAdminWPF.Views
                 var json = await api.Get("api/AdminDashboard/stats");
 
                 var stats = JsonSerializer.Deserialize<DashboardStatsDto>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                if (stats == null)
-                    return;
+                if (stats == null) return;
 
                 OsszesTagText.Text = stats.OsszesTag.ToString();
                 AktivTagText.Text = stats.AktivTag.ToString();
@@ -59,6 +83,24 @@ namespace SmartGymAdminWPF.Views
             }
         }
 
+        private async Task LoadBentLevok()
+        {
+            try
+            {
+                var api = new ApiService();
+                var json = await api.Get("api/AdminDashboard/bent-levok");
+
+                var lista = JsonSerializer.Deserialize<List<BentLevoDto>>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<BentLevoDto>();
+
+                BentLevokGrid.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Bent lévők hiba: " + ex.Message);
+            }
+        }
+
         private async Task LoadUtolsoBelepesek()
         {
             try
@@ -67,10 +109,7 @@ namespace SmartGymAdminWPF.Views
                 var json = await api.Get("api/AdminDashboard/utolso-belepesek");
 
                 var lista = JsonSerializer.Deserialize<List<UtolsoBelepesDto>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }) ?? new List<UtolsoBelepesDto>();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<UtolsoBelepesDto>();
 
                 UtolsoBelepesekGrid.ItemsSource = lista;
             }
@@ -78,6 +117,74 @@ namespace SmartGymAdminWPF.Views
             {
                 MessageBox.Show("Utolsó belépések hiba: " + ex.Message);
             }
+        }
+
+        private async Task LoadHetiBelepesek()
+        {
+            try
+            {
+                var api = new ApiService();
+                var json = await api.Get("api/AdminDashboard/heti-belepesek");
+
+                var lista = JsonSerializer.Deserialize<List<HetiBelepesDto>>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<HetiBelepesDto>();
+
+                var max = lista.Any() ? Math.Max(lista.Max(x => x.Darab), 1) : 1;
+
+                foreach (var item in lista)
+                {
+                    item.MaxErtek = max;
+                }
+
+                HetiBelepesekItemsControl.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Heti belépések hiba: " + ex.Message);
+            }
+        }
+
+        private async Task LoadBerletMegoszlas()
+        {
+            try
+            {
+                var api = new ApiService();
+                var json = await api.Get("api/AdminDashboard/berlet-megoszlas");
+
+                var adat = JsonSerializer.Deserialize<BerletMegoszlasDto>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (adat == null) return;
+
+                var total = Math.Max(adat.Aktiv + adat.Lejart, 1);
+
+                AktivBerletProgress.Maximum = total;
+                AktivBerletProgress.Value = adat.Aktiv;
+                AktivBerletAranyText.Text = $"{adat.Aktiv} db";
+
+                LejartBerletProgress.Maximum = total;
+                LejartBerletProgress.Value = adat.Lejart;
+                LejartBerletAranyText.Text = $"{adat.Lejart} db";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Bérlet megoszlás hiba: " + ex.Message);
+            }
+        }
+
+        private async void FrissitesButton_Click(object sender, RoutedEventArgs e)
+        {
+            await ReloadAll();
+        }
+
+        private void AutoRefreshCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            _timer.Start();
+        }
+
+        private void AutoRefreshCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _timer.Stop();
         }
     }
 
@@ -98,5 +205,26 @@ namespace SmartGymAdminWPF.Views
         public string TeljesNev { get; set; }
         public DateTime BelepesIdopont { get; set; }
         public DateTime? KilepesIdopont { get; set; }
+    }
+
+    public class BentLevoDto
+    {
+        public int BelepesId { get; set; }
+        public int TagId { get; set; }
+        public string TeljesNev { get; set; }
+        public DateTime BelepesIdopont { get; set; }
+    }
+
+    public class HetiBelepesDto
+    {
+        public string Datum { get; set; }
+        public int Darab { get; set; }
+        public int MaxErtek { get; set; }
+    }
+
+    public class BerletMegoszlasDto
+    {
+        public int Aktiv { get; set; }
+        public int Lejart { get; set; }
     }
 }

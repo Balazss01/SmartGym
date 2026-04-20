@@ -48,5 +48,17 @@ namespace SmartGymAdminWPF.Services
 
             return result;
         }
+
+        public async Task<string> Put(string url, string json)
+        {
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _client.PutAsync(url, content);
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(result);
+
+            return result;
+        }
     }
 }
