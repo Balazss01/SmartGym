@@ -75,6 +75,17 @@ namespace GymWebApiBackend.Controllers
 
             var kezdet = DateTime.Now;
             var vege = kezdet.AddDays(tipus.IdotartamNapok);
+            var regiAktivBerlet = await _context.Berletek
+            .FirstOrDefaultAsync(b =>
+                b.TagId == userId &&
+                b.Aktiv &&
+                b.VegeDatum > DateTime.Now);
+
+            // 🔥 ha van, inaktiváljuk
+            if (regiAktivBerlet != null)
+            {
+                regiAktivBerlet.Aktiv = false;
+            }
 
             var berlet = new Berlet
             {
