@@ -49,46 +49,95 @@
 
             <div id="successSection" style="display:none;">
                 <div class="status-box bent success-big">
-                    <div class="status-title">Sikeres belépés</div>
-                    <div class="status-text">A rendszer szerint bent tartózkodsz a konditeremben.</div>
+                    <div class="status-title" id="statusTitle">Sikeres belépés</div>
+                    <div class="status-text" id="statusText">A rendszer szerint bent tartózkodsz a konditeremben.</div>
                 </div>
             </div>
 
-            <form method="post" asp-page-handler="Kilep" class="kilepes-form">
-                <button type="submit" class="main-btn kilep-btn">
+            <div id="kilepesQrSection" style="display:none;">
+                <div class="status-box kint">
+                    <div class="status-title">Kilépés folyamatban</div>
+                    <div class="status-text">Mutasd fel a QR-kódot a kiléptető kapunál.</div>
+                </div>
+
+                <div class="qr-box">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=SmartGYM-Kilepes" alt="QR kód" />
+                    <p class="qr-text">Kiléptető QR-kód</p>
+                    <p id="kilepesCountdownText" class="countdown-text">Kilépés... 3</p>
+                </div>
+            </div>
+
+            <form method="post" asp-page-handler="Kilep" class="kilepes-form" id="kilepesForm">
+                <button type="button" class="main-btn kilep-btn" id="kilepesBtn" onclick="startKilepesQr()" style="display:none;">
                     Kilépés
                 </button>
             </form>
 
             <script>
-                const qrSection = document.getElementById("qrSection");
-                const successSection = document.getElementById("successSection");
-                const text = document.getElementById("countdownText");
+                        const qrSection = document.getElementById("qrSection");
+                        const successSection = document.getElementById("successSection");
+                        const kilepesQrSection = document.getElementById("kilepesQrSection");
+                        const countdownText = document.getElementById("countdownText");
+                        const kilepesCountdownText = document.getElementById("kilepesCountdownText");
+                        const kilepesBtn = document.getElementById("kilepesBtn");
+                        const kilepesForm = document.getElementById("kilepesForm");
+                        const statusTitle = document.getElementById("statusTitle");
+                        const statusText = document.getElementById("statusText");
 
-                const qrLejart = sessionStorage.getItem("qrLejart");
+                        const qrLejart = sessionStorage.getItem("qrLejart");
 
-                if (qrLejart === "igen") {
-                    qrSection.style.display = "none";
-                    successSection.style.display = "block";
-                } else {
-                    qrSection.style.display = "block";
-                    successSection.style.display = "none";
-
-                    let mp = 3;
-
-                    const timer = setInterval(() => {
-                        mp--;
-
-                        if (mp > 0) {
-                            text.innerText = "Szkennelés... " + mp;
-                        } else {
-                            clearInterval(timer);
-                            qrSection.style.display = "none";
+                        if (qrLejart === "igen") {
                             successSection.style.display = "block";
-                            sessionStorage.setItem("qrLejart", "igen");
+                            kilepesBtn.style.display = "inline-block";
+                        } else {
+                            qrSection.style.display = "block";
+
+                            let mp = 3;
+                            const timer = setInterval(() => {
+                                mp--;
+
+                                if (mp > 0) {
+                                    countdownText.innerText = "Szkennelés... " + mp;
+                                } else {
+                                    clearInterval(timer);
+
+                                    qrSection.style.display = "none";
+                                    successSection.style.display = "block";
+                                    kilepesBtn.style.display = "inline-block";
+
+                                    sessionStorage.setItem("qrLejart", "igen");
+                                }
+                            }, 1000);
                         }
-                    }, 1000);
-                }
+
+                        function startKilepesQr() {
+                            successSection.style.display = "none";
+                            kilepesBtn.style.display = "none";
+                            kilepesQrSection.style.display = "block";
+
+                            let mp = 3;
+                            const timer = setInterval(() => {
+                                mp--;
+
+                                if (mp > 0) {
+                                    kilepesCountdownText.innerText = "Kilépés... " + mp;
+                                } else {
+                                    clearInterval(timer);
+
+                                    kilepesQrSection.style.display = "none";
+                                    successSection.style.display = "block";
+
+                                    statusTitle.innerText = "Sikeres kilépés";
+                                    statusText.innerText = "A rendszer szerint sikeresen kiléptél.";
+
+                                    sessionStorage.removeItem("qrLejart");
+
+                                    setTimeout(() => {
+                                        kilepesForm.submit();
+                                    }, 1000);
+                                }
+                            }, 1000);
+                        }
             </script>
         }
     </div>
