@@ -67,37 +67,28 @@ namespace GymWebApiBackend.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            // 🔥 régi aktív bérlet keresése
-            var regiAktivBerlet = await _context.Berletek
-                .FirstOrDefaultAsync(b =>
-                    b.TagId == userId &&
-                    b.Aktiv &&
-                    b.VegeDatum > DateTime.Now);
+            var tipus = await _context.BerletTipusok
+                .FirstOrDefaultAsync(t => t.BerletTipusId == dto.BerletTipusId);
 
-            // 🔥 ha van, inaktiváljuk
-            if (regiAktivBerlet != null)
-            {
-                regiAktivBerlet.Aktiv = false;
-            }
+            if (tipus == null)
+                return BadRequest(new { message = "Bérlettípus nem létezik" });
 
-            // 🔥 új bérlet létrehozása
+            var kezdet = DateTime.Now;
+            var vege = kezdet.AddDays(tipus.IdotartamNapok);
+
             var berlet = new Berlet
             {
                 TagId = userId,
                 BerletTipusId = dto.BerletTipusId,
-                KezdetDatum = dto.KezdetDatum,
-                VegeDatum = dto.VegeDatum,
+                KezdetDatum = kezdet,
+                VegeDatum = vege,
                 Aktiv = true
             };
 
             _context.Berletek.Add(berlet);
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                message = "Bérlet sikeresen megvásárolva!",
-                berlet = berlet
-            });
+            return Ok(new { message = "Bérlet létrehozva" });
         }
 
         [HttpPut("{id}")]
