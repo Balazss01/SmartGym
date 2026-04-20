@@ -16,27 +16,28 @@ namespace GymFrontend.Pages
         }
 
         public bool BentVan { get; set; }
+        public bool VanAktivSzekreny { get; set; }
 
         public async Task OnGetAsync()
         {
             var token = HttpContext.Session.GetString("JWT");
-            if (string.IsNullOrEmpty(token))
-                return;
+            if (string.IsNullOrEmpty(token)) return;
 
             var client = _httpClientFactory.CreateClient("Api");
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
             var res = await client.GetAsync("api/Belepesek/statusz");
-
-            if (!res.IsSuccessStatusCode)
-                return;
+            if (!res.IsSuccessStatusCode) return;
 
             var json = await res.Content.ReadAsStringAsync();
             var data = JsonDocument.Parse(json).RootElement;
 
             if (data.TryGetProperty("bentVan", out var bent))
                 BentVan = bent.GetBoolean();
+
+            if (data.TryGetProperty("vanAktivSzekreny", out var szekreny))
+                VanAktivSzekreny = szekreny.GetBoolean();
         }
 
         public async Task<IActionResult> OnPostBelepAsync()

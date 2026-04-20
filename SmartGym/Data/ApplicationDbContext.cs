@@ -22,6 +22,8 @@ namespace GymWebApiBackend.Data
         public DbSet<Belepes> Belepesek { get; set; }
         public DbSet<Szekreny> Szekrenyek { get; set; }
         public DbSet<SzekrenyFoglalas> SzekrenyFoglalasok { get; set; }
+        public DbSet<Ertesites> Ertesitesek { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -120,6 +122,17 @@ namespace GymWebApiBackend.Data
                     .WithMany(p => p.SzekrenyFoglalasok)
                     .HasForeignKey(d => d.SzekrenyId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<Ertesites>(entity =>
+            {
+                entity.ToTable("ertesitesek");
+                entity.HasKey(e => e.ErtesitesId);
+
+                entity.Property(e => e.ErtesitesId).HasColumnName("ertesites_id");
+                entity.Property(e => e.TagId).HasColumnName("tag_id");
+                entity.Property(e => e.Uzenet).HasColumnName("uzenet");
+                entity.Property(e => e.Olvasott).HasColumnName("olvasott");
+                entity.Property(e => e.Datum).HasColumnName("datum");
             });
         }
     }

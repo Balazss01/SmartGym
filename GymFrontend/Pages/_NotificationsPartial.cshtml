@@ -1,0 +1,19 @@
+﻿
+
+<div class="dropdown-wrapper">
+    <button class="icon-btn" onclick="toggleDropdown('notifDropdown')" aria-label="Értesítések">
+        <i class="bi bi-bell"></i>
+        <span id="notifBadge" class="notif-badge" style="display:none">0</span>
+    </button>
+
+    <div id="notifDropdown" class="dropdown-menu-custom">
+        <div class="dropdown-header">
+            <strong>Értesítések</strong>
+            <small id="notifCount">0 olvasatlan</small>
+        </div>
+
+        <div id="notifList">
+            <div class="notif-empty">Betöltés...</div>
+        </div>
+    </div>
+</div>

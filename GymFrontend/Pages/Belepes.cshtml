@@ -68,9 +68,22 @@
             </div>
 
             <form method="post" asp-page-handler="Kilep" class="kilepes-form" id="kilepesForm">
-                <button type="button" class="main-btn kilep-btn" id="kilepesBtn" onclick="startKilepesQr()" style="display:none;">
-                    Kilépés
-                </button>
+                @if (Model.VanAktivSzekreny)
+                {
+                    <button type="button" class="main-btn kilep-btn disabled-btn" disabled>
+                        Kilépés
+                    </button>
+
+                    <p class="locker-warning">
+                        Előbb zárd le a lefoglalt szekrényedet a kilépéshez!
+                    </p>
+                }
+                else
+                {
+                    <button type="button" class="main-btn kilep-btn" id="kilepesBtn" onclick="startKilepesQr()" style="display:none;">
+                        Kilépés
+                    </button>
+                }
             </form>
 
             <script>
@@ -296,5 +309,17 @@
             opacity: 1;
             transform: translateY(0);
         }
+    }
+    .disabled-btn {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .locker-warning {
+        margin-top: 12px;
+        color: #fca5a5;
+        font-size: 15px;
+        font-weight: 600;
     }
 </style>

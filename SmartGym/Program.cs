@@ -26,6 +26,8 @@ namespace GymWebApiBackend
                 )
             );
 
+
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequireDigit = true;

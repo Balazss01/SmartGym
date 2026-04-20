@@ -643,6 +643,67 @@
         a {
             color: inherit;
         }
+    .dropdown-wrapper {
+        position: relative;
+    }
+
+    .notif-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        font-size: 11px;
+        padding: 2px 6px;
+        font-weight: bold;
+    }
+
+    .dropdown-menu-custom {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 45px;
+        width: 320px;
+        background: #1e1e1e;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        z-index: 999;
+        overflow: hidden;
+    }
+
+    .dropdown-menu-custom.show {
+        display: block;
+    }
+
+    .dropdown-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        color: white;
+    }
+
+    .notif-item {
+        padding: 14px 16px;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        transition: 0.2s;
+    }
+
+    .notif-item:hover {
+        background: rgba(255,255,255,0.08);
+    }
+
+    .notif-item.unread {
+        background: rgba(59,130,246,0.15);
+    }
+
+    .notif-empty {
+        padding: 16px;
+        color: #aaa;
+        text-align: center;
+    }
     </style>
 </head>
 <body>
@@ -748,26 +809,7 @@
                 }
 
                 <!-- Értesítések -->
-                <div class="dropdown-wrapper">
-                    <button class="icon-btn" onclick="toggleDropdown('notifDropdown')" aria-label="Értesítések">
-                        <i class="bi bi-bell"></i>
-                        <span class="notif-badge"></span>
-                    </button>
-                    <div id="notifDropdown" class="dropdown-menu-custom">
-                        <div class="dropdown-header">
-                            <strong>Értesítések</strong>
-                            <small>2 olvasatlan</small>
-                        </div>
-                        <div class="notif-item">
-                            <span class="notif-icon">💪</span>
-                            <span>Új edzésprogram érhető el</span>
-                        </div>
-                        <div class="notif-item">
-                            <span class="notif-icon">📅</span>
-                            <span>Bérleted hamarosan lejár</span>
-                        </div>
-                    </div>
-                </div>
+                <partial name="_NotificationsPartial" />
 
                 <!-- Profil -->
                 <div class="dropdown-wrapper">
@@ -872,6 +914,72 @@
         if (activeLink) {
             document.getElementById("topbar-page-title").textContent = activeLink.textContent.trim();
         }
+
+            async function loadNotifications() {
+        try {
+            const response = await fetch('/api/Notifications');
+            const data = await response.json();
+
+            const notifList = document.getElementById("notifList");
+            const notifBadge = document.getElementById("notifBadge");
+            const notifCount = document.getElementById("notifCount");
+
+            notifList.innerHTML = "";
+
+            if (!data || data.length === 0) {
+                notifList.innerHTML = `<div class="notif-empty">Nincs értesítés</div>`;
+                notifBadge.style.display = "none";
+                notifCount.innerText = "0 olvasatlan";
+                return;
+            }
+
+            let unreadCount = data.filter(x => !x.olvasott).length;
+            notifCount.innerText = unreadCount + " olvasatlan";
+
+            if (unreadCount > 0) {
+                notifBadge.style.display = "inline-block";
+                notifBadge.innerText = unreadCount;
+            } else {
+                notifBadge.style.display = "none";
+            }
+
+            data.forEach(item => {
+                notifList.innerHTML += `
+                    <div class="notif-item ${item.olvasott ? '' : 'unread'}"
+                         onclick="markAsRead(${item.id})">
+                        <span class="notif-icon">🔔</span>
+                        <span>${item.uzenet}</span>
+                    </div>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Notification hiba:", err);
+        }
+    }
+
+    async function markAsRead(id) {
+        try {
+            await fetch(`/api/Notifications/markasread/${id}`, {
+                method: 'POST'
+            });
+
+            loadNotifications();
+        } catch (err) {
+            console.error("Olvasottá jelölés hiba:", err);
+        }
+    }
+
+    function toggleNotifications() {
+        const dropdown = document.getElementById("notifDropdown");
+        dropdown.classList.toggle("show");
+    }
+
+    document.addEventListener("DOMContentLoaded", loadNotifications);
+
+    setInterval(() => {
+        location.reload();
+    }, 30000);
     </script>
 </body>
 </html>

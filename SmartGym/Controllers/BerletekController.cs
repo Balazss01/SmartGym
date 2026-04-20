@@ -97,9 +97,19 @@ namespace GymWebApiBackend.Controllers
             };
 
             _context.Berletek.Add(berlet);
+
+            _context.Ertesitesek.Add(new Ertesites
+            {
+                TagId = userId,
+                Uzenet = "Sikeresen vásároltál egy új bérletet!",
+                Olvasott = false,
+                Datum = DateTime.Now
+            });
+
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Bérlet létrehozva" });
+
         }
 
         [HttpPut("{id}")]
@@ -141,5 +151,6 @@ namespace GymWebApiBackend.Controllers
 
             return Ok();
         }
+
     }
 }

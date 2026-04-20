@@ -79,10 +79,14 @@ namespace GymWebApiBackend.Controllers
             var aktivBelepes = await _context.Belepesek
                 .FirstOrDefaultAsync(b => b.TagId == userId && b.KilepesIdopont == null);
 
+            var vanAktivSzekreny = await _context.SzekrenyFoglalasok
+            .AnyAsync(x => x.TagId == userId && x.Zarva);
+
             return Ok(new
             {
                 bentVan = aktivBelepes != null,
-                belepesId = aktivBelepes?.BelepesId
+                belepesId = aktivBelepes?.BelepesId,
+                vanAktivSzekreny = vanAktivSzekreny
             });
         }
 
@@ -153,9 +157,22 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Kilep()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (!int.TryParse(userIdClaim, out var userId))
             {
                 return Unauthorized();
+            }
+
+            // VAN-E AKTÍV SZEKRÉNYFOGLALÁS?
+            var vanAktivSzekreny = await _context.SzekrenyFoglalasok
+                .AnyAsync(x => x.TagId == userId && x.Zarva);
+
+            if (vanAktivSzekreny)
+            {
+                return BadRequest(new
+                {
+                    message = "Nem tudsz kilépni, amíg van aktív szekrényfoglalásod!"
+                });
             }
 
             var aktivBelepes = await _context.Belepesek
@@ -163,13 +180,20 @@ namespace GymWebApiBackend.Controllers
 
             if (aktivBelepes == null)
             {
-                return BadRequest(new { message = "Jelenleg nem vagy bent a konditeremben." });
+                return BadRequest(new
+                {
+                    message = "Jelenleg nem vagy bent a konditeremben."
+                });
             }
 
             aktivBelepes.KilepesIdopont = DateTime.Now;
+
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Sikeres kilépés!" });
+            return Ok(new
+            {
+                message = "Sikeres kilépés!"
+            });
         }
 
         // Admin: törlés
