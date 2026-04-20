@@ -1,26 +1,41 @@
 ﻿<Page x:Class="SmartGymAdminWPF.Views.BelepesekPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Background="#0B1120">
+      Title="BelepesekPage"
+      Background="#1e293b">
 
-    <Grid>
+    <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="15"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="Belépések"
-                   Foreground="White"
-                   FontSize="24"
+                   FontSize="28"
                    FontWeight="Bold"
-                   Margin="0,0,0,16"/>
+                   Foreground="White"
+                   Margin="5,0,0,0"/>
 
-        <Border Grid.Row="1" Background="#111827" CornerRadius="18" Padding="14">
-            <DataGrid x:Name="Grid"
-                      AutoGenerateColumns="True"
-                      Background="Transparent"
-                      Foreground="White"
-                      BorderThickness="0"/>
-        </Border>
+        <DataGrid x:Name="BelepesekGrid"
+                  Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  Background="#0f172a"
+                  Foreground="White"
+                  RowBackground="#1e293b"
+                  AlternatingRowBackground="#111827"
+                  BorderBrush="#334155"
+                  GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Belépés ID" Binding="{Binding BelepesId}" Width="*"/>
+                <DataGridTextColumn Header="Tag ID" Binding="{Binding TagId}" Width="*"/>
+                <DataGridTextColumn Header="Név" Binding="{Binding TeljesNev}" Width="2*"/>
+                <DataGridTextColumn Header="Belépés időpont" Binding="{Binding BelepesIdopont}" Width="2*"/>
+                <DataGridTextColumn Header="Kilépés időpont" Binding="{Binding KilepesIdopont}" Width="2*"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Page>

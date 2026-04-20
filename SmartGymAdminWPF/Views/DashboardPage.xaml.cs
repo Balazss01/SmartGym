@@ -1,4 +1,9 @@
-﻿using System.Text.Json;
+﻿using SmartGymAdminWPF.Services;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SmartGymAdminWPF.Views
@@ -8,31 +13,90 @@ namespace SmartGymAdminWPF.Views
         public DashboardPage()
         {
             InitializeComponent();
-            LoadData();
+            Loaded += DashboardPage_Loaded;
         }
 
-        private async void LoadData()
+        private async void DashboardPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(ApiService.Token))
+            {
+                var main = (MainWindow)Application.Current.MainWindow;
+                main.MainFrame.Navigate(new LoginPage());
+                return;
+            }
+
+            await LoadStats();
+            await LoadUtolsoBelepesek();
+        }
+
+        private async Task LoadStats()
         {
             try
             {
-                var tagokJson = await MainWindow.Api.Get("/api/tagok");
-                var belepesekJson = await MainWindow.Api.Get("/api/belepesek");
-                var berletekJson = await MainWindow.Api.Get("/api/berletek");
+                var api = new ApiService();
+                var json = await api.Get("api/AdminDashboard/stats");
 
-                int tagok = JsonDocument.Parse(tagokJson).RootElement.GetArrayLength();
-                int belepesek = JsonDocument.Parse(belepesekJson).RootElement.GetArrayLength();
-                int berletek = JsonDocument.Parse(berletekJson).RootElement.GetArrayLength();
+                var stats = JsonSerializer.Deserialize<DashboardStatsDto>(json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
-                TagCountText.Text = tagok.ToString();
-                BelepesCountText.Text = belepesek.ToString();
-                BerletCountText.Text = berletek.ToString();
+                if (stats == null)
+                    return;
 
-                StatsText.Text = $"Tagok: {tagok} | Belépések: {belepesek} | Bérletek: {berletek}";
+                OsszesTagText.Text = stats.OsszesTag.ToString();
+                AktivTagText.Text = stats.AktivTag.ToString();
+                OsszesBerletText.Text = stats.OsszesBerlet.ToString();
+                AktivBerletText.Text = stats.AktivBerlet.ToString();
+                MaiBelepesText.Text = stats.MaiBelepesek.ToString();
+                BentLevokText.Text = stats.BentLevok.ToString();
+                SzekrenyFoglalasText.Text = stats.AktivSzekrenyFoglalasok.ToString();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                StatsText.Text = "Hiba: " + ex.Message;
+                MessageBox.Show("Dashboard stat hiba: " + ex.Message);
             }
         }
+
+        private async Task LoadUtolsoBelepesek()
+        {
+            try
+            {
+                var api = new ApiService();
+                var json = await api.Get("api/AdminDashboard/utolso-belepesek");
+
+                var lista = JsonSerializer.Deserialize<List<UtolsoBelepesDto>>(json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new List<UtolsoBelepesDto>();
+
+                UtolsoBelepesekGrid.ItemsSource = lista;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Utolsó belépések hiba: " + ex.Message);
+            }
+        }
+    }
+
+    public class DashboardStatsDto
+    {
+        public int OsszesTag { get; set; }
+        public int AktivTag { get; set; }
+        public int OsszesBerlet { get; set; }
+        public int AktivBerlet { get; set; }
+        public int MaiBelepesek { get; set; }
+        public int BentLevok { get; set; }
+        public int AktivSzekrenyFoglalasok { get; set; }
+    }
+
+    public class UtolsoBelepesDto
+    {
+        public int BelepesId { get; set; }
+        public string TeljesNev { get; set; }
+        public DateTime BelepesIdopont { get; set; }
+        public DateTime? KilepesIdopont { get; set; }
     }
 }

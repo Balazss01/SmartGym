@@ -1,5 +1,9 @@
-﻿using System.Data;
+﻿using SmartGymAdminWPF.Services;
+using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SmartGymAdminWPF.Views
@@ -9,41 +13,49 @@ namespace SmartGymAdminWPF.Views
         public BelepesekPage()
         {
             InitializeComponent();
-            LoadData();
+            Loaded += BelepesekPage_Loaded;
         }
 
-        private async void LoadData()
+        private async void BelepesekPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(ApiService.Token))
+            {
+                var main = (MainWindow)Application.Current.MainWindow;
+                main.MainFrame.Navigate(new LoginPage());
+                return;
+            }
+
+            await LoadBelepesek();
+        }
+
+        private async Task LoadBelepesek()
         {
             try
             {
-                var json = await MainWindow.Api.Get("/api/belepesek");
-                var table = new DataTable();
+                var api = new ApiService();
+                var json = await api.Get("api/Belepesek");
 
-                using var doc = JsonDocument.Parse(json);
-                var arr = doc.RootElement.EnumerateArray();
-
-                foreach (var item in arr)
-                {
-                    foreach (var p in item.EnumerateObject())
+                var data = JsonSerializer.Deserialize<List<BelepesDto>>(json,
+                    new JsonSerializerOptions
                     {
-                        if (!table.Columns.Contains(p.Name))
-                            table.Columns.Add(p.Name);
-                    }
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new List<BelepesDto>();
 
-                    var row = table.NewRow();
-
-                    foreach (var p in item.EnumerateObject())
-                        row[p.Name] = p.Value.ToString();
-
-                    table.Rows.Add(row);
-                }
-
-                Grid.ItemsSource = table.DefaultView;
+                BelepesekGrid.ItemsSource = data;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                MessageBox.Show("Belépések betöltési hiba: " + ex.Message);
             }
         }
+    }
+
+    public class BelepesDto
+    {
+        public int BelepesId { get; set; }
+        public int TagId { get; set; }
+        public string TeljesNev { get; set; }
+        public DateTime BelepesIdopont { get; set; }
+        public DateTime? KilepesIdopont { get; set; }
     }
 }

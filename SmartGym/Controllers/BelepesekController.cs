@@ -1,5 +1,4 @@
 ﻿using GymWebApiBackend.Data;
-using GymWebApiBackend.DTOs;
 using GymWebApiBackend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +27,14 @@ namespace GymWebApiBackend.Controllers
             var belepesek = await _context.Belepesek
                 .Include(b => b.Tag)
                 .OrderByDescending(b => b.BelepesIdopont)
+                .Select(b => new
+                {
+                    BelepesId = b.BelepesId,
+                    TagId = b.TagId,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
+                    BelepesIdopont = b.BelepesIdopont,
+                    KilepesIdopont = b.KilepesIdopont
+                })
                 .ToListAsync();
 
             return Ok(belepesek);
@@ -40,7 +47,16 @@ namespace GymWebApiBackend.Controllers
         {
             var belepes = await _context.Belepesek
                 .Include(b => b.Tag)
-                .FirstOrDefaultAsync(b => b.BelepesId == id);
+                .Where(b => b.BelepesId == id)
+                .Select(b => new
+                {
+                    BelepesId = b.BelepesId,
+                    TagId = b.TagId,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
+                    BelepesIdopont = b.BelepesIdopont,
+                    KilepesIdopont = b.KilepesIdopont
+                })
+                .FirstOrDefaultAsync();
 
             if (belepes == null)
             {
@@ -86,7 +102,6 @@ namespace GymWebApiBackend.Controllers
                 return BadRequest(new { message = "A tag nem létezik." });
             }
 
-            // 🔥 LEJÁRT BÉRLETEK AUTOMATIKUS INAKTIVÁLÁSA
             var lejartBerletek = await _context.Berletek
                 .Where(b => b.TagId == userId && b.Aktiv && b.VegeDatum <= DateTime.Now)
                 .ToListAsync();
@@ -101,7 +116,6 @@ namespace GymWebApiBackend.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // 🔥 VAN-E AKTÍV BÉRLET?
             var vanAktivBerlet = await _context.Berletek
                 .AnyAsync(b =>
                     b.TagId == userId &&
@@ -164,7 +178,6 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var belepes = await _context.Belepesek.FindAsync(id);
-
             if (belepes == null)
             {
                 return NotFound();

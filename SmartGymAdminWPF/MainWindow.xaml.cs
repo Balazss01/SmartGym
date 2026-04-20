@@ -6,45 +6,66 @@ namespace SmartGymAdminWPF
 {
     public partial class MainWindow : Window
     {
-        public static ApiService Api = new ApiService();
-
         public MainWindow()
         {
             InitializeComponent();
-            Init();
+            MainFrame.Navigate(new LoginPage());
         }
 
-        private async void Init()
+        private bool IsLoggedIn()
         {
-            try
-            {
-                await Api.Login();
-                MainFrame.Navigate(new DashboardPage());
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            return !string.IsNullOrWhiteSpace(ApiService.Token);
+        }
+
+        private void RequireLogin()
+        {
+            MessageBox.Show("Először jelentkezz be adminnal.");
+            MainFrame.Navigate(new LoginPage());
+        }
+
+        private void Login_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new LoginPage());
         }
 
         private void Dashboard_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new DashboardPage());
-        }
+            if (!IsLoggedIn())
+            {
+                RequireLogin();
+                return;
+            }
 
-        private void Tagok_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new TagokPage());
+            MainFrame.Navigate(new DashboardPage());
         }
 
         private void Berletek_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsLoggedIn())
+            {
+                RequireLogin();
+                return;
+            }
+
             MainFrame.Navigate(new BerletekPage());
         }
 
         private void Belepesek_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsLoggedIn())
+            {
+                RequireLogin();
+                return;
+            }
+
             MainFrame.Navigate(new BelepesekPage());
+        }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            ApiService.Token = "";
+            MessageBox.Show("Kijelentkeztél.");
+            MainFrame.Navigate(new LoginPage());
         }
     }
 }

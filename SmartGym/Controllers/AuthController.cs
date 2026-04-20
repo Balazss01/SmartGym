@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Linq;
 
 namespace GymWebApiBackend.Controllers
 {
@@ -81,34 +82,50 @@ namespace GymWebApiBackend.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // tagok lekerese
+            // tag rekord lekérése
             var tag = await _context.Tagok
                 .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
 
+            // ha nincs, automatikusan létrehozzuk
             if (tag == null)
-                return BadRequest(new { message = "Nincs tag rekord" });
+            {
+                var teljesNev = (user.TeljesNev ?? "").Trim();
+                var nevek = teljesNev.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            // tokenne alakitas
+                var vezeteknev = nevek.Length > 0 ? nevek[0] : "Ismeretlen";
+                var keresztnev = nevek.Length > 1 ? string.Join(" ", nevek.Skip(1)) : "Felhasználó";
+
+                tag = new Tag
+                {
+                    IdentityUserId = user.Id,
+                    Vezeteknev = vezeteknev,
+                    Keresztnev = keresztnev,
+                    SzuletesiDatum = new DateTime(1990, 1, 1),
+                    Aktiv = true
+                };
+
+                _context.Tagok.Add(tag);
+                await _context.SaveChangesAsync();
+            }
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, tag.TagId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.Name, user.UserName ?? "")
             };
-            // role hozzaadas
+
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            // jwt kulcs eloallitasa
+
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
             );
 
-            // alairas
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // token letrehozasa
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
@@ -119,7 +136,6 @@ namespace GymWebApiBackend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            //valasz
             return Ok(new
             {
                 message = "Sikeres login",
@@ -136,7 +152,6 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Me()
         {
             var tagIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (!int.TryParse(tagIdStr, out var tagId))
                 return Unauthorized();
 

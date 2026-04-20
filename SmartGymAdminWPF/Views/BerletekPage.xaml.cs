@@ -1,5 +1,9 @@
-﻿using System.Data;
+﻿using SmartGymAdminWPF.Services;
+using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SmartGymAdminWPF.Views
@@ -9,41 +13,67 @@ namespace SmartGymAdminWPF.Views
         public BerletekPage()
         {
             InitializeComponent();
-            LoadData();
+            Loaded += BerletekPage_Loaded;
         }
 
-        private async void LoadData()
+        private async void BerletekPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(ApiService.Token))
+            {
+                var main = (MainWindow)Application.Current.MainWindow;
+                main.MainFrame.Navigate(new LoginPage());
+                return;
+            }
+
+            await LoadBerletek();
+        }
+
+        private async Task LoadBerletek()
         {
             try
             {
-                var json = await MainWindow.Api.Get("/api/berletek");
-                var table = new DataTable();
+                var api = new ApiService();
+                var json = await api.Get("api/Berletek");
 
-                using var doc = JsonDocument.Parse(json);
-                var arr = doc.RootElement.EnumerateArray();
-
-                foreach (var item in arr)
-                {
-                    foreach (var p in item.EnumerateObject())
+                var berletek = JsonSerializer.Deserialize<List<BerletListDto>>(json,
+                    new JsonSerializerOptions
                     {
-                        if (!table.Columns.Contains(p.Name))
-                            table.Columns.Add(p.Name);
-                    }
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new List<BerletListDto>();
 
-                    var row = table.NewRow();
-
-                    foreach (var p in item.EnumerateObject())
-                        row[p.Name] = p.Value.ToString();
-
-                    table.Rows.Add(row);
-                }
-
-                Grid.ItemsSource = table.DefaultView;
+                BerletekGrid.ItemsSource = berletek;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                MessageBox.Show("Bérletek betöltési hiba: " + ExtractMessage(ex.Message));
             }
         }
+
+        private string ExtractMessage(string raw)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(raw);
+
+                if (doc.RootElement.TryGetProperty("message", out var msg))
+                    return msg.GetString() ?? raw;
+            }
+            catch
+            {
+            }
+
+            return raw;
+        }
+    }
+
+    public class BerletListDto
+    {
+        public int BerletId { get; set; }
+        public int TagId { get; set; }
+        public string TeljesNev { get; set; }
+        public DateTime KezdetDatum { get; set; }
+        public DateTime VegeDatum { get; set; }
+        public bool Aktiv { get; set; }
+        public string BerletTipusNev { get; set; }
     }
 }

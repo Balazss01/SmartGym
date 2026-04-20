@@ -6,7 +6,6 @@
         Width="1380"
         Background="#0B1120"
         WindowStartupLocation="CenterScreen">
-
     <Window.Resources>
         <Style x:Key="SidebarButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="White"/>
@@ -35,14 +34,14 @@
                            FontWeight="Bold"
                            Margin="8,0,8,24"/>
 
+                <Button Content="Login"
+                        Style="{StaticResource SidebarButtonStyle}"
+                        />
+
                 <Button Content="Dashboard"
                         Style="{StaticResource SidebarButtonStyle}"
                         Background="#1D4ED8"
                         Click="Dashboard_Click"/>
-
-                <Button Content="Tagok"
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Click="Tagok_Click"/>
 
                 <Button Content="Bérletek"
                         Style="{StaticResource SidebarButtonStyle}"

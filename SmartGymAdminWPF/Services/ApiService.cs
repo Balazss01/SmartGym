@@ -1,70 +1,52 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SmartGymAdminWPF.Services
 {
     public class ApiService
     {
-        private readonly HttpClient client = new HttpClient();
-        private const string BaseUrl = "https://localhost:7270";
+        private readonly HttpClient _client;
+        public static string Token { get; set; } = "";
 
-        public async Task Login()
+        public ApiService()
         {
-            var login = new
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://localhost:7270/");
+
+            if (!string.IsNullOrWhiteSpace(Token))
             {
-                email = "admin@smartgym.hu",
-                password = "Admin123!"
-            };
-
-            var res = await client.PostAsync(
-                $"{BaseUrl}/api/auth/login",
-                new StringContent(
-                    JsonSerializer.Serialize(login),
-                    Encoding.UTF8,
-                    "application/json")
-            );
-
-            var json = await res.Content.ReadAsStringAsync();
-
-            if (!res.IsSuccessStatusCode)
-                throw new HttpRequestException("Login hiba: " + json);
-
-            using var doc = JsonDocument.Parse(json);
-
-            string? token = null;
-
-            if (doc.RootElement.TryGetProperty("token", out var t1))
-                token = t1.GetString();
-            else if (doc.RootElement.TryGetProperty("Token", out var t2))
-                token = t2.GetString();
-
-            if (string.IsNullOrWhiteSpace(token))
-                throw new HttpRequestException("Nem jött vissza token.");
-
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                _client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", Token);
+            }
         }
 
-        public async Task<string> Get(string endpoint)
+        public async Task<string> Get(string url)
         {
-            var res = await client.GetAsync($"{BaseUrl}{endpoint}");
-            var json = await res.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(Token))
+                throw new Exception("Nincs bejelentkezve!");
+
+            var res = await _client.GetAsync(url);
+            var content = await res.Content.ReadAsStringAsync();
 
             if (!res.IsSuccessStatusCode)
-                throw new HttpRequestException($"{endpoint} hiba: {json}");
+                throw new Exception(content);
 
-            return json;
+            return content;
         }
-        public async Task Delete(string endpoint)
+
+        public async Task<string> Post(string url, string json)
         {
-            var res = await client.DeleteAsync($"{BaseUrl}{endpoint}");
-            var json = await res.Content.ReadAsStringAsync();
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var res = await _client.PostAsync(url, content);
+            var result = await res.Content.ReadAsStringAsync();
 
             if (!res.IsSuccessStatusCode)
-                throw new HttpRequestException($"{endpoint} törlés hiba: {json}");
+                throw new Exception(result);
+
+            return result;
         }
     }
 }
