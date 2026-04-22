@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SmartGym.Models;
 using System.Reflection.Emit;
 
 namespace GymWebApiBackend.Data
@@ -16,7 +17,7 @@ namespace GymWebApiBackend.Data
         }
 
         public DbSet<Tag> Tagok { get; set; }
-
+        public DbSet<Helyszin> Helyszinek { get; set; }
         public DbSet<Berlet> Berletek { get; set; }
         public DbSet<BerletTipus> BerletTipusok { get; set; }
         public DbSet<Belepes> Belepesek { get; set; }

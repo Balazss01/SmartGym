@@ -1,0 +1,680 @@
+﻿@page
+@model GymFrontend.Pages.HelyszinekModel
+
+<style>
+    /* ── LAYOUT ── */
+   .helyszin-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+    max-width: 1200px;
+    height: calc(100vh - 160px); 
+    min-height: 600px;
+    overflow: hidden; 
+}
+
+    /* ── MAP PANEL ── */
+    .terkep-panel {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .terkep-fejlec {
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    .terkep-cim {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(240,237,232,0.4);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .terkep-cim::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #00f5c4;
+        animation: blink-dot 2s infinite;
+    }
+
+    @@keyframes blink-dot {
+        0%,100% { opacity:1; }
+        50% { opacity:0.2; }
+    }
+
+    .helyszin-szam-pill {
+        font-size: 11px;
+        background: rgba(0,245,196,0.1);
+        border: 1px solid rgba(0,245,196,0.2);
+        color: #00f5c4;
+        border-radius: 20px;
+        padding: 3px 10px;
+    }
+
+    /* SVG terkep */
+    .terkep-svg-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #magyarorszag-svg {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+    }
+
+    /* Megye path stílusok */
+    .megye-ut {
+        fill: rgba(255,255,255,0.04);
+        stroke: rgba(255,255,255,0.12);
+        stroke-width: 0.5;
+        transition: fill 0.2s;
+    }
+
+    .megye-ut:hover {
+        fill: rgba(255,255,255,0.07);
+    }
+
+    /* Pin marker */
+    .gym-pin-csoport {
+        cursor: pointer;
+    }
+
+    .gym-pin-kör {
+        fill: #00f5c4;
+        opacity: 0.15;
+        transition: all 0.3s;
+    }
+
+    .gym-pin-belsö {
+        fill: #00f5c4;
+        transition: all 0.3s;
+        filter: drop-shadow(0 0 6px rgba(0,245,196,0.8));
+    }
+
+    .gym-pin-csoport:hover .gym-pin-kör,
+    .gym-pin-csoport.aktiv .gym-pin-kör {
+        opacity: 0.35;
+        r: 22;
+    }
+
+    .gym-pin-csoport:hover .gym-pin-belsö,
+    .gym-pin-csoport.aktiv .gym-pin-belsö {
+        fill: #fff;
+        filter: drop-shadow(0 0 10px rgba(0,245,196,1));
+    }
+
+    .gym-pin-pulse {
+        fill: none;
+        stroke: #00f5c4;
+        stroke-width: 1.5;
+        opacity: 0;
+    }
+
+    .gym-pin-csoport.aktiv .gym-pin-pulse {
+        animation: pin-pulse 1.8s infinite;
+    }
+
+    @@keyframes pin-pulse {
+        0%   { r: 10; opacity: 0.8; }
+        100% { r: 28; opacity: 0; }
+    }
+
+    /* Városnév label */
+    .varos-label {
+        font-size: 9px;
+        fill: rgba(240,237,232,0.5);
+        font-family: 'DM Sans', sans-serif;
+        text-anchor: middle;
+        pointer-events: none;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    /* ── DETAIL PANEL ── */
+  .detail-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    overflow-y: auto; 
+    padding-right: 8px; 
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 245, 196, 0.2) transparent;
+}
+
+/* Görgetősáv stílus Chrome/Edge/Safari-hoz */
+.detail-panel::-webkit-scrollbar {
+    width: 5px;
+}
+
+.detail-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.detail-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.detail-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 245, 196, 0.3);
+}
+
+    /* Üres állapot */
+    .ures-panel {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 24px;
+        flex: 1;
+        color: rgba(240,237,232,0.35);
+    }
+
+    .ures-ikon-nagy {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.4;
+    }
+
+    .ures-szoveg {
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* Detail kártya */
+   .helyszin-kartya {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    flex-shrink: 0; 
+}
+
+    .helyszin-kartya.latszik {
+        display: flex;
+    }
+
+    /* Kártya fejléc */
+    .kartya-fejlec {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        position: relative;
+    }
+
+    .kartya-fejlec::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #00f5c4, #7c6af8);
+        border-radius: 16px 16px 0 0;
+    }
+
+    .helyszin-emoji {
+        font-size: 28px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .helyszin-nev {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f0ede8;
+        margin-bottom: 4px;
+    }
+
+    .helyszin-varos-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        background: rgba(124,106,248,0.12);
+        border: 1px solid rgba(124,106,248,0.25);
+        color: #a89cf7;
+        border-radius: 20px;
+        padding: 2px 10px;
+    }
+
+    /* Kártya test */
+    .kartya-test {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .leiras-szoveg {
+        font-size: 13px;
+        color: rgba(240,237,232,0.65);
+        line-height: 1.7;
+    }
+
+    /* Info sorok */
+    .info-sor {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .info-ikon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .info-tartalom {
+        flex: 1;
+    }
+
+    .info-cimke {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(240,237,232,0.35);
+        margin-bottom: 2px;
+    }
+
+    .info-ertek {
+        color: #f0ede8;
+        font-size: 13px;
+    }
+
+    /* Nyitvatartás tábla */
+    .nyitva-sor {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12.5px;
+        padding: 3px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .nyitva-sor:last-child { border-bottom: none; }
+    .nyitva-nap { color: rgba(240,237,232,0.45); }
+    .nyitva-ido { color: #f0ede8; }
+
+    /* Szolgáltatás tagek */
+    .szolg-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .szolg-tag {
+        font-size: 11px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(240,237,232,0.7);
+        border-radius: 20px;
+        padding: 3px 10px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Lista panel alján */
+    .lista-panel {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .lista-fejlec {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(240,237,232,0.4);
+    }
+
+    .lista-elem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+    }
+
+    .lista-elem:last-child { border-bottom: none; }
+
+    .lista-elem:hover,
+    .lista-elem.aktiv {
+        background: rgba(255,255,255,0.04);
+    }
+
+    .lista-elem.aktiv {
+        background: rgba(0,245,196,0.05);
+    }
+
+    .lista-emoji {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .lista-info { flex: 1; overflow: hidden; }
+
+    .lista-nev {
+        font-size: 13px;
+        font-weight: 500;
+        color: #f0ede8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .lista-varos {
+        font-size: 11px;
+        color: rgba(240,237,232,0.4);
+    }
+
+    .lista-nyil {
+        font-size: 12px;
+        color: rgba(240,237,232,0.2);
+        transition: color 0.2s;
+    }
+
+    .lista-elem:hover .lista-nyil,
+    .lista-elem.aktiv .lista-nyil {
+        color: #00f5c4;
+    }
+
+    /* Loading */
+    .toltodot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: rgba(240,237,232,0.3);
+        font-size: 13px;
+        gap: 10px;
+    }
+
+    .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.1);
+        border-top-color: #00f5c4;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+
+    @@vkeyframes spin { to { transform: rotate(360deg); } }
+
+    /* Oldal cím */
+    .oldal-cim { font-size: 21px; font-weight: 700; color: #f0ede8; letter-spacing: .01em; }
+    .oldal-alcim { font-size: 13px; color: rgba(240,237,232,0.4); }
+
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .helyszin-wrapper {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+        .terkep-panel { height: 380px; }
+    }
+</style>
+
+<!-- Oldal fejléc -->
+<div class="mb-4">
+    <div class="oldal-cim">Helyszíneink</div>
+    <div class="oldal-alcim">Kattints egy városra a térképen, és nézd meg a terem adatait</div>
+</div>
+
+<div class="helyszin-wrapper">
+
+    <!-- BAL: Térkép -->
+    <div class="terkep-panel">
+        <div class="terkep-fejlec">
+            <span class="terkep-cim">Magyarország térkép</span>
+            <span class="helyszin-szam-pill" id="helyszin-szam-pill">— helyszín</span>
+        </div>
+        <div class="terkep-svg-wrap">
+            <svg id="magyarorszag-svg" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Magyarország egyszerűsített körvonala -->
+                <g id="orszag-hatar">
+    <path class="megye-ut" d="
+        M110,130 
+        L120,110 L140,95 L170,90 L200,95 L230,105 L260,100 L290,90 L320,80 
+        L340,70 L360,65 L385,75 L410,70 L435,60 L465,65 L500,70 L540,80 
+        L580,95 L615,110 L650,135 L685,170 L705,210 L710,250 L695,290 
+        L665,325 L625,345 L580,355 L530,360 L480,365 L430,370 L380,365 
+        L330,365 L280,360 L230,350 L190,335 L155,315 L125,290 L105,250 
+        L95,200 L100,160 Z" 
+        style="stroke-linejoin: round; stroke-linecap: round;" />
+</g>
+                <!-- Belső dekoratív grid -->
+                <g opacity="0.04" stroke="rgba(255,255,255,0.5)" stroke-width="0.5">
+                    <line x1="0" y1="140" x2="800" y2="140" />
+                    <line x1="0" y1="200" x2="800" y2="200" />
+                    <line x1="0" y1="260" x2="800" y2="260" />
+                    <line x1="200" y1="0" x2="200" y2="420" />
+                    <line x1="350" y1="0" x2="350" y2="420" />
+                    <line x1="500" y1="0" x2="500" y2="420" />
+                    <line x1="650" y1="0" x2="650" y2="420" />
+                </g>
+                <!-- Pin-ek és városnevek (JS tölti) -->
+                <g id="pin-reteg"></g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- JOBB: Detail + Lista -->
+    <div class="detail-panel" id="detail-panel">
+
+        <!-- Üres állapot (alapból látszik) -->
+        <div class="ures-panel" id="ures-allapot">
+            <div class="ures-ikon-nagy">📍</div>
+            <div class="ures-szoveg">
+                Válassz ki egy helyszínt a térképen<br>
+                <span style="color: rgba(240,237,232,0.2);">vagy a lista alapján</span>
+            </div>
+        </div>
+
+        <!-- Detail kártya (JS tölti) -->
+        <div class="helyszin-kartya" id="helyszin-kartya">
+            <div class="kartya-fejlec">
+                <span class="helyszin-emoji" id="kartya-emoji"></span>
+                <div class="helyszin-nev" id="kartya-nev"></div>
+                <span class="helyszin-varos-tag">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span id="kartya-varos"></span>
+                </span>
+            </div>
+            <div class="kartya-test">
+                <p class="leiras-szoveg" id="kartya-leiras"></p>
+
+                <!-- Cím -->
+                <div class="info-sor">
+                    <div class="info-ikon"><i class="bi bi-map"></i></div>
+                    <div class="info-tartalom">
+                        <div class="info-cimke">Cím</div>
+                        <div class="info-ertek" id="kartya-cim"></div>
+                    </div>
+                </div>
+
+                <!-- Telefon -->
+                <div class="info-sor">
+                    <div class="info-ikon"><i class="bi bi-telephone"></i></div>
+                    <div class="info-tartalom">
+                        <div class="info-cimke">Telefon</div>
+                        <div class="info-ertek" id="kartya-telefon"></div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="info-sor">
+                    <div class="info-ikon"><i class="bi bi-envelope"></i></div>
+                    <div class="info-tartalom">
+                        <div class="info-cimke">Email</div>
+                        <div class="info-ertek" id="kartya-email"></div>
+                    </div>
+                </div>
+
+                <!-- Nyitvatartás -->
+                <div class="info-sor">
+                    <div class="info-ikon"><i class="bi bi-clock"></i></div>
+                    <div class="info-tartalom">
+                        <div class="info-cimke">Nyitvatartás</div>
+                        <div id="kartya-nyitva">
+                            <div class="nyitva-sor">
+                                <span class="nyitva-nap">H–P</span>
+                                <span class="nyitva-ido" id="kartya-nyitva-hetfo"></span>
+                            </div>
+                            <div class="nyitva-sor">
+                                <span class="nyitva-nap">Szombat</span>
+                                <span class="nyitva-ido" id="kartya-nyitva-heto"></span>
+                            </div>
+                            <div class="nyitva-sor">
+                                <span class="nyitva-nap">Vasárnap</span>
+                                <span class="nyitva-ido" id="kartya-nyitva-vasarnap"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Szolgáltatások -->
+                <div>
+                    <div class="info-cimke mb-2">Szolgáltatások</div>
+                    <div class="szolg-grid" id="kartya-szolgaltatasok"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Helyszín lista -->
+     <span class="helyszin-szam-pill">@Model.Helyszinek.Count helyszín</span>
+
+<div id="helyszin-lista">
+    @foreach (var h in Model.Helyszinek)
+    {
+        <div class="lista-elem" data-id="@h.Id" onclick="kivalaszt(@h.Id)">
+            <span class="lista-emoji">@(h.Kep ?? "📍")</span>
+            <div class="lista-info">
+                <div class="lista-nev">@h.Nev</div>
+                <div class="lista-varos">@h.Varos · @(h.Cim?.Split(',')[0])</div>
+            </div>
+            <i class="bi bi-chevron-right lista-nyil"></i>
+        </div>
+    }
+</div>
+
+    </div>
+</div>
+
+<script>
+    // 1. ADATÁTVÉTEL: A szerveroldali listát átadjuk a JS-nek JSON formátumban
+    const helyszinek = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Helyszinek));
+    let kivalasztottId = null;
+
+    // Koordináta konverzió (marad változatlan)
+    function gpsToSvg(lat, lon) {
+        const LAT_MIN = 45.7, LAT_MAX = 48.6;
+        const LON_MIN = 16.1, LON_MAX = 22.9;
+        const SVG_W = 800, SVG_H = 420;
+        const PAD_X = 85, PAD_Y = 65;
+        const x = PAD_X + ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * (SVG_W - PAD_X * 2);
+        const y = (SVG_H - PAD_Y) - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * (SVG_H - PAD_Y * 2);
+        return { x: Math.round(x), y: Math.round(y) };
+    }
+
+    // 2. PIN RENDERELÉS: Most már a helyi 'helyszinek' változóból dolgozik
+    function renderPinek() {
+        const reteg = document.getElementById('pin-reteg');
+        reteg.innerHTML = '';
+
+        helyszinek.forEach(h => {
+            // Itt figyeltem a C# PascalCase nevekre (Szelesseg, Hosszusag)!
+            const { x, y } = gpsToSvg(h.Szelesseg, h.Hosszusag);
+
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('class', 'gym-pin-csoport');
+            g.setAttribute('data-id', h.Id);
+            g.setAttribute('transform', `translate(${x},${y})`);
+            
+            g.innerHTML = `
+                <circle class="gym-pin-pulse" cx="0" cy="0" r="10"/>
+                <circle class="gym-pin-kör" cx="0" cy="0" r="16"/>
+                <circle class="gym-pin-belsö" cx="0" cy="0" r="7"/>
+                <text class="varos-label" x="0" y="26">${h.Varos}</text>
+            `;
+
+            g.addEventListener('click', () => kivalaszt(h.Id));
+            reteg.appendChild(g);
+        });
+    }
+
+    // 3. KIVÁLASZTÁS: Itt is PascalCase propertyket használunk
+    function kivalaszt(id) {
+        const h = helyszinek.find(x => x.Id === id);
+        if (!h) return;
+
+        document.querySelectorAll('.gym-pin-csoport').forEach(el => el.classList.toggle('aktiv', parseInt(el.dataset.id) === id));
+        document.querySelectorAll('.lista-elem').forEach(el => el.classList.toggle('aktiv', parseInt(el.dataset.id) === id));
+
+        document.getElementById('ures-allapot').style.display = 'none';
+
+        document.getElementById('kartya-emoji').textContent = h.Kep || '📍';
+        document.getElementById('kartya-nev').textContent = h.Nev;
+        document.getElementById('kartya-varos').textContent = h.Varos;
+        document.getElementById('kartya-leiras').textContent = h.Leiras;
+        document.getElementById('kartya-cim').textContent = h.Cim;
+        document.getElementById('kartya-telefon').textContent = h.Telefon;
+        document.getElementById('kartya-email').textContent = h.Email;
+        
+        document.getElementById('kartya-nyitva-hetfo').textContent = h.NyitvatartasHetfo;
+        document.getElementById('kartya-nyitva-heto').textContent = h.NyitvatartasHeto;
+        document.getElementById('kartya-nyitva-vasarnap').textContent = h.NyitvatartasVasarnap;
+
+        // Szolgáltatások renderelése
+        const szolgGrid = document.getElementById('kartya-szolgaltatasok');
+        szolgGrid.innerHTML = (h.Szolgaltatasok || []).map(s => {
+            return `<span class="szolg-tag">${s}</span>`;
+        }).join('');
+
+        document.getElementById('helyszin-kartya').classList.add('latszik');
+        document.getElementById('detail-panel').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Indítás
+    renderPinek();
+</script>

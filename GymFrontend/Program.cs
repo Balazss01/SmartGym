@@ -1,3 +1,6 @@
+using GymWebApiBackend.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace GymFrontend
 {
     public class Program
@@ -5,6 +8,15 @@ namespace GymFrontend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+            )
+            );
             builder.Services.AddHttpClient("Api", client =>
             {
                 client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
