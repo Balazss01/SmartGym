@@ -299,7 +299,16 @@
 
 @{
     /* Aktív bérlet keresése */
-    var aktivBerlet = Model.Berletek.FirstOrDefault(b => b.Aktiv && b.VegeDatum > DateTime.Now);
+    var aktivBerlet = Model.Berletek
+    .FirstOrDefault(b => b.Aktiv 
+        && b.KezdetDatum <= DateTime.Now 
+        && b.VegeDatum > DateTime.Now);
+
+    
+    var kovetkezoBerlet = Model.Berletek
+    .Where(b => b.KezdetDatum > DateTime.Now)
+    .OrderBy(b => b.KezdetDatum)
+    .FirstOrDefault();
 
     /* Alap statisztikák */
     int osszesBerlet = Model.Berletek.Count;
@@ -370,6 +379,23 @@
             </div>
   
         </div>
+        @if (kovetkezoBerlet != null)
+{
+    <div class="card p-3 mb-3" style="border:1px dashed rgba(0,245,196,0.3);">
+        <div class="halvany mb-1" style="font-size:12px;">
+            Következő bérleted:
+        </div>
+
+        <div style="font-weight:600;">
+            @kovetkezoBerlet.BerletTipusNev
+        </div>
+
+        <div class="halvany" style="font-size:12px;">
+            @kovetkezoBerlet.KezdetDatum.ToString("yyyy.MM.dd") –
+            @kovetkezoBerlet.VegeDatum.ToString("yyyy.MM.dd")
+        </div>
+    </div>
+}
     }
 
     <!-- Statisztika kártyák -->
@@ -436,7 +462,8 @@
                     }
                     @foreach (var berlet in Model.Berletek)
                     {
-                        bool sorAktiv = berlet.Aktiv && berlet.VegeDatum > DateTime.Now;
+                       bool sorAktiv = berlet.Aktiv && berlet.KezdetDatum <= DateTime.Now && berlet.VegeDatum > DateTime.Now;
+                       bool sorJovobeli = berlet.KezdetDatum > DateTime.Now;
                         <tr>
                             <td class="halvany" style="font-size: 12px;">@sorszam</td>
                             <td><strong>@berlet.BerletTipusNev</strong></td>
@@ -449,10 +476,16 @@
                                         <i class="bi bi-circle-fill" style="font-size: 5px;"></i> Aktív
                                     </span>
                                 }
+                                else if (sorJovobeli)
+                                {
+                                    <span class="pill-aktiv" style="background: rgba(124,106,248,0.1); border-color: rgba(124,106,248,0.3); color:#7c6af8;">
+                                    <i class="bi bi-clock"></i> Előre megvásárolt
+                                </span>
+                                }
                                 else
                                 {
                                     <span class="pill-lejart">
-                                        <i class="bi bi-circle" style="font-size: 5px;"></i> Lejárt
+                                        <i class="bi bi-circle"></i> Lejárt
                                     </span>
                                 }
                             </td>

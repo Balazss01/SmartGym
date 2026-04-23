@@ -62,7 +62,7 @@ namespace GymWebApiBackend.Controllers
             return Ok(berlet);
         }
 
-        [HttpPost]
+        [HttpPost]  
         public async Task<IActionResult> Create(CreateBerletDto dto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -73,20 +73,29 @@ namespace GymWebApiBackend.Controllers
             if (tipus == null)
                 return BadRequest(new { message = "Bérlettípus nem létezik" });
 
-            var kezdet = DateTime.Now;
-            var vege = kezdet.AddDays(tipus.IdotartamNapok);
-            var regiAktivBerlet = await _context.Berletek
-            .FirstOrDefaultAsync(b =>
-                b.TagId == userId &&
-                b.Aktiv &&
-                b.VegeDatum > DateTime.Now);
+            // 🔥 AKTÍV bérlet keresése
+            var aktivBerlet = await _context.Berletek
+                .Where(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now)
+                .OrderByDescending(b => b.VegeDatum)
+                .FirstOrDefaultAsync();
 
-            // 🔥 ha van, inaktiváljuk
-            if (regiAktivBerlet != null)
+            
+
+            DateTime kezdet;
+
+            if (aktivBerlet != null)
             {
-                regiAktivBerlet.Aktiv = false;
+                // 👉 STACKELÉS: az új bérlet a régi után indul
+                kezdet = aktivBerlet.VegeDatum;
+            }
+            else
+            {
+                kezdet = DateTime.Now;
             }
 
+            var vege = kezdet.AddDays(tipus.IdotartamNapok);
+
+            // 🔥 régi marad aktív (NEM kapcsoljuk ki!)
             var berlet = new Berlet
             {
                 TagId = userId,
@@ -101,7 +110,7 @@ namespace GymWebApiBackend.Controllers
             _context.Ertesitesek.Add(new Ertesites
             {
                 TagId = userId,
-                Uzenet = "Sikeresen vásároltál egy új bérletet!",
+                Uzenet = "Új bérlet hozzáadva (stackelve)!",
                 Olvasott = false,
                 Datum = DateTime.Now
             });
@@ -109,7 +118,6 @@ namespace GymWebApiBackend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Bérlet létrehozva" });
-
         }
 
         [HttpPut("{id}")]
