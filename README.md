@@ -48,16 +48,22 @@ Heti: 04.30 - 05.07
 
 ```
 SmartGym/
-├── GymWebApiBackend/
+├── GymWebApiBackend/          
 │   ├── Controllers/
 │   ├── Models/
 │   ├── Data/
 │   └── Services/
 │
-├── GymFrontend/
+├── GymFrontend/              
 │   ├── Pages/
 │   ├── Shared/
 │   └── wwwroot/
+│
+├── SmartGymAdminWPF/          
+│   ├── Services/              
+│   ├── Views/                        
+│   ├── App.xaml                    
+│   └── MainWindow.xaml       
 │
 └── README.md
 
