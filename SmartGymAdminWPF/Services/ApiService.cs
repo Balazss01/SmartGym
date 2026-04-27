@@ -42,6 +42,7 @@ namespace SmartGymAdminWPF.Services
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var res = await _client.PostAsync(url, content);
             var result = await res.Content.ReadAsStringAsync();
+            
 
             if (!res.IsSuccessStatusCode)
                 throw new Exception(result);

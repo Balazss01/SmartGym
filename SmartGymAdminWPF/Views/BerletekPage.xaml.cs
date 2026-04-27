@@ -13,38 +13,49 @@ namespace SmartGymAdminWPF.Views
     public partial class BerletekPage : Page
     {
         private List<BerletListDto> _osszesBerlet = new();
-
         private readonly DispatcherTimer _timer = new();
+        private bool _isUnloading = false;
 
         public BerletekPage()
         {
             InitializeComponent();
-            Loaded += BerletekPage_Loaded;
 
-            // 🔥 AUTO REFRESH
+            Loaded += BerletekPage_Loaded;
+            Unloaded += BerletekPage_Unloaded;
+
             _timer.Interval = TimeSpan.FromSeconds(20);
             _timer.Tick += async (_, __) => await LoadBerletek();
-            _timer.Start();
         }
 
         private async void BerletekPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(ApiService.Token))
-            {
-                var main = (MainWindow)Application.Current.MainWindow;
-                main.MainFrame.Navigate(new LoginPage());
-                return;
-            }
+            _isUnloading = false;
 
+            if (string.IsNullOrWhiteSpace(ApiService.Token))
+                return;
+
+            _timer.Start();
             await LoadBerletek();
+        }
+
+        private void BerletekPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _isUnloading = true;
+            _timer.Stop();
         }
 
         private async Task LoadBerletek()
         {
+            if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
+                return;
+
             try
             {
                 var api = new ApiService();
                 var json = await api.Get("api/Berletek");
+
+                if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
+                    return;
 
                 _osszesBerlet = JsonSerializer.Deserialize<List<BerletListDto>>(json,
                     new JsonSerializerOptions
@@ -58,6 +69,9 @@ namespace SmartGymAdminWPF.Views
             }
             catch (Exception ex)
             {
+                if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
+                    return;
+
                 MessageBox.Show("Bérletek betöltési hiba: " + ExtractMessage(ex.Message));
             }
         }
@@ -78,9 +92,7 @@ namespace SmartGymAdminWPF.Views
             BerletTipusComboBox.Items.Add(new ComboBoxItem { Content = "Összes típus" });
 
             foreach (var tipus in tipusok)
-            {
                 BerletTipusComboBox.Items.Add(new ComboBoxItem { Content = tipus });
-            }
 
             BerletTipusComboBox.SelectedIndex = 0;
         }
@@ -89,22 +101,20 @@ namespace SmartGymAdminWPF.Views
         {
             var most = DateTime.Now;
 
-            var osszes = _osszesBerlet.Count;
-            var aktiv = _osszesBerlet.Count(b =>
-                b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most);
+            OsszesBerletText.Text = _osszesBerlet.Count.ToString();
 
-            var lejart = _osszesBerlet.Count(b =>
-                b.VegeDatum <= most || !b.Aktiv);
+            AktivBerletText.Text = _osszesBerlet.Count(b =>
+                b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most).ToString();
 
-            OsszesBerletText.Text = osszes.ToString();
-            AktivBerletText.Text = aktiv.ToString();
-            LejartBerletText.Text = lejart.ToString();
+            LejartBerletText.Text = _osszesBerlet.Count(b =>
+                b.VegeDatum <= most || !b.Aktiv).ToString();
         }
 
         private void ApplyFilter()
         {
-            var keresett = KeresesTextBox.Text?.Trim().ToLower() ?? "";
+            if (_isUnloading) return;
 
+            var keresett = KeresesTextBox.Text?.Trim().ToLower() ?? "";
             var csakAktiv = CsakAktivCheckBox.IsChecked == true;
             var csakLejart = CsakLejartCheckBox.IsChecked == true;
 
@@ -131,20 +141,11 @@ namespace SmartGymAdminWPF.Views
             BerletekGrid.ItemsSource = szurt;
         }
 
-        private void KeresesTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ApplyFilter();
-        }
+        private void KeresesTextBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
 
-        private void FilterChanged(object sender, RoutedEventArgs e)
-        {
-            ApplyFilter();
-        }
+        private void FilterChanged(object sender, RoutedEventArgs e) => ApplyFilter();
 
-        private void FilterChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFilter();
-        }
+        private void FilterChanged(object sender, SelectionChangedEventArgs e) => ApplyFilter();
 
         private async void FrissitesButton_Click(object sender, RoutedEventArgs e)
         {
@@ -153,6 +154,9 @@ namespace SmartGymAdminWPF.Views
 
         private async void ToggleBerlet_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(ApiService.Token))
+                return;
+
             try
             {
                 var button = sender as Button;
@@ -176,6 +180,9 @@ namespace SmartGymAdminWPF.Views
             }
             catch (Exception ex)
             {
+                if (string.IsNullOrWhiteSpace(ApiService.Token))
+                    return;
+
                 MessageBox.Show("Toggle hiba: " + ex.Message);
             }
         }
@@ -185,7 +192,6 @@ namespace SmartGymAdminWPF.Views
             try
             {
                 using var doc = JsonDocument.Parse(raw);
-
                 if (doc.RootElement.TryGetProperty("message", out var msg))
                     return msg.GetString() ?? raw;
             }
@@ -195,7 +201,6 @@ namespace SmartGymAdminWPF.Views
         }
     }
 
-    // 🔥 DTO + STATUS LOGIKA
     public class BerletListDto
     {
         public int BerletId { get; set; }

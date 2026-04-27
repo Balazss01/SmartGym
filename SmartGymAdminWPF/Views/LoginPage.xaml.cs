@@ -11,6 +11,8 @@ namespace SmartGymAdminWPF.Views
 {
     public partial class LoginPage : Page
     {
+        private bool _isPasswordVisible = false;
+
         public LoginPage()
         {
             InitializeComponent();
@@ -22,19 +24,55 @@ namespace SmartGymAdminWPF.Views
                 LoginButton_Click(sender, e);
         }
 
+        private void TogglePassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isPasswordVisible)
+            {
+                PasswordBox.Password = PasswordVisibleTextBox.Text;
+                PasswordBox.Visibility = Visibility.Visible;
+                PasswordVisibleTextBox.Visibility = Visibility.Collapsed;
+
+                PasswordBox.Focus();
+            }
+            else
+            {
+                PasswordVisibleTextBox.Text = PasswordBox.Password;
+                PasswordBox.Visibility = Visibility.Collapsed;
+                PasswordVisibleTextBox.Visibility = Visibility.Visible;
+
+                PasswordVisibleTextBox.Focus();
+                PasswordVisibleTextBox.CaretIndex = PasswordVisibleTextBox.Text.Length;
+            }
+
+            _isPasswordVisible = !_isPasswordVisible;
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorText.Text = message;
+            ErrorBorder.Visibility = Visibility.Visible;
+        }
+
+        private void HideError()
+        {
+            ErrorText.Text = "";
+            ErrorBorder.Visibility = Visibility.Collapsed;
+        }
+
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ErrorText.Visibility = Visibility.Collapsed;
-                ErrorText.Text = "";
+                HideError();
 
                 var api = new ApiService();
 
                 var json = JsonSerializer.Serialize(new
                 {
                     email = EmailTextBox.Text,
-                    password = PasswordBox.Password
+                    password = _isPasswordVisible
+                        ? PasswordVisibleTextBox.Text
+                        : PasswordBox.Password
                 });
 
                 var response = await api.Post("api/Auth/login", json);
@@ -44,8 +82,7 @@ namespace SmartGymAdminWPF.Views
 
                 if (!root.TryGetProperty("token", out var tokenElement))
                 {
-                    ErrorText.Text = "Hibás email vagy jelszó!";
-                    ErrorText.Visibility = Visibility.Visible;
+                    ShowError("Hibás email vagy jelszó!");
                     return;
                 }
 
@@ -53,8 +90,7 @@ namespace SmartGymAdminWPF.Views
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    ErrorText.Text = "Nincs token.";
-                    ErrorText.Visibility = Visibility.Visible;
+                    ShowError("Nincs token.");
                     return;
                 }
 
@@ -69,8 +105,7 @@ namespace SmartGymAdminWPF.Views
 
                 if (!admin)
                 {
-                    ErrorText.Text = "Csak admin léphet be!";
-                    ErrorText.Visibility = Visibility.Visible;
+                    ShowError("Csak admin léphet be!");
                     return;
                 }
 
@@ -81,8 +116,7 @@ namespace SmartGymAdminWPF.Views
             }
             catch
             {
-                ErrorText.Text = "Hibás email vagy jelszó!";
-                ErrorText.Visibility = Visibility.Visible;
+                ShowError("Hibás email vagy jelszó!");
             }
         }
     }

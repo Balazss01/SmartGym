@@ -143,7 +143,7 @@ namespace GymWebApiBackend.Controllers
                 b.TagId == tag.TagId &&
                 b.KilepesIdopont == null);
 
-            if (vanAktivBerlet && !marBentVan)
+            if (roles.Contains("User") && !marBentVan)
             {
                 _context.Belepesek.Add(new Belepes
                 {
