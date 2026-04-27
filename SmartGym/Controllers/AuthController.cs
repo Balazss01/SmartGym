@@ -1,15 +1,14 @@
 ﻿using GymWebApiBackend.Data;
 using GymWebApiBackend.DTOs;
 using GymWebApiBackend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Linq;
 
 namespace GymWebApiBackend.Controllers
 {
@@ -38,6 +37,7 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Register(RegisterDto dto)
         {
             var letezo = await _userManager.FindByEmailAsync(dto.Email);
+
             if (letezo != null)
                 return BadRequest(new { message = "Email már használatban" });
 
@@ -49,6 +49,7 @@ namespace GymWebApiBackend.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
+
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
@@ -73,33 +74,27 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Login(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
+
             if (user == null)
                 return Unauthorized(new { message = "Hibás adatok" });
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
+
             if (!result.Succeeded)
                 return Unauthorized(new { message = "Hibás adatok" });
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // tag rekord lekérése
             var tag = await _context.Tagok
                 .FirstOrDefaultAsync(t => t.IdentityUserId == user.Id);
 
-            // ha nincs, automatikusan létrehozzuk
             if (tag == null)
             {
-                var teljesNev = (user.TeljesNev ?? "").Trim();
-                var nevek = teljesNev.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                var vezeteknev = nevek.Length > 0 ? nevek[0] : "Ismeretlen";
-                var keresztnev = nevek.Length > 1 ? string.Join(" ", nevek.Skip(1)) : "Felhasználó";
-
                 tag = new Tag
                 {
                     IdentityUserId = user.Id,
-                    Vezeteknev = vezeteknev,
-                    Keresztnev = keresztnev,
+                    Vezeteknev = "Ismeretlen",
+                    Keresztnev = "Felhasználó",
                     SzuletesiDatum = new DateTime(1990, 1, 1),
                     Aktiv = true
                 };
@@ -136,6 +131,30 @@ namespace GymWebApiBackend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
+            var most = DateTime.Now;
+
+            var vanAktivBerlet = await _context.Berletek.AnyAsync(b =>
+                b.TagId == tag.TagId &&
+                b.Aktiv &&
+                b.KezdetDatum <= most &&
+                b.VegeDatum > most);
+
+            var marBentVan = await _context.Belepesek.AnyAsync(b =>
+                b.TagId == tag.TagId &&
+                b.KilepesIdopont == null);
+
+            if (vanAktivBerlet && !marBentVan)
+            {
+                _context.Belepesek.Add(new Belepes
+                {
+                    TagId = tag.TagId,
+                    BelepesIdopont = most,
+                    KilepesIdopont = null
+                });
+
+                await _context.SaveChangesAsync();
+            }
+
             return Ok(new
             {
                 message = "Sikeres login",
@@ -152,11 +171,11 @@ namespace GymWebApiBackend.Controllers
         public async Task<IActionResult> Me()
         {
             var tagIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (!int.TryParse(tagIdStr, out var tagId))
                 return Unauthorized();
 
-            var tag = await _context.Tagok
-                .FirstOrDefaultAsync(t => t.TagId == tagId);
+            var tag = await _context.Tagok.FirstOrDefaultAsync(t => t.TagId == tagId);
 
             if (tag == null)
                 return NotFound();

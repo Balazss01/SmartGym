@@ -26,9 +26,13 @@ namespace GymWebApiBackend.Controllers
 
             var osszesTag = await _context.Tagok.CountAsync();
             var aktivTag = await _context.Tagok.CountAsync(t => t.Aktiv);
-
             var osszesBerlet = await _context.Berletek.CountAsync();
-            var aktivBerlet = await _context.Berletek.CountAsync(b => b.Aktiv && b.VegeDatum > most);
+
+            var aktivBerlet = await _context.Berletek
+                .CountAsync(b => b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most);
+
+            var eloreMegvasaroltBerlet = await _context.Berletek
+                .CountAsync(b => b.Aktiv && b.KezdetDatum > most);
 
             var maiBelepesek = await _context.Belepesek
                 .CountAsync(b => b.BelepesIdopont >= ma && b.BelepesIdopont < holnap);
@@ -44,6 +48,7 @@ namespace GymWebApiBackend.Controllers
                 aktivTag,
                 osszesBerlet,
                 aktivBerlet,
+                eloreMegvasaroltBerlet, 
                 maiBelepesek,
                 bentLevok,
                 aktivSzekrenyFoglalasok
@@ -60,7 +65,7 @@ namespace GymWebApiBackend.Controllers
                 .Select(b => new
                 {
                     b.BelepesId,
-                    teljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
                     b.BelepesIdopont,
                     b.KilepesIdopont
                 })
@@ -68,34 +73,6 @@ namespace GymWebApiBackend.Controllers
 
             return Ok(lista);
         }
-
-        [HttpGet("napi-belepesek")]
-        public async Task<IActionResult> GetNapiBelepesek()
-        {
-            var kezdoNap = DateTime.Today.AddDays(-6);
-
-            var adatok = await _context.Belepesek
-                .Where(b => b.BelepesIdopont.Date >= kezdoNap.Date)
-                .GroupBy(b => b.BelepesIdopont.Date)
-                .Select(g => new
-                {
-                    datum = g.Key,
-                    darab = g.Count()
-                })
-                .ToListAsync();
-
-            var eredmeny = Enumerable.Range(0, 7)
-                .Select(i => kezdoNap.AddDays(i).Date)
-                .Select(nap => new
-                {
-                    datum = nap.ToString("MM.dd"),
-                    darab = adatok.FirstOrDefault(x => x.datum == nap)?.darab ?? 0
-                })
-                .ToList();
-
-            return Ok(eredmeny);
-        }
-
 
         [HttpGet("bent-levok")]
         public async Task<IActionResult> GetBentLevok()
@@ -106,10 +83,10 @@ namespace GymWebApiBackend.Controllers
                 .OrderByDescending(b => b.BelepesIdopont)
                 .Select(b => new
                 {
-                    BelepesId = b.BelepesId,
-                    TagId = b.TagId,
+                    b.BelepesId,
+                    b.TagId,
                     TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
-                    BelepesIdopont = b.BelepesIdopont
+                    b.BelepesIdopont
                 })
                 .ToListAsync();
 
@@ -122,7 +99,7 @@ namespace GymWebApiBackend.Controllers
             var kezdoNap = DateTime.Today.AddDays(-6);
 
             var adatok = await _context.Belepesek
-                .Where(b => b.BelepesIdopont.Date >= kezdoNap)
+                .Where(b => b.BelepesIdopont.Date >= kezdoNap.Date)
                 .GroupBy(b => b.BelepesIdopont.Date)
                 .Select(g => new
                 {
@@ -132,11 +109,11 @@ namespace GymWebApiBackend.Controllers
                 .ToListAsync();
 
             var eredmeny = Enumerable.Range(0, 7)
-                .Select(i => kezdoNap.AddDays(i))
+                .Select(i => kezdoNap.AddDays(i).Date)
                 .Select(nap => new
                 {
                     Datum = nap.ToString("MM.dd"),
-                    Darab = adatok.FirstOrDefault(x => x.Datum == nap.Date)?.Darab ?? 0
+                    Darab = adatok.FirstOrDefault(x => x.Datum == nap)?.Darab ?? 0
                 })
                 .ToList();
 
@@ -148,16 +125,21 @@ namespace GymWebApiBackend.Controllers
         {
             var most = DateTime.Now;
 
-            var aktiv = await _context.Berletek.CountAsync(b => b.Aktiv && b.VegeDatum > most);
-            var lejart = await _context.Berletek.CountAsync(b => !b.Aktiv || b.VegeDatum <= most);
+            var aktiv = await _context.Berletek
+                .CountAsync(b => b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most);
+
+            var eloreMegvasarolt = await _context.Berletek
+                .CountAsync(b => b.Aktiv && b.KezdetDatum > most);
+
+            var lejart = await _context.Berletek
+                .CountAsync(b => !b.Aktiv || b.VegeDatum <= most);
 
             return Ok(new
             {
                 Aktiv = aktiv,
-                Lejart = lejart
+                Lejart = lejart,
+                EloreMegvasarolt = eloreMegvasarolt
             });
         }
-
-
     }
 }

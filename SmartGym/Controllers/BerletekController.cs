@@ -19,6 +19,7 @@ namespace GymWebApiBackend.Controllers
         {
             _context = context;
         }
+
         public class BerletListDto
         {
             public int BerletId { get; set; }
@@ -27,7 +28,7 @@ namespace GymWebApiBackend.Controllers
             public bool Aktiv { get; set; }
             public string BerletTipusNev { get; set; }
         }
-        // SAJÁT BÉRLETEK (frontend ezt hívja)
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -36,6 +37,7 @@ namespace GymWebApiBackend.Controllers
             var berletek = await _context.Berletek
                 .Where(b => b.TagId == userId)
                 .Include(b => b.BerletTipus)
+                .OrderByDescending(b => b.KezdetDatum)
                 .Select(b => new BerletListDto
                 {
                     BerletId = b.BerletId,
@@ -48,6 +50,7 @@ namespace GymWebApiBackend.Controllers
 
             return Ok(berletek);
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -62,7 +65,7 @@ namespace GymWebApiBackend.Controllers
             return Ok(berlet);
         }
 
-        [HttpPost]  
+        [HttpPost]
         public async Task<IActionResult> Create(CreateBerletDto dto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -73,29 +76,19 @@ namespace GymWebApiBackend.Controllers
             if (tipus == null)
                 return BadRequest(new { message = "Bérlettípus nem létezik" });
 
-            // 🔥 AKTÍV bérlet keresése
-            var aktivBerlet = await _context.Berletek
-                .Where(b => b.TagId == userId && b.Aktiv && b.VegeDatum > DateTime.Now)
+            var most = DateTime.Now;
+
+            var utolsoBerlet = await _context.Berletek
+                .Where(b => b.TagId == userId && b.Aktiv && b.VegeDatum > most)
                 .OrderByDescending(b => b.VegeDatum)
                 .FirstOrDefaultAsync();
 
-            
-
-            DateTime kezdet;
-
-            if (aktivBerlet != null)
-            {
-                // 👉 STACKELÉS: az új bérlet a régi után indul
-                kezdet = aktivBerlet.VegeDatum;
-            }
-            else
-            {
-                kezdet = DateTime.Now;
-            }
+            var kezdet = utolsoBerlet != null
+                ? utolsoBerlet.VegeDatum
+                : most;
 
             var vege = kezdet.AddDays(tipus.IdotartamNapok);
 
-            // 🔥 régi marad aktív (NEM kapcsoljuk ki!)
             var berlet = new Berlet
             {
                 TagId = userId,
@@ -110,14 +103,19 @@ namespace GymWebApiBackend.Controllers
             _context.Ertesitesek.Add(new Ertesites
             {
                 TagId = userId,
-                Uzenet = "Új bérlet hozzáadva (stackelve)!",
+                Uzenet = $"Új bérlet vásárolva. Kezdete: {kezdet:yyyy.MM.dd}",
                 Olvasott = false,
                 Datum = DateTime.Now
             });
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Bérlet létrehozva" });
+            return Ok(new
+            {
+                message = "Bérlet sikeresen létrehozva",
+                kezdet = kezdet,
+                vege = vege
+            });
         }
 
         [HttpPut("{id}")]
@@ -128,15 +126,18 @@ namespace GymWebApiBackend.Controllers
             if (berlet == null)
                 return NotFound();
 
-            var berletTipusLetezik = await _context.BerletTipusok
-                .AnyAsync(bt => bt.BerletTipusId == dto.BerletTipusId);
-
-            if (!berletTipusLetezik)
+            // Ha a frontend 0-t küld, megtartjuk a régi bérlettípust
+            if (dto.BerletTipusId != 0)
             {
-                return BadRequest(new { message = "A megadott bérlettípus nem létezik." });
+                var berletTipusLetezik = await _context.BerletTipusok
+                    .AnyAsync(bt => bt.BerletTipusId == dto.BerletTipusId);
+
+                if (!berletTipusLetezik)
+                    return BadRequest(new { message = "A megadott bérlettípus nem létezik." });
+
+                berlet.BerletTipusId = dto.BerletTipusId;
             }
 
-            berlet.BerletTipusId = dto.BerletTipusId;
             berlet.KezdetDatum = dto.KezdetDatum;
             berlet.VegeDatum = dto.VegeDatum;
             berlet.Aktiv = dto.Aktiv;
@@ -159,6 +160,5 @@ namespace GymWebApiBackend.Controllers
 
             return Ok();
         }
-
     }
 }

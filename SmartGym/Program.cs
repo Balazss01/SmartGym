@@ -16,7 +16,7 @@ namespace GymWebApiBackend
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
-
+            builder.Services.AddHostedService<BerletBackgroundService>();
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>

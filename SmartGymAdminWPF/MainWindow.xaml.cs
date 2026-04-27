@@ -9,7 +9,27 @@ namespace SmartGymAdminWPF
         public MainWindow()
         {
             InitializeComponent();
+            HideSidebar();
             MainFrame.Navigate(new LoginPage());
+        }
+
+        public void NavigateToDashboard()
+        {
+            ShowSidebar();
+            ClearFrameHistory();
+            MainFrame.Navigate(new DashboardPage());
+        }
+
+        private void ShowSidebar()
+        {
+            SidebarColumn.Width = new GridLength(260);
+            SidebarBorder.Visibility = Visibility.Visible;
+        }
+
+        private void HideSidebar()
+        {
+            SidebarColumn.Width = new GridLength(0);
+            SidebarBorder.Visibility = Visibility.Collapsed;
         }
 
         private bool IsLoggedIn()
@@ -17,9 +37,21 @@ namespace SmartGymAdminWPF
             return !string.IsNullOrWhiteSpace(ApiService.Token);
         }
 
+        // 🔥 EZ HIÁNYZOTT → FRAME TAKARÍTÁS
+        private void ClearFrameHistory()
+        {
+            MainFrame.Content = null;
+
+            while (MainFrame.CanGoBack)
+            {
+                MainFrame.RemoveBackEntry();
+            }
+        }
+
         private void RequireLogin()
         {
-            MessageBox.Show("Először jelentkezz be adminnal.");
+            ClearFrameHistory();
+            HideSidebar();
             MainFrame.Navigate(new LoginPage());
         }
 
@@ -31,6 +63,7 @@ namespace SmartGymAdminWPF
                 return;
             }
 
+            ClearFrameHistory();
             MainFrame.Navigate(new DashboardPage());
         }
 
@@ -42,6 +75,7 @@ namespace SmartGymAdminWPF
                 return;
             }
 
+            ClearFrameHistory();
             MainFrame.Navigate(new TagokPage());
         }
 
@@ -53,6 +87,7 @@ namespace SmartGymAdminWPF
                 return;
             }
 
+            ClearFrameHistory();
             MainFrame.Navigate(new BerletekPage());
         }
 
@@ -64,13 +99,17 @@ namespace SmartGymAdminWPF
                 return;
             }
 
+            ClearFrameHistory();
             MainFrame.Navigate(new BelepesekPage());
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
+            ClearFrameHistory();
+
             ApiService.Token = "";
-            MessageBox.Show("Kijelentkeztél.");
+            HideSidebar();
+
             MainFrame.Navigate(new LoginPage());
         }
     }

@@ -306,14 +306,23 @@
 
     
     var kovetkezoBerlet = Model.Berletek
-    .Where(b => b.KezdetDatum > DateTime.Now)
+    .Where(b => b.Aktiv && b.KezdetDatum > DateTime.Now)
     .OrderBy(b => b.KezdetDatum)
     .FirstOrDefault();
 
     /* Alap statisztikák */
     int osszesBerlet = Model.Berletek.Count;
-    int aktivDb      = Model.Berletek.Count(b => b.Aktiv && b.VegeDatum > DateTime.Now);
-    int lejartDb     = Model.Berletek.Count(b => !b.Aktiv || b.VegeDatum <= DateTime.Now);
+
+    int aktivDb = Model.Berletek.Count(b =>
+        b.Aktiv &&
+        b.KezdetDatum <= DateTime.Now &&
+        b.VegeDatum > DateTime.Now
+    );
+
+    int lejartDb = Model.Berletek.Count(b =>
+        !b.Aktiv ||
+        b.VegeDatum <= DateTime.Now
+    );
 }
 
 <div class="sajat-berletek sb-container container-fluid px-0" style="max-width: 980px;">
@@ -463,8 +472,8 @@
                     @foreach (var berlet in Model.Berletek)
                     {
                        bool sorAktiv = berlet.Aktiv && berlet.KezdetDatum <= DateTime.Now && berlet.VegeDatum > DateTime.Now;
-                       bool sorJovobeli = berlet.KezdetDatum > DateTime.Now;
-                        <tr>
+                            bool sorJovobeli = berlet.Aktiv && berlet.KezdetDatum > DateTime.Now;
+                            <tr>
                             <td class="halvany" style="font-size: 12px;">@sorszam</td>
                             <td><strong>@berlet.BerletTipusNev</strong></td>
                             <td class="halvany">@berlet.KezdetDatum.ToString("yyyy.MM.dd")</td>

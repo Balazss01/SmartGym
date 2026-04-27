@@ -6,17 +6,25 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace SmartGymAdminWPF.Views
 {
     public partial class BerletekPage : Page
     {
-        private List<BerletListDto> _osszesBerlet = new List<BerletListDto>();
+        private List<BerletListDto> _osszesBerlet = new();
+
+        private readonly DispatcherTimer _timer = new();
 
         public BerletekPage()
         {
             InitializeComponent();
             Loaded += BerletekPage_Loaded;
+
+            // 🔥 AUTO REFRESH
+            _timer.Interval = TimeSpan.FromSeconds(20);
+            _timer.Tick += async (_, __) => await LoadBerletek();
+            _timer.Start();
         }
 
         private async void BerletekPage_Loaded(object sender, RoutedEventArgs e)
@@ -42,7 +50,7 @@ namespace SmartGymAdminWPF.Views
                     new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
-                    }) ?? new List<BerletListDto>();
+                    }) ?? new();
 
                 LoadTipusok();
                 UpdateStats();
@@ -59,8 +67,6 @@ namespace SmartGymAdminWPF.Views
             if (BerletTipusComboBox == null)
                 return;
 
-            var aktualis = (BerletTipusComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
-
             var tipusok = _osszesBerlet
                 .Select(b => b.BerletTipusNev)
                 .Where(t => !string.IsNullOrWhiteSpace(t))
@@ -76,30 +82,19 @@ namespace SmartGymAdminWPF.Views
                 BerletTipusComboBox.Items.Add(new ComboBoxItem { Content = tipus });
             }
 
-            if (!string.IsNullOrWhiteSpace(aktualis))
-            {
-                foreach (ComboBoxItem item in BerletTipusComboBox.Items)
-                {
-                    if ((item.Content?.ToString() ?? "") == aktualis)
-                    {
-                        BerletTipusComboBox.SelectedItem = item;
-                        return;
-                    }
-                }
-            }
-
             BerletTipusComboBox.SelectedIndex = 0;
         }
 
         private void UpdateStats()
         {
-            if (OsszesBerletText == null || AktivBerletText == null || LejartBerletText == null)
-                return;
-
             var most = DateTime.Now;
+
             var osszes = _osszesBerlet.Count;
-            var aktiv = _osszesBerlet.Count(b => b.Aktiv && b.VegeDatum > most);
-            var lejart = _osszesBerlet.Count(b => b.VegeDatum <= most || !b.Aktiv);
+            var aktiv = _osszesBerlet.Count(b =>
+                b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most);
+
+            var lejart = _osszesBerlet.Count(b =>
+                b.VegeDatum <= most || !b.Aktiv);
 
             OsszesBerletText.Text = osszes.ToString();
             AktivBerletText.Text = aktiv.ToString();
@@ -108,30 +103,27 @@ namespace SmartGymAdminWPF.Views
 
         private void ApplyFilter()
         {
-            if (BerletekGrid == null ||
-                KeresesTextBox == null ||
-                CsakAktivCheckBox == null ||
-                CsakLejartCheckBox == null ||
-                BerletTipusComboBox == null)
-                return;
-
             var keresett = KeresesTextBox.Text?.Trim().ToLower() ?? "";
+
             var csakAktiv = CsakAktivCheckBox.IsChecked == true;
             var csakLejart = CsakLejartCheckBox.IsChecked == true;
-            var selectedTipus = (BerletTipusComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Összes típus";
-            var most = DateTime.Now;
+
+            var selectedTipus =
+                (BerletTipusComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString()
+                ?? "Összes típus";
 
             var szurt = _osszesBerlet
                 .Where(b =>
-                    (!csakAktiv || (b.Aktiv && b.VegeDatum > most)) &&
-                    (!csakLejart || (b.VegeDatum <= most || !b.Aktiv)) &&
+                    (!csakAktiv || b.Statusz == "AKTÍV") &&
+                    (!csakLejart || b.Statusz == "LEJÁRT") &&
                     (selectedTipus == "Összes típus" || b.BerletTipusNev == selectedTipus) &&
                     (
                         string.IsNullOrWhiteSpace(keresett) ||
                         b.BerletId.ToString().Contains(keresett) ||
                         b.TagId.ToString().Contains(keresett) ||
                         (b.TeljesNev?.ToLower().Contains(keresett) ?? false) ||
-                        (b.BerletTipusNev?.ToLower().Contains(keresett) ?? false)
+                        (b.BerletTipusNev?.ToLower().Contains(keresett) ?? false) ||
+                        b.Statusz.ToLower().Contains(keresett)
                     ))
                 .OrderByDescending(b => b.KezdetDatum)
                 .ToList();
@@ -193,17 +185,17 @@ namespace SmartGymAdminWPF.Views
             try
             {
                 using var doc = JsonDocument.Parse(raw);
+
                 if (doc.RootElement.TryGetProperty("message", out var msg))
                     return msg.GetString() ?? raw;
             }
-            catch
-            {
-            }
+            catch { }
 
             return raw;
         }
     }
 
+    // 🔥 DTO + STATUS LOGIKA
     public class BerletListDto
     {
         public int BerletId { get; set; }
@@ -214,6 +206,22 @@ namespace SmartGymAdminWPF.Views
         public bool Aktiv { get; set; }
         public string BerletTipusNev { get; set; }
         public int BerletTipusId { get; set; }
+
+        public string Statusz
+        {
+            get
+            {
+                var most = DateTime.Now;
+
+                if (Aktiv && KezdetDatum > most)
+                    return "ELŐRE MEGVÁSÁROLT";
+
+                if (Aktiv && KezdetDatum <= most && VegeDatum > most)
+                    return "AKTÍV";
+
+                return "LEJÁRT";
+            }
+        }
     }
 
     public class UpdateBerletDto

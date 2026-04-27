@@ -102,29 +102,41 @@
                 <DataGridTextColumn Header="Név" Binding="{Binding TeljesNev}" Width="2*"/>
                 <DataGridTextColumn Header="Bérlet típusa" Binding="{Binding BerletTipusNev}" Width="2*"/>
                 <DataGridTextColumn Header="Kezdet" Binding="{Binding KezdetDatum, StringFormat=yyyy.MM.dd HH:mm}" Width="2*"/>
+                <DataGridTextColumn Header="Indulás" Binding="{Binding KezdetDatum, StringFormat=yyyy.MM.dd}" Width="2*"/>
                 <DataGridTextColumn Header="Vége" Binding="{Binding VegeDatum, StringFormat=yyyy.MM.dd HH:mm}" Width="2*"/>
 
                 <DataGridTemplateColumn Header="Státusz" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Padding="6"
-                                    CornerRadius="8"
-                                    HorizontalAlignment="Center">
+                    CornerRadius="8"
+                    HorizontalAlignment="Center">
+
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="Background" Value="#dc2626"/>
+                                        <!-- LEJÁRT -->
+
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Aktiv}" Value="True">
+
+                                            <!-- AKTÍV -->
+                                            <DataTrigger Binding="{Binding Statusz}" Value="AKTÍV">
                                                 <Setter Property="Background" Value="#16a34a"/>
                                             </DataTrigger>
+
+                                            <!-- ELŐRE MEGVÁSÁROLT -->
+                                            <DataTrigger Binding="{Binding Statusz}" Value="ELŐRE MEGVÁSÁROLT">
+                                                <Setter Property="Background" Value="#2563eb"/>
+                                            </DataTrigger>
+
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
 
-                                <TextBlock Text="{Binding Aktiv, Converter={StaticResource BoolToStatusTextConverter}}"
-                                           Foreground="White"
-                                           FontWeight="Bold"
-                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding Statusz}"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -133,7 +145,7 @@
                 <DataGridTemplateColumn Header="Művelet" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="Toggle"
+                            <Button Content="Állapot váltás"
                                     Padding="8,4"
                                     Click="ToggleBerlet_Click"/>
                         </DataTemplate>

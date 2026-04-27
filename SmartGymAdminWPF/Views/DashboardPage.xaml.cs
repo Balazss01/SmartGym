@@ -19,8 +19,7 @@ namespace SmartGymAdminWPF.Views
             InitializeComponent();
             Loaded += DashboardPage_Loaded;
             Unloaded += DashboardPage_Unloaded;
-
-            _timer.Interval = TimeSpan.FromSeconds(15);
+            _timer.Interval = TimeSpan.FromSeconds(5);
             _timer.Tick += Timer_Tick;
         }
 
@@ -34,6 +33,9 @@ namespace SmartGymAdminWPF.Views
             }
 
             await ReloadAll();
+
+            _timer.Start();
+            AutoRefreshCheckBox.IsChecked = true;
         }
 
         private void DashboardPage_Unloaded(object sender, RoutedEventArgs e)
@@ -73,6 +75,7 @@ namespace SmartGymAdminWPF.Views
                 AktivTagText.Text = stats.AktivTag.ToString();
                 OsszesBerletText.Text = stats.OsszesBerlet.ToString();
                 AktivBerletText.Text = stats.AktivBerlet.ToString();
+                EloreMegvasaroltBerletText.Text = stats.EloreMegvasaroltBerlet.ToString();
                 MaiBelepesText.Text = stats.MaiBelepesek.ToString();
                 BentLevokText.Text = stats.BentLevok.ToString();
                 SzekrenyFoglalasText.Text = stats.AktivSzekrenyFoglalasok.ToString();
@@ -91,7 +94,7 @@ namespace SmartGymAdminWPF.Views
                 var json = await api.Get("api/AdminDashboard/bent-levok");
 
                 var lista = JsonSerializer.Deserialize<List<BentLevoDto>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<BentLevoDto>();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
                 BentLevokGrid.ItemsSource = lista;
             }
@@ -109,7 +112,7 @@ namespace SmartGymAdminWPF.Views
                 var json = await api.Get("api/AdminDashboard/utolso-belepesek");
 
                 var lista = JsonSerializer.Deserialize<List<UtolsoBelepesDto>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<UtolsoBelepesDto>();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
                 UtolsoBelepesekGrid.ItemsSource = lista;
             }
@@ -127,7 +130,7 @@ namespace SmartGymAdminWPF.Views
                 var json = await api.Get("api/AdminDashboard/heti-belepesek");
 
                 var lista = JsonSerializer.Deserialize<List<HetiBelepesDto>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<HetiBelepesDto>();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
                 var max = lista.Any() ? Math.Max(lista.Max(x => x.Darab), 1) : 1;
 
@@ -156,15 +159,19 @@ namespace SmartGymAdminWPF.Views
 
                 if (adat == null) return;
 
-                var total = Math.Max(adat.Aktiv + adat.Lejart, 1);
+                var total = Math.Max(adat.Aktiv + adat.EloreMegvasarolt + adat.Lejart, 1);
 
                 AktivBerletProgress.Maximum = total;
                 AktivBerletProgress.Value = adat.Aktiv;
-                AktivBerletAranyText.Text = $"{adat.Aktiv} db";
+                AktivBerletAranyText.Text = $"{adat.Aktiv} aktív";
+
+                EloreMegvasaroltProgress.Maximum = total;
+                EloreMegvasaroltProgress.Value = adat.EloreMegvasarolt;
+                EloreMegvasaroltAranyText.Text = $"{adat.EloreMegvasarolt} előre megvásárolt";
 
                 LejartBerletProgress.Maximum = total;
                 LejartBerletProgress.Value = adat.Lejart;
-                LejartBerletAranyText.Text = $"{adat.Lejart} db";
+                LejartBerletAranyText.Text = $"{adat.Lejart} lejárt / inaktív";
             }
             catch (Exception ex)
             {
@@ -194,6 +201,7 @@ namespace SmartGymAdminWPF.Views
         public int AktivTag { get; set; }
         public int OsszesBerlet { get; set; }
         public int AktivBerlet { get; set; }
+        public int EloreMegvasaroltBerlet { get; set; }
         public int MaiBelepesek { get; set; }
         public int BentLevok { get; set; }
         public int AktivSzekrenyFoglalasok { get; set; }
@@ -226,5 +234,6 @@ namespace SmartGymAdminWPF.Views
     {
         public int Aktiv { get; set; }
         public int Lejart { get; set; }
+        public int EloreMegvasarolt { get; set; }
     }
 }

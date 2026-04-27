@@ -1,9 +1,11 @@
-﻿using SmartGymAdminWPF.Services;
+﻿using SmartGymAdminWPF;
+using SmartGymAdminWPF.Services;
 using System;
 using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SmartGymAdminWPF.Views
 {
@@ -14,10 +16,19 @@ namespace SmartGymAdminWPF.Views
             InitializeComponent();
         }
 
+        private void LoginEnter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                LoginButton_Click(sender, e);
+        }
+
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                ErrorText.Visibility = Visibility.Collapsed;
+                ErrorText.Text = "";
+
                 var api = new ApiService();
 
                 var json = JsonSerializer.Serialize(new
@@ -31,15 +42,22 @@ namespace SmartGymAdminWPF.Views
                 using var doc = JsonDocument.Parse(response);
                 var root = doc.RootElement;
 
-                var token = root.GetProperty("token").GetString();
-
-                if (string.IsNullOrWhiteSpace(token))
+                if (!root.TryGetProperty("token", out var tokenElement))
                 {
-                    MessageBox.Show("Nincs token.");
+                    ErrorText.Text = "Hibás email vagy jelszó!";
+                    ErrorText.Visibility = Visibility.Visible;
                     return;
                 }
 
-                // 🔥 ADMIN CHECK
+                var token = tokenElement.GetString();
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    ErrorText.Text = "Nincs token.";
+                    ErrorText.Visibility = Visibility.Visible;
+                    return;
+                }
+
                 bool admin = false;
 
                 if (root.TryGetProperty("roles", out var roles))
@@ -51,20 +69,20 @@ namespace SmartGymAdminWPF.Views
 
                 if (!admin)
                 {
-                    MessageBox.Show("Csak admin léphet be!");
+                    ErrorText.Text = "Csak admin léphet be!";
+                    ErrorText.Visibility = Visibility.Visible;
                     return;
                 }
 
                 ApiService.Token = token;
 
-                MessageBox.Show("Sikeres admin login!");
-
-                var main = (MainWindow)Application.Current.MainWindow;
-                main.MainFrame.Navigate(new DashboardPage());
+                var main = Application.Current.MainWindow as MainWindow;
+                main?.NavigateToDashboard();
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show(ex.Message);
+                ErrorText.Text = "Hibás email vagy jelszó!";
+                ErrorText.Visibility = Visibility.Visible;
             }
         }
     }
