@@ -1,0 +1,706 @@
+﻿@page
+@model GymFrontend.Pages.GaleriaModel
+
+<style>
+    /* ── PAGE HEADER ── */
+    .galeria-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-tag {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #00f5c4;
+        margin-bottom: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .page-tag-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #00f5c4;
+        animation: gal-blink 2s infinite;
+    }
+
+    @@keyframes gal-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    .page-title {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 700;
+        color: #f0ede8;
+        margin: 0 0 10px 0;
+        line-height: 1.1;
+    }
+
+        .page-title .accent {
+            background: linear-gradient(135deg, #00f5c4, #7c6af8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+    .page-desc {
+        font-size: 14px;
+        color: rgba(240,237,232,0.5);
+        line-height: 1.7;
+        max-width: 580px;
+    }
+
+    /* ── FILTER CHIPS ── */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 16px;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        color: rgba(240,237,232,0.7);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12.5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .filter-chip:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.18);
+            color: #f0ede8;
+        }
+
+        .filter-chip.active {
+            background: rgba(0,245,196,0.1);
+            border-color: rgba(0,245,196,0.3);
+            color: #00f5c4;
+        }
+
+    .filter-chip i {
+        font-size: 13px;
+    }
+
+    /* ── GALÉRIA GRID ── */
+    .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 220px;
+        gap: 14px;
+    }
+
+    .gal-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        cursor: pointer;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.08);
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+
+        .gal-item.size-l {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gal-item.size-m {
+            grid-row: span 2;
+        }
+
+        .gal-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                transparent 40%,
+                rgba(9,9,15,0.4) 70%,
+                rgba(9,9,15,0.92) 100%);
+            opacity: 0.85;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .gal-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(.4,0,.2,1), filter 0.3s;
+            filter: brightness(0.9) saturate(0.95);
+        }
+
+        .gal-item:hover {
+            border-color: rgba(0,245,196,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4),
+                        0 0 0 1px rgba(0,245,196,0.15);
+        }
+
+            .gal-item:hover::after {
+                opacity: 1;
+            }
+
+            .gal-item:hover img {
+                transform: scale(1.06);
+                filter: brightness(1) saturate(1.05);
+            }
+
+    .gal-info {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 18px 20px;
+        z-index: 2;
+        transform: translateY(8px);
+        opacity: 0.92;
+        transition: all 0.3s;
+    }
+
+    .gal-item:hover .gal-info {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .gal-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #00f5c4;
+        background: rgba(0,245,196,0.12);
+        border: 0.5px solid rgba(0,245,196,0.25);
+        border-radius: 12px;
+        padding: 3px 10px;
+        margin-bottom: 8px;
+    }
+
+        .gal-tag.purple {
+            color: #7c6af8;
+            background: rgba(124,106,248,0.12);
+            border-color: rgba(124,106,248,0.25);
+        }
+
+        .gal-tag.green {
+            color: #4ade80;
+            background: rgba(74,222,128,0.12);
+            border-color: rgba(74,222,128,0.25);
+        }
+
+    .gal-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: #f0ede8;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .gal-item.size-l .gal-title {
+        font-size: 22px;
+    }
+
+    .gal-desc {
+        font-size: 12.5px;
+        color: rgba(240,237,232,0.6);
+        line-height: 1.5;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s, margin 0.4s;
+    }
+
+    .gal-item:hover .gal-desc {
+        max-height: 60px;
+        margin-top: 2px;
+    }
+
+    .gal-icon-zoom {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(9,9,15,0.7);
+        backdrop-filter: blur(8px);
+        border: 0.5px solid rgba(255,255,255,0.15);
+        color: #f0ede8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: all 0.3s;
+        z-index: 2;
+    }
+
+    .gal-item:hover .gal-icon-zoom {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .gal-item.hidden { display: none; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(9,9,15,0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 40px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+        .lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+    .lb-content {
+        max-width: 1100px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+    }
+
+    .lb-img-wrap {
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 8px;
+        overflow: hidden;
+    }
+
+    #lb-img {
+        max-height: 75vh;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        margin: 0 auto;
+        border-radius: 12px;
+        display: block;
+    }
+
+    .lb-caption {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .lb-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        color: #f0ede8;
+        font-weight: 600;
+    }
+
+    .lb-desc {
+        font-size: 13px;
+        color: rgba(240,237,232,0.55);
+        max-width: 600px;
+    }
+
+    .lb-counter {
+        margin-top: 8px;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(240,237,232,0.35);
+    }
+
+    .lb-btn {
+        position: absolute;
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(8px);
+        border: 0.5px solid rgba(255,255,255,0.12);
+        color: #f0ede8;
+        font-size: 18px;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        z-index: 2;
+    }
+
+        .lb-btn:hover {
+            background: rgba(0,245,196,0.12);
+            border-color: rgba(0,245,196,0.3);
+            color: #00f5c4;
+        }
+
+    .lb-close {
+        top: 24px;
+        right: 24px;
+        position: fixed;
+    }
+
+    .lb-prev { left: -70px; top: 50%; transform: translateY(-50%); }
+    .lb-next { right: -70px; top: 50%; transform: translateY(-50%); }
+
+    /* ── RESPONSIVE ── */
+    @@media (max-width: 1024px) {
+        .galeria-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gal-item.size-l {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        .gal-item.size-m {
+            grid-row: span 1;
+        }
+
+        .lb-prev, .lb-next {
+            position: fixed;
+            top: auto;
+            bottom: 30px;
+            transform: none;
+        }
+
+            .lb-prev { left: 30%; }
+            .lb-next { right: 30%; }
+    }
+
+    @@media (max-width: 640px) {
+        .galeria-grid {
+            grid-template-columns: 1fr;
+            grid-auto-rows: 240px;
+        }
+
+        .gal-item.size-l { grid-column: span 1; }
+
+        .gal-info { opacity: 1; transform: translateY(0); }
+        .gal-desc { max-height: 60px; margin-top: 2px; }
+
+        .lightbox { padding: 16px; }
+
+        .lb-prev { left: 20px; }
+        .lb-next { right: 20px; }
+    }
+</style>
+
+<div class="galeria-wrapper">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="page-tag">
+            <span class="page-tag-dot"></span>
+            Tekints be hozzánk
+        </div>
+        <h1 class="page-title">
+            Smart<span class="accent">GYM</span> galéria
+        </h1>
+        <p class="page-desc">
+            Fedezd fel a termünk minden zegét-zugát — a recepciótól a wellness részlegig.
+            Modern eszközpark, prémium környezet, letisztult elegancia.
+        </p>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+        <button class="filter-chip active" data-filter="all">
+            <i class="bi bi-grid-3x3-gap"></i>
+            Összes
+        </button>
+        <button class="filter-chip" data-filter="terem">
+            <i class="bi bi-bicycle"></i>
+            Edzőterem
+        </button>
+        <button class="filter-chip" data-filter="kozosseg">
+            <i class="bi bi-cup-hot"></i>
+            Közösségi terek
+        </button>
+        <button class="filter-chip" data-filter="wellness">
+            <i class="bi bi-droplet"></i>
+            Wellness &amp; Higiénia
+        </button>
+    </div>
+
+    <!-- GRID -->
+    <div class="galeria-grid">
+
+        <figure class="gal-item size-l" data-cat="kozosseg" data-index="0">
+            <img src="~/images/galeria/recepcio.png" alt="Recepció" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag purple"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <div class="gal-title">Recepció</div>
+                <div class="gal-desc">Az első benyomás. Itt fogad téged a csapatunk a regisztrációhoz és tájékoztatáshoz.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item size-m" data-cat="terem" data-index="1">
+            <img src="~/images/galeria/terem1.png" alt="Edzőterem 1" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="gal-title">Főterem</div>
+                <div class="gal-desc">Súlyzók, gépek és tükörfalak — minden, ami az erőedzéshez kell.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="terem" data-index="2">
+            <img src="~/images/galeria/terem2.png" alt="Edzőterem 2" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="gal-title">Gépterem</div>
+                <div class="gal-desc">Csúcskategóriás kardió- és erősítőgépek.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="terem" data-index="3">
+            <img src="~/images/galeria/bemelegito.png" alt="Bemelegítő terület" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="gal-title">Bemelegítő zóna</div>
+                <div class="gal-desc">Funkcionális tréninghez kialakított szabad terület.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item size-l" data-cat="wellness" data-index="4">
+            <img src="~/images/galeria/wellnes.png" alt="Wellness részleg" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag green"><i class="bi bi-droplet"></i> Wellness</span>
+                <div class="gal-title">Wellness &amp; pihenő</div>
+                <div class="gal-desc">Pezsgőfürdő, szauna és pihenőágyak az edzés utáni regenerációhoz.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="terem" data-index="5">
+            <img src="~/images/galeria/boxring.png" alt="Bokszring" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="gal-title">Bokszring</div>
+                <div class="gal-desc">Profi méretű ring és felszerelés a küzdősportok kedvelőinek.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="kozosseg" data-index="6">
+            <img src="~/images/galeria/bufe.png" alt="Büfé" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag purple"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <div class="gal-title">Büfé</div>
+                <div class="gal-desc">Frissen préselt levek, fehérje shake-ek és egészséges falatok.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="wellness" data-index="7">
+            <img src="~/images/galeria/oltozok.png" alt="Öltözők" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="gal-title">Öltözők</div>
+                <div class="gal-desc">Számzáras szekrények, márvány burkolat, kényelmes tér.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="wellness" data-index="8">
+            <img src="~/images/galeria/tusolok.png" alt="Tusolók" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="gal-title">Tusolók</div>
+                <div class="gal-desc">Külön zuhanyfülkék, prémium kiszolgálással.</div>
+            </div>
+        </figure>
+
+        <figure class="gal-item" data-cat="wellness" data-index="9">
+            <img src="~/images/galeria/mosdo.png" alt="Mosdó" loading="lazy" />
+            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="gal-info">
+                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="gal-title">Mosdó</div>
+                <div class="gal-desc">Letisztult, márvány burkolatú mosdóhelyiség.</div>
+            </div>
+        </figure>
+
+    </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lb-btn lb-close" id="lb-close" aria-label="Bezárás">
+        <i class="bi bi-x-lg"></i>
+    </button>
+    <button class="lb-btn lb-prev" id="lb-prev" aria-label="Előző">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <button class="lb-btn lb-next" id="lb-next" aria-label="Következő">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+
+    <div class="lb-content">
+        <div class="lb-img-wrap">
+            <img id="lb-img" src="" alt="" />
+        </div>
+        <div class="lb-caption">
+            <div class="lb-title" id="lb-title"></div>
+            <div class="lb-desc" id="lb-desc"></div>
+            <div class="lb-counter" id="lb-counter"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        // ── FILTER ──
+        const chips = document.querySelectorAll('.filter-chip');
+        const items = document.querySelectorAll('.gal-item');
+
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+
+                const f = chip.dataset.filter;
+                items.forEach(item => {
+                    const show = (f === 'all' || item.dataset.cat === f);
+                    item.classList.toggle('hidden', !show);
+                });
+            });
+        });
+
+        // ── LIGHTBOX ──
+        const lb       = document.getElementById('lightbox');
+        const lbImg    = document.getElementById('lb-img');
+        const lbTitle  = document.getElementById('lb-title');
+        const lbDesc   = document.getElementById('lb-desc');
+        const lbCount  = document.getElementById('lb-counter');
+        const lbClose  = document.getElementById('lb-close');
+        const lbPrev   = document.getElementById('lb-prev');
+        const lbNext   = document.getElementById('lb-next');
+
+        const data = Array.from(items).map(it => ({
+            src:   it.querySelector('img').src,
+            alt:   it.querySelector('img').alt,
+            title: it.querySelector('.gal-title').textContent,
+            desc:  it.querySelector('.gal-desc').textContent
+        }));
+
+        let cur = 0;
+
+        function visibleIndices() {
+            return Array.from(items)
+                .map((it, i) => ({ it, i }))
+                .filter(x => !x.it.classList.contains('hidden'))
+                .map(x => x.i);
+        }
+
+        function update() {
+            const d = data[cur];
+            lbImg.src = d.src;
+            lbImg.alt = d.alt;
+            lbTitle.textContent = d.title;
+            lbDesc.textContent = d.desc;
+
+            const vis = visibleIndices();
+            const pos = vis.indexOf(cur) + 1;
+            lbCount.textContent = pos + ' / ' + vis.length;
+        }
+
+        function open(idx) {
+            cur = idx;
+            update();
+            lb.classList.add('active');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function close() {
+            lb.classList.remove('active');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function step(dir) {
+            const vis = visibleIndices();
+            if (vis.length === 0) return;
+            let p = vis.indexOf(cur);
+            p = (p + dir + vis.length) % vis.length;
+            cur = vis[p];
+            update();
+        }
+
+        items.forEach((it, idx) => {
+            it.addEventListener('click', () => open(idx));
+        });
+
+        lbClose.addEventListener('click', close);
+        lbPrev .addEventListener('click', () => step(-1));
+        lbNext .addEventListener('click', () => step(1));
+
+        lb.addEventListener('click', (e) => {
+            if (e.target === lb) close();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!lb.classList.contains('active')) return;
+            if (e.key === 'Escape')     close();
+            if (e.key === 'ArrowLeft')  step(-1);
+            if (e.key === 'ArrowRight') step(1);
+        });
+
+        // ── FADE-IN ON SCROLL ──
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(en => {
+                    if (en.isIntersecting) {
+                        en.target.style.opacity = '1';
+                        en.target.style.transform = 'translateY(0)';
+                        io.unobserve(en.target);
+                    }
+                });
+            }, { threshold: 0.08 });
+
+            items.forEach((it, idx) => {
+                it.style.opacity = '0';
+                it.style.transform = 'translateY(20px)';
+                it.style.transition = 'opacity .55s ease ' + (idx * 0.04) + 's, transform .55s ease ' + (idx * 0.04) + 's, border-color .3s, box-shadow .3s';
+                io.observe(it);
+            });
+        }
+    })();
+</script>
