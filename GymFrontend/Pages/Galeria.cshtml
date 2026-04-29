@@ -2,17 +2,17 @@
 @model GymFrontend.Pages.GaleriaModel
 
 <style>
-    /* ── PAGE HEADER ── */
-    .galeria-wrapper {
+    /* ── OLDAL FEJLEC ── */
+    .galeria-keret {
         max-width: 1280px;
         margin: 0 auto;
     }
 
-    .page-header {
+    .oldal-fejlec {
         margin-bottom: 28px;
     }
 
-    .page-tag {
+    .oldal-cimke {
         font-size: 11px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
@@ -23,20 +23,20 @@
         gap: 7px;
     }
 
-    .page-tag-dot {
+    .oldal-cimke-pont {
         width: 6px;
         height: 6px;
         border-radius: 50%;
         background: #00f5c4;
-        animation: gal-blink 2s infinite;
+        animation: villog 2s infinite;
     }
 
-    @@keyframes gal-blink {
+    @@keyframes villog {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.3; }
     }
 
-    .page-title {
+    .oldal-cim {
         font-family: 'Syne', sans-serif;
         font-size: clamp(1.8rem, 4vw, 2.4rem);
         font-weight: 700;
@@ -45,22 +45,22 @@
         line-height: 1.1;
     }
 
-        .page-title .accent {
+        .oldal-cim .kiemelt {
             background: linear-gradient(135deg, #00f5c4, #7c6af8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-    .page-desc {
+    .oldal-leiras {
         font-size: 14px;
         color: rgba(240,237,232,0.5);
         line-height: 1.7;
         max-width: 580px;
     }
 
-    /* ── FILTER CHIPS ── */
-    .filter-bar {
+    /* ── SZURO SAV ── */
+    .szuro-sav {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
@@ -69,7 +69,7 @@
         border-bottom: 0.5px solid rgba(255,255,255,0.08);
     }
 
-    .filter-chip {
+    .szuro-gomb {
         display: inline-flex;
         align-items: center;
         gap: 7px;
@@ -85,31 +85,31 @@
         transition: all 0.2s;
     }
 
-        .filter-chip:hover {
+        .szuro-gomb:hover {
             background: rgba(255,255,255,0.07);
             border-color: rgba(255,255,255,0.18);
             color: #f0ede8;
         }
 
-        .filter-chip.active {
+        .szuro-gomb.aktiv {
             background: rgba(0,245,196,0.1);
             border-color: rgba(0,245,196,0.3);
             color: #00f5c4;
         }
 
-    .filter-chip i {
+    .szuro-gomb i {
         font-size: 13px;
     }
 
-    /* ── GALÉRIA GRID ── */
-    .galeria-grid {
+    /* ── GALERIA RACS ── */
+    .galeria-racs {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         grid-auto-rows: 220px;
         gap: 14px;
     }
 
-    .gal-item {
+    .kep-doboz {
         position: relative;
         overflow: hidden;
         border-radius: 16px;
@@ -119,16 +119,16 @@
         transition: all 0.3s cubic-bezier(.4,0,.2,1);
     }
 
-        .gal-item.size-l {
+        .kep-doboz.nagy {
             grid-column: span 2;
             grid-row: span 2;
         }
 
-        .gal-item.size-m {
+        .kep-doboz.kozepes {
             grid-row: span 2;
         }
 
-        .gal-item::after {
+        .kep-doboz::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -142,7 +142,7 @@
             z-index: 1;
         }
 
-        .gal-item img {
+        .kep-doboz img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -150,23 +150,23 @@
             filter: brightness(0.9) saturate(0.95);
         }
 
-        .gal-item:hover {
+        .kep-doboz:hover {
             border-color: rgba(0,245,196,0.3);
             transform: translateY(-3px);
             box-shadow: 0 12px 32px rgba(0,0,0,0.4),
                         0 0 0 1px rgba(0,245,196,0.15);
         }
 
-            .gal-item:hover::after {
+            .kep-doboz:hover::after {
                 opacity: 1;
             }
 
-            .gal-item:hover img {
+            .kep-doboz:hover img {
                 transform: scale(1.06);
                 filter: brightness(1) saturate(1.05);
             }
 
-    .gal-info {
+    .kep-infok {
         position: absolute;
         left: 0;
         right: 0;
@@ -178,12 +178,12 @@
         transition: all 0.3s;
     }
 
-    .gal-item:hover .gal-info {
+    .kep-doboz:hover .kep-infok {
         transform: translateY(0);
         opacity: 1;
     }
 
-    .gal-tag {
+    .kep-cimke {
         display: inline-flex;
         align-items: center;
         gap: 5px;
@@ -198,19 +198,19 @@
         margin-bottom: 8px;
     }
 
-        .gal-tag.purple {
+        .kep-cimke.lila {
             color: #7c6af8;
             background: rgba(124,106,248,0.12);
             border-color: rgba(124,106,248,0.25);
         }
 
-        .gal-tag.green {
+        .kep-cimke.zold {
             color: #4ade80;
             background: rgba(74,222,128,0.12);
             border-color: rgba(74,222,128,0.25);
         }
 
-    .gal-title {
+    .kep-cim {
         font-family: 'Syne', sans-serif;
         font-size: 17px;
         font-weight: 700;
@@ -219,11 +219,11 @@
         line-height: 1.2;
     }
 
-    .gal-item.size-l .gal-title {
+    .kep-doboz.nagy .kep-cim {
         font-size: 22px;
     }
 
-    .gal-desc {
+    .kep-leiras {
         font-size: 12.5px;
         color: rgba(240,237,232,0.6);
         line-height: 1.5;
@@ -232,12 +232,12 @@
         transition: max-height 0.4s, margin 0.4s;
     }
 
-    .gal-item:hover .gal-desc {
+    .kep-doboz:hover .kep-leiras {
         max-height: 60px;
         margin-top: 2px;
     }
 
-    .gal-icon-zoom {
+    .kep-nagyitas {
         position: absolute;
         top: 14px;
         right: 14px;
@@ -258,15 +258,15 @@
         z-index: 2;
     }
 
-    .gal-item:hover .gal-icon-zoom {
+    .kep-doboz:hover .kep-nagyitas {
         opacity: 1;
         transform: translateY(0);
     }
 
-    .gal-item.hidden { display: none; }
+    .kep-doboz.rejtett { display: none; }
 
-    /* ── LIGHTBOX ── */
-    .lightbox {
+    /* ── NAGYITO ── */
+    .nagyito {
         position: fixed;
         inset: 0;
         background: rgba(9,9,15,0.92);
@@ -281,19 +281,19 @@
         transition: opacity 0.3s;
     }
 
-        .lightbox.active {
+        .nagyito.aktiv {
             display: flex;
             opacity: 1;
         }
 
-    .lb-content {
+    .nagyito-tartalom {
         max-width: 1100px;
         width: 100%;
         text-align: center;
         position: relative;
     }
 
-    .lb-img-wrap {
+    .nagyito-kep-keret {
         background: rgba(255,255,255,0.04);
         border: 0.5px solid rgba(255,255,255,0.1);
         border-radius: 16px;
@@ -301,7 +301,7 @@
         overflow: hidden;
     }
 
-    #lb-img {
+    #nagyito-kep {
         max-height: 75vh;
         max-width: 100%;
         width: auto;
@@ -311,7 +311,7 @@
         display: block;
     }
 
-    .lb-caption {
+    .nagyito-felirat {
         margin-top: 18px;
         display: flex;
         flex-direction: column;
@@ -319,20 +319,20 @@
         gap: 6px;
     }
 
-    .lb-title {
+    .nagyito-cim {
         font-family: 'Syne', sans-serif;
         font-size: 18px;
         color: #f0ede8;
         font-weight: 600;
     }
 
-    .lb-desc {
+    .nagyito-leiras {
         font-size: 13px;
         color: rgba(240,237,232,0.55);
         max-width: 600px;
     }
 
-    .lb-counter {
+    .nagyito-szamlalo {
         margin-top: 8px;
         font-size: 11px;
         letter-spacing: 0.12em;
@@ -340,7 +340,7 @@
         color: rgba(240,237,232,0.35);
     }
 
-    .lb-btn {
+    .nagyito-gomb {
         position: absolute;
         background: rgba(255,255,255,0.05);
         backdrop-filter: blur(8px);
@@ -358,348 +358,348 @@
         z-index: 2;
     }
 
-        .lb-btn:hover {
+        .nagyito-gomb:hover {
             background: rgba(0,245,196,0.12);
             border-color: rgba(0,245,196,0.3);
             color: #00f5c4;
         }
 
-    .lb-close {
+    .nagyito-bezar {
         top: 24px;
         right: 24px;
         position: fixed;
     }
 
-    .lb-prev { left: -70px; top: 50%; transform: translateY(-50%); }
-    .lb-next { right: -70px; top: 50%; transform: translateY(-50%); }
+    .nagyito-elozo { left: -70px; top: 50%; transform: translateY(-50%); }
+    .nagyito-kovetkezo { right: -70px; top: 50%; transform: translateY(-50%); }
 
-    /* ── RESPONSIVE ── */
+    /* ── RESZPONZIV ── */
     @@media (max-width: 1024px) {
-        .galeria-grid {
+        .galeria-racs {
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .gal-item.size-l {
+        .kep-doboz.nagy {
             grid-column: span 2;
             grid-row: span 1;
         }
 
-        .gal-item.size-m {
+        .kep-doboz.kozepes {
             grid-row: span 1;
         }
 
-        .lb-prev, .lb-next {
+        .nagyito-elozo, .nagyito-kovetkezo {
             position: fixed;
             top: auto;
             bottom: 30px;
             transform: none;
         }
 
-            .lb-prev { left: 30%; }
-            .lb-next { right: 30%; }
+            .nagyito-elozo { left: 30%; }
+            .nagyito-kovetkezo { right: 30%; }
     }
 
     @@media (max-width: 640px) {
-        .galeria-grid {
+        .galeria-racs {
             grid-template-columns: 1fr;
             grid-auto-rows: 240px;
         }
 
-        .gal-item.size-l { grid-column: span 1; }
+        .kep-doboz.nagy { grid-column: span 1; }
 
-        .gal-info { opacity: 1; transform: translateY(0); }
-        .gal-desc { max-height: 60px; margin-top: 2px; }
+        .kep-infok { opacity: 1; transform: translateY(0); }
+        .kep-leiras { max-height: 60px; margin-top: 2px; }
 
-        .lightbox { padding: 16px; }
+        .nagyito { padding: 16px; }
 
-        .lb-prev { left: 20px; }
-        .lb-next { right: 20px; }
+        .nagyito-elozo { left: 20px; }
+        .nagyito-kovetkezo { right: 20px; }
     }
 </style>
 
-<div class="galeria-wrapper">
+<div class="galeria-keret">
 
-    <!-- HEADER -->
-    <div class="page-header">
-        <div class="page-tag">
-            <span class="page-tag-dot"></span>
+    <!-- FEJLEC -->
+    <div class="oldal-fejlec">
+        <div class="oldal-cimke">
+            <span class="oldal-cimke-pont"></span>
             Tekints be hozzánk
         </div>
-        <h1 class="page-title">
-            Smart<span class="accent">GYM</span> galéria
+        <h1 class="oldal-cim">
+            Smart<span class="kiemelt">GYM</span> galéria
         </h1>
-        <p class="page-desc">
+        <p class="oldal-leiras">
             Fedezd fel a termünk minden zegét-zugát — a recepciótól a wellness részlegig.
             Modern eszközpark, prémium környezet, letisztult elegancia.
         </p>
     </div>
 
-    <!-- FILTER -->
-    <div class="filter-bar">
-        <button class="filter-chip active" data-filter="all">
+    <!-- SZURO -->
+    <div class="szuro-sav">
+        <button class="szuro-gomb aktiv" data-szuro="osszes">
             <i class="bi bi-grid-3x3-gap"></i>
             Összes
         </button>
-        <button class="filter-chip" data-filter="terem">
+        <button class="szuro-gomb" data-szuro="terem">
             <i class="bi bi-bicycle"></i>
             Edzőterem
         </button>
-        <button class="filter-chip" data-filter="kozosseg">
+        <button class="szuro-gomb" data-szuro="kozosseg">
             <i class="bi bi-cup-hot"></i>
             Közösségi terek
         </button>
-        <button class="filter-chip" data-filter="wellness">
+        <button class="szuro-gomb" data-szuro="wellness">
             <i class="bi bi-droplet"></i>
             Wellness &amp; Higiénia
         </button>
     </div>
 
-    <!-- GRID -->
-    <div class="galeria-grid">
+    <!-- RACS -->
+    <div class="galeria-racs">
 
-        <figure class="gal-item size-l" data-cat="kozosseg" data-index="0">
+        <figure class="kep-doboz nagy" data-kategoria="kozosseg" data-sorszam="0">
             <img src="~/images/galeria/recepcio.png" alt="Recepció" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag purple"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
-                <div class="gal-title">Recepció</div>
-                <div class="gal-desc">Az első benyomás. Itt fogad téged a csapatunk a regisztrációhoz és tájékoztatáshoz.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke lila"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <div class="kep-cim">Recepció</div>
+                <div class="kep-leiras">Az első benyomás. Itt fogad téged a csapatunk a regisztrációhoz és tájékoztatáshoz.</div>
             </div>
         </figure>
 
-        <figure class="gal-item size-m" data-cat="terem" data-index="1">
+        <figure class="kep-doboz kozepes" data-kategoria="terem" data-sorszam="1">
             <img src="~/images/galeria/terem1.png" alt="Edzőterem 1" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
-                <div class="gal-title">Főterem</div>
-                <div class="gal-desc">Súlyzók, gépek és tükörfalak — minden, ami az erőedzéshez kell.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="kep-cim">Főterem</div>
+                <div class="kep-leiras">Súlyzók, gépek és tükörfalak — minden, ami az erőedzéshez kell.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="terem" data-index="2">
+        <figure class="kep-doboz" data-kategoria="terem" data-sorszam="2">
             <img src="~/images/galeria/terem2.png" alt="Edzőterem 2" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
-                <div class="gal-title">Gépterem</div>
-                <div class="gal-desc">Csúcskategóriás kardió- és erősítőgépek.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="kep-cim">Gépterem</div>
+                <div class="kep-leiras">Csúcskategóriás kardió- és erősítőgépek.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="terem" data-index="3">
+        <figure class="kep-doboz" data-kategoria="terem" data-sorszam="3">
             <img src="~/images/galeria/bemelegito.png" alt="Bemelegítő terület" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
-                <div class="gal-title">Bemelegítő zóna</div>
-                <div class="gal-desc">Funkcionális tréninghez kialakított szabad terület.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="kep-cim">Bemelegítő zóna</div>
+                <div class="kep-leiras">Funkcionális tréninghez kialakított szabad terület.</div>
             </div>
         </figure>
 
-        <figure class="gal-item size-l" data-cat="wellness" data-index="4">
+        <figure class="kep-doboz nagy" data-kategoria="wellness" data-sorszam="4">
             <img src="~/images/galeria/wellnes.png" alt="Wellness részleg" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag green"><i class="bi bi-droplet"></i> Wellness</span>
-                <div class="gal-title">Wellness &amp; pihenő</div>
-                <div class="gal-desc">Pezsgőfürdő, szauna és pihenőágyak az edzés utáni regenerációhoz.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Wellness</span>
+                <div class="kep-cim">Wellness &amp; pihenő</div>
+                <div class="kep-leiras">Pezsgőfürdő, szauna és pihenőágyak az edzés utáni regenerációhoz.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="terem" data-index="5">
+        <figure class="kep-doboz" data-kategoria="terem" data-sorszam="5">
             <img src="~/images/galeria/boxring.png" alt="Bokszring" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag"><i class="bi bi-bicycle"></i> Edzőterem</span>
-                <div class="gal-title">Bokszring</div>
-                <div class="gal-desc">Profi méretű ring és felszerelés a küzdősportok kedvelőinek.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <div class="kep-cim">Bokszring</div>
+                <div class="kep-leiras">Profi méretű ring és felszerelés a küzdősportok kedvelőinek.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="kozosseg" data-index="6">
+        <figure class="kep-doboz" data-kategoria="kozosseg" data-sorszam="6">
             <img src="~/images/galeria/bufe.png" alt="Büfé" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag purple"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
-                <div class="gal-title">Büfé</div>
-                <div class="gal-desc">Frissen préselt levek, fehérje shake-ek és egészséges falatok.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke lila"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <div class="kep-cim">Büfé</div>
+                <div class="kep-leiras">Frissen préselt levek, fehérje shake-ek és egészséges falatok.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="wellness" data-index="7">
+        <figure class="kep-doboz" data-kategoria="wellness" data-sorszam="7">
             <img src="~/images/galeria/oltozok.png" alt="Öltözők" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
-                <div class="gal-title">Öltözők</div>
-                <div class="gal-desc">Számzáras szekrények, márvány burkolat, kényelmes tér.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="kep-cim">Öltözők</div>
+                <div class="kep-leiras">Számzáras szekrények, márvány burkolat, kényelmes tér.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="wellness" data-index="8">
+        <figure class="kep-doboz" data-kategoria="wellness" data-sorszam="8">
             <img src="~/images/galeria/tusolok.png" alt="Tusolók" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
-                <div class="gal-title">Tusolók</div>
-                <div class="gal-desc">Külön zuhanyfülkék, prémium kiszolgálással.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="kep-cim">Tusolók</div>
+                <div class="kep-leiras">Külön zuhanyfülkék, prémium kiszolgálással.</div>
             </div>
         </figure>
 
-        <figure class="gal-item" data-cat="wellness" data-index="9">
+        <figure class="kep-doboz" data-kategoria="wellness" data-sorszam="9">
             <img src="~/images/galeria/mosdo.png" alt="Mosdó" loading="lazy" />
-            <div class="gal-icon-zoom"><i class="bi bi-arrows-fullscreen"></i></div>
-            <div class="gal-info">
-                <span class="gal-tag green"><i class="bi bi-droplet"></i> Higiénia</span>
-                <div class="gal-title">Mosdó</div>
-                <div class="gal-desc">Letisztult, márvány burkolatú mosdóhelyiség.</div>
+            <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
+            <div class="kep-infok">
+                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <div class="kep-cim">Mosdó</div>
+                <div class="kep-leiras">Letisztult, márvány burkolatú mosdóhelyiség.</div>
             </div>
         </figure>
 
     </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" aria-hidden="true">
-    <button class="lb-btn lb-close" id="lb-close" aria-label="Bezárás">
+<!-- NAGYITO -->
+<div class="nagyito" id="nagyito" aria-hidden="true">
+    <button class="nagyito-gomb nagyito-bezar" id="nagyito-bezar" aria-label="Bezárás">
         <i class="bi bi-x-lg"></i>
     </button>
-    <button class="lb-btn lb-prev" id="lb-prev" aria-label="Előző">
+    <button class="nagyito-gomb nagyito-elozo" id="nagyito-elozo" aria-label="Előző">
         <i class="bi bi-chevron-left"></i>
     </button>
-    <button class="lb-btn lb-next" id="lb-next" aria-label="Következő">
+    <button class="nagyito-gomb nagyito-kovetkezo" id="nagyito-kovetkezo" aria-label="Következő">
         <i class="bi bi-chevron-right"></i>
     </button>
 
-    <div class="lb-content">
-        <div class="lb-img-wrap">
-            <img id="lb-img" src="" alt="" />
+    <div class="nagyito-tartalom">
+        <div class="nagyito-kep-keret">
+            <img id="nagyito-kep" src="" alt="" />
         </div>
-        <div class="lb-caption">
-            <div class="lb-title" id="lb-title"></div>
-            <div class="lb-desc" id="lb-desc"></div>
-            <div class="lb-counter" id="lb-counter"></div>
+        <div class="nagyito-felirat">
+            <div class="nagyito-cim" id="nagyito-cim"></div>
+            <div class="nagyito-leiras" id="nagyito-leiras"></div>
+            <div class="nagyito-szamlalo" id="nagyito-szamlalo"></div>
         </div>
     </div>
 </div>
 
 <script>
     (function () {
-        // ── FILTER ──
-        const chips = document.querySelectorAll('.filter-chip');
-        const items = document.querySelectorAll('.gal-item');
+        // ── SZURES ──
+        const szuroGombok = document.querySelectorAll('.szuro-gomb');
+        const kepDobozok  = document.querySelectorAll('.kep-doboz');
 
-        chips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                chips.forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
+        szuroGombok.forEach(gomb => {
+            gomb.addEventListener('click', () => {
+                szuroGombok.forEach(g => g.classList.remove('aktiv'));
+                gomb.classList.add('aktiv');
 
-                const f = chip.dataset.filter;
-                items.forEach(item => {
-                    const show = (f === 'all' || item.dataset.cat === f);
-                    item.classList.toggle('hidden', !show);
+                const szuro = gomb.dataset.szuro;
+                kepDobozok.forEach(doboz => {
+                    const megjelenit = (szuro === 'osszes' || doboz.dataset.kategoria === szuro);
+                    doboz.classList.toggle('rejtett', !megjelenit);
                 });
             });
         });
 
-        // ── LIGHTBOX ──
-        const lb       = document.getElementById('lightbox');
-        const lbImg    = document.getElementById('lb-img');
-        const lbTitle  = document.getElementById('lb-title');
-        const lbDesc   = document.getElementById('lb-desc');
-        const lbCount  = document.getElementById('lb-counter');
-        const lbClose  = document.getElementById('lb-close');
-        const lbPrev   = document.getElementById('lb-prev');
-        const lbNext   = document.getElementById('lb-next');
+        // ── NAGYITO ──
+        const nagyito          = document.getElementById('nagyito');
+        const nagyitoKep       = document.getElementById('nagyito-kep');
+        const nagyitoCim       = document.getElementById('nagyito-cim');
+        const nagyitoLeiras    = document.getElementById('nagyito-leiras');
+        const nagyitoSzamlalo  = document.getElementById('nagyito-szamlalo');
+        const nagyitoBezar     = document.getElementById('nagyito-bezar');
+        const nagyitoElozo     = document.getElementById('nagyito-elozo');
+        const nagyitoKovetkezo = document.getElementById('nagyito-kovetkezo');
 
-        const data = Array.from(items).map(it => ({
-            src:   it.querySelector('img').src,
-            alt:   it.querySelector('img').alt,
-            title: it.querySelector('.gal-title').textContent,
-            desc:  it.querySelector('.gal-desc').textContent
+        const adatok = Array.from(kepDobozok).map(doboz => ({
+            forras: doboz.querySelector('img').src,
+            alt:    doboz.querySelector('img').alt,
+            cim:    doboz.querySelector('.kep-cim').textContent,
+            leiras: doboz.querySelector('.kep-leiras').textContent
         }));
 
-        let cur = 0;
+        let aktualis = 0;
 
-        function visibleIndices() {
-            return Array.from(items)
-                .map((it, i) => ({ it, i }))
-                .filter(x => !x.it.classList.contains('hidden'))
-                .map(x => x.i);
+        function lathatoSorszamok() {
+            return Array.from(kepDobozok)
+                .map((doboz, sorszam) => ({ doboz, sorszam }))
+                .filter(x => !x.doboz.classList.contains('rejtett'))
+                .map(x => x.sorszam);
         }
 
-        function update() {
-            const d = data[cur];
-            lbImg.src = d.src;
-            lbImg.alt = d.alt;
-            lbTitle.textContent = d.title;
-            lbDesc.textContent = d.desc;
+        function frissit() {
+            const adat = adatok[aktualis];
+            nagyitoKep.src = adat.forras;
+            nagyitoKep.alt = adat.alt;
+            nagyitoCim.textContent = adat.cim;
+            nagyitoLeiras.textContent = adat.leiras;
 
-            const vis = visibleIndices();
-            const pos = vis.indexOf(cur) + 1;
-            lbCount.textContent = pos + ' / ' + vis.length;
+            const lathato = lathatoSorszamok();
+            const pozicio = lathato.indexOf(aktualis) + 1;
+            nagyitoSzamlalo.textContent = pozicio + ' / ' + lathato.length;
         }
 
-        function open(idx) {
-            cur = idx;
-            update();
-            lb.classList.add('active');
-            lb.setAttribute('aria-hidden', 'false');
+        function megnyit(sorszam) {
+            aktualis = sorszam;
+            frissit();
+            nagyito.classList.add('aktiv');
+            nagyito.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
         }
 
-        function close() {
-            lb.classList.remove('active');
-            lb.setAttribute('aria-hidden', 'true');
+        function bezar() {
+            nagyito.classList.remove('aktiv');
+            nagyito.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
         }
 
-        function step(dir) {
-            const vis = visibleIndices();
-            if (vis.length === 0) return;
-            let p = vis.indexOf(cur);
-            p = (p + dir + vis.length) % vis.length;
-            cur = vis[p];
-            update();
+        function lepes(irany) {
+            const lathato = lathatoSorszamok();
+            if (lathato.length === 0) return;
+            let pozicio = lathato.indexOf(aktualis);
+            pozicio = (pozicio + irany + lathato.length) % lathato.length;
+            aktualis = lathato[pozicio];
+            frissit();
         }
 
-        items.forEach((it, idx) => {
-            it.addEventListener('click', () => open(idx));
+        kepDobozok.forEach((doboz, sorszam) => {
+            doboz.addEventListener('click', () => megnyit(sorszam));
         });
 
-        lbClose.addEventListener('click', close);
-        lbPrev .addEventListener('click', () => step(-1));
-        lbNext .addEventListener('click', () => step(1));
+        nagyitoBezar.addEventListener('click', bezar);
+        nagyitoElozo.addEventListener('click', () => lepes(-1));
+        nagyitoKovetkezo.addEventListener('click', () => lepes(1));
 
-        lb.addEventListener('click', (e) => {
-            if (e.target === lb) close();
+        nagyito.addEventListener('click', (esemeny) => {
+            if (esemeny.target === nagyito) bezar();
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (!lb.classList.contains('active')) return;
-            if (e.key === 'Escape')     close();
-            if (e.key === 'ArrowLeft')  step(-1);
-            if (e.key === 'ArrowRight') step(1);
+        document.addEventListener('keydown', (esemeny) => {
+            if (!nagyito.classList.contains('aktiv')) return;
+            if (esemeny.key === 'Escape')     bezar();
+            if (esemeny.key === 'ArrowLeft')  lepes(-1);
+            if (esemeny.key === 'ArrowRight') lepes(1);
         });
 
-        // ── FADE-IN ON SCROLL ──
+        // ── BELEPESI ANIMACIO GORGETESKOR ──
         if ('IntersectionObserver' in window) {
-            const io = new IntersectionObserver((entries) => {
-                entries.forEach(en => {
-                    if (en.isIntersecting) {
-                        en.target.style.opacity = '1';
-                        en.target.style.transform = 'translateY(0)';
-                        io.unobserve(en.target);
+            const figyelo = new IntersectionObserver((bejegyzesek) => {
+                bejegyzesek.forEach(bej => {
+                    if (bej.isIntersecting) {
+                        bej.target.style.opacity = '1';
+                        bej.target.style.transform = 'translateY(0)';
+                        figyelo.unobserve(bej.target);
                     }
                 });
             }, { threshold: 0.08 });
 
-            items.forEach((it, idx) => {
-                it.style.opacity = '0';
-                it.style.transform = 'translateY(20px)';
-                it.style.transition = 'opacity .55s ease ' + (idx * 0.04) + 's, transform .55s ease ' + (idx * 0.04) + 's, border-color .3s, box-shadow .3s';
-                io.observe(it);
+            kepDobozok.forEach((doboz, sorszam) => {
+                doboz.style.opacity = '0';
+                doboz.style.transform = 'translateY(20px)';
+                doboz.style.transition = 'opacity .55s ease ' + (sorszam * 0.04) + 's, transform .55s ease ' + (sorszam * 0.04) + 's, border-color .3s, box-shadow .3s';
+                figyelo.observe(doboz);
             });
         }
     })();
