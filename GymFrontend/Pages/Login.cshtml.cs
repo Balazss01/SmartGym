@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json;
 
@@ -12,9 +13,10 @@ public class LoginModel : PageModel
         _httpClientFactory = httpClientFactory;
     }
 
+    [Required(ErrorMessage = "Az email cím megadása kötelezõ.")]
     [BindProperty]
     public string Email { get; set; }
-
+    [Required(ErrorMessage = "A jelszó megadása kötelezõ.")]
     [BindProperty]
     public string Password { get; set; }
 

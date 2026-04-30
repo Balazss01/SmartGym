@@ -231,7 +231,9 @@
             </button>
         </form>
 
-        <div asp-validation-summary="All" class="validation-msg"></div>
+        <div asp-validation-summary="All" class="validation-msg"
+             style="@(ViewData.ModelState.IsValid ? "display:none;" : "")">
+        </div>
 
         <div class="login-divider">vagy</div>
 

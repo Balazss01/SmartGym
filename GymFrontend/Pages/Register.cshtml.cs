@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json;
 
@@ -12,15 +13,19 @@ public class RegisterModel : PageModel
         _httpClientFactory = httpClientFactory;
     }
 
+    [Required(ErrorMessage = "Az email cím megadása kötelező.")]
     [BindProperty]
     public string Email { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "A jelszó megadása kötelező.")]    
     [BindProperty]
     public string Password { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "A vezetéknév megadása kötelező.")]
     [BindProperty]
     public string Vezeteknev { get; set; } = string.Empty;
-
+    
+    [Required(ErrorMessage = "A keresztnév megadása kötelező.")]
     [BindProperty]
     public string Keresztnev { get; set; } = string.Empty;
 
@@ -54,8 +59,7 @@ public class RegisterModel : PageModel
         }
 
         var error = await response.Content.ReadAsStringAsync();
-        ModelState.AddModelError("", error);
-
+        ModelState.AddModelError("", "Hiba történt a regisztráció során!");
         return Page();
     }
 }
