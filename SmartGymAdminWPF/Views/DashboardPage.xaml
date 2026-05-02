@@ -345,7 +345,7 @@
                         <TextBlock Text="AKTIVITÁS"
                                    Foreground="#00f5c4" FontSize="10" FontWeight="SemiBold"
                                    Margin="0,0,0,3"/>
-                        <TextBlock Text="Utolsó 10 belépés"
+                        <TextBlock Text="Utolsó 10 belépés a terembe"
                                    Foreground="#f0ede8" FontSize="16" FontWeight="Bold"/>
                     </StackPanel>
                     <DataGrid x:Name="UtolsoBelepesekGrid"
