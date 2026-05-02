@@ -52,16 +52,14 @@ namespace SmartGymAdminWPF.Views
             try
             {
                 var api = new ApiService();
-                var json = await api.Get("api/Berletek");
+
+                var json = await api.Get("api/Berletek/admin-all");
 
                 if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
                     return;
 
                 _osszesBerlet = JsonSerializer.Deserialize<List<BerletListDto>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }) ?? new();
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
                 LoadTipusok();
                 UpdateStats();
@@ -142,9 +140,7 @@ namespace SmartGymAdminWPF.Views
         }
 
         private void KeresesTextBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
-
         private void FilterChanged(object sender, RoutedEventArgs e) => ApplyFilter();
-
         private void FilterChanged(object sender, SelectionChangedEventArgs e) => ApplyFilter();
 
         private async void FrissitesButton_Click(object sender, RoutedEventArgs e)
@@ -166,7 +162,6 @@ namespace SmartGymAdminWPF.Views
                     return;
 
                 var api = new ApiService();
-
                 var json = JsonSerializer.Serialize(new UpdateBerletDto
                 {
                     BerletTipusId = berlet.BerletTipusId,
@@ -201,15 +196,17 @@ namespace SmartGymAdminWPF.Views
         }
     }
 
+    // ── DTOs ──
+
     public class BerletListDto
     {
         public int BerletId { get; set; }
         public int TagId { get; set; }
-        public string TeljesNev { get; set; }
+        public string TeljesNev { get; set; } = "";
         public DateTime KezdetDatum { get; set; }
         public DateTime VegeDatum { get; set; }
         public bool Aktiv { get; set; }
-        public string BerletTipusNev { get; set; }
+        public string BerletTipusNev { get; set; } = "";
         public int BerletTipusId { get; set; }
 
         public string Statusz
@@ -217,13 +214,8 @@ namespace SmartGymAdminWPF.Views
             get
             {
                 var most = DateTime.Now;
-
-                if (Aktiv && KezdetDatum > most)
-                    return "ELŐRE MEGVÁSÁROLT";
-
-                if (Aktiv && KezdetDatum <= most && VegeDatum > most)
-                    return "AKTÍV";
-
+                if (Aktiv && KezdetDatum > most) return "ELŐRE MEGVÁSÁROLT";
+                if (Aktiv && KezdetDatum <= most && VegeDatum > most) return "AKTÍV";
                 return "LEJÁRT";
             }
         }

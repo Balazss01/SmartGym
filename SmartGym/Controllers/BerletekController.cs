@@ -20,19 +20,52 @@ namespace GymWebApiBackend.Controllers
             _context = context;
         }
 
+        // ── DTOs ────────────────────────────────────────────────────
+
         public class BerletListDto
         {
             public int BerletId { get; set; }
+            public int TagId { get; set; }          // FIX: hozzáadva
+            public string TeljesNev { get; set; } = "";    // FIX: hozzáadva
             public DateTime KezdetDatum { get; set; }
             public DateTime VegeDatum { get; set; }
             public bool Aktiv { get; set; }
-            public string BerletTipusNev { get; set; }
+            public string BerletTipusNev { get; set; } = "";
+            public int BerletTipusId { get; set; }          // FIX: hozzáadva (WPF toggle-hoz kell)
         }
+
+        // ── ADMIN: összes bérlet (TagId + TeljesNev is benne) ───────
+
+        [HttpGet("admin-all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAll()
+        {
+            var berletek = await _context.Berletek
+                .Include(b => b.Tag)
+                .Include(b => b.BerletTipus)
+                .OrderByDescending(b => b.KezdetDatum)
+                .Select(b => new BerletListDto
+                {
+                    BerletId = b.BerletId,
+                    TagId = b.TagId,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
+                    KezdetDatum = b.KezdetDatum,
+                    VegeDatum = b.VegeDatum,
+                    Aktiv = b.Aktiv,
+                    BerletTipusNev = b.BerletTipus.Megnevezes,
+                    BerletTipusId = b.BerletTipusId
+                })
+                .ToListAsync();
+
+            return Ok(berletek);
+        }
+
+        // ── USER: saját bérletek ─────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var berletek = await _context.Berletek
                 .Where(b => b.TagId == userId)
@@ -41,10 +74,13 @@ namespace GymWebApiBackend.Controllers
                 .Select(b => new BerletListDto
                 {
                     BerletId = b.BerletId,
+                    TagId = b.TagId,
+                    TeljesNev = b.Tag.Vezeteknev + " " + b.Tag.Keresztnev,
                     KezdetDatum = b.KezdetDatum,
                     VegeDatum = b.VegeDatum,
                     Aktiv = b.Aktiv,
-                    BerletTipusNev = b.BerletTipus.Megnevezes
+                    BerletTipusNev = b.BerletTipus.Megnevezes,
+                    BerletTipusId = b.BerletTipusId
                 })
                 .ToListAsync();
 
@@ -68,7 +104,7 @@ namespace GymWebApiBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateBerletDto dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var tipus = await _context.BerletTipusok
                 .FirstOrDefaultAsync(t => t.BerletTipusId == dto.BerletTipusId);
@@ -83,10 +119,7 @@ namespace GymWebApiBackend.Controllers
                 .OrderByDescending(b => b.VegeDatum)
                 .FirstOrDefaultAsync();
 
-            var kezdet = utolsoBerlet != null
-                ? utolsoBerlet.VegeDatum
-                : most;
-
+            var kezdet = utolsoBerlet != null ? utolsoBerlet.VegeDatum : most;
             var vege = kezdet.AddDays(tipus.IdotartamNapok);
 
             var berlet = new Berlet
@@ -110,12 +143,7 @@ namespace GymWebApiBackend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                message = "Bérlet sikeresen létrehozva",
-                kezdet = kezdet,
-                vege = vege
-            });
+            return Ok(new { message = "Bérlet sikeresen létrehozva", kezdet, vege });
         }
 
         [HttpPut("{id}")]
@@ -126,7 +154,6 @@ namespace GymWebApiBackend.Controllers
             if (berlet == null)
                 return NotFound();
 
-            // Ha a frontend 0-t küld, megtartjuk a régi bérlettípust
             if (dto.BerletTipusId != 0)
             {
                 var berletTipusLetezik = await _context.BerletTipusok
