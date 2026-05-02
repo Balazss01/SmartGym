@@ -86,7 +86,8 @@ namespace GymWebApiBackend.Controllers
             {
                 bentVan = aktivBelepes != null,
                 belepesId = aktivBelepes?.BelepesId,
-                vanAktivSzekreny = vanAktivSzekreny
+                vanAktivSzekreny = vanAktivSzekreny,
+                tagId = userId
             });
         }
 

@@ -17,6 +17,7 @@ namespace GymFrontend.Pages
 
         public bool BentVan { get; set; }
         public bool VanAktivSzekreny { get; set; }
+        public int TagId { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -38,6 +39,9 @@ namespace GymFrontend.Pages
 
             if (data.TryGetProperty("vanAktivSzekreny", out var szekreny))
                 VanAktivSzekreny = szekreny.GetBoolean();
+
+            if (data.TryGetProperty("tagId", out var tag) && tag.ValueKind == JsonValueKind.Number)
+                TagId = tag.GetInt32();
         }
 
         public async Task<IActionResult> OnPostBelepAsync()
