@@ -23,7 +23,7 @@ namespace SmartGymAdminWPF.Views
             Loaded += BerletekPage_Loaded;
             Unloaded += BerletekPage_Unloaded;
 
-            _timer.Interval = TimeSpan.FromSeconds(20);
+            _timer.Interval = TimeSpan.FromSeconds(5);
             _timer.Tick += async (_, __) => await LoadBerletek();
         }
 
