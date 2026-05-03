@@ -9,6 +9,7 @@
         justify-content: center;
         padding: 40px 16px;
     }
+
     .register-card {
         width: 100%;
         max-width: 460px;
@@ -19,18 +20,20 @@
         position: relative;
         overflow: hidden;
     }
-    .register-card::before {
-        content: '';
-        position: absolute;
-        bottom: -60px;
-        right: -60px;
-        width: 200px;
-        height: 200px;
-        background: rgba(124,106,248,0.07);
-        border-radius: 50%;
-        filter: blur(60px);
-        pointer-events: none;
-    }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            background: rgba(124,106,248,0.07);
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
     .register-title {
         font-size: 22px;
         font-weight: 700;
@@ -38,26 +41,31 @@
         text-align: center;
         margin-bottom: 6px;
     }
+
     .register-subtitle {
         font-size: 13px;
         color: rgba(240,237,232,0.4);
         text-align: center;
         margin-bottom: 28px;
     }
+
     .field-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
+
     .field-group {
         margin-bottom: 14px;
     }
+
     .field-label {
         font-size: 12px;
         color: rgba(240,237,232,0.5);
         margin-bottom: 6px;
         display: block;
     }
+
     .field-input {
         width: 100%;
         background: rgba(255,255,255,0.05) !important;
@@ -67,11 +75,13 @@
         font-size: 14px !important;
         padding: 11px 14px !important;
     }
+
     .validation-msg {
         margin-top: 6px;
         color: #f87171;
         font-size: 12px;
     }
+
     .submit-btn {
         width: 100%;
         padding: 12px;
@@ -83,6 +93,38 @@
         font-weight: 700 !important;
         cursor: pointer !important;
     }
+
+    .date-row {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 1.5fr;
+        gap: 8px;
+    }
+
+    .date-select {
+        width: 100%;
+        background: rgba(255,255,255,0.05) !important;
+        border: 0.5px solid rgba(255,255,255,0.1) !important;
+        border-radius: 10px !important;
+        color: #f0ede8 !important;
+        font-size: 14px !important;
+        padding: 11px 12px !important;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        cursor: pointer;
+    }
+
+        .date-select option {
+            background: #1a1a2e;
+            color: #f0ede8;
+        }
+
+        .date-select:focus {
+            outline: none;
+            border-color: rgba(0,245,196,0.4) !important;
+        }
 </style>
 
 <div class="register-wrap">
@@ -109,7 +151,31 @@
 
             <div class="field-group">
                 <label class="field-label">Születési dátum</label>
-                <input asp-for="SzuletesiDatum" type="date" class="field-input" />
+                <!-- Hidden input amit a model binding olvas -->
+                <input asp-for="SzuletesiDatum" type="hidden" id="szuletesiDatumHidden" />
+                <div class="date-row">
+                    <select id="dd_ev" class="date-select" onchange="updateDatum()">
+                        <option value="">Év</option>
+                    </select>
+                    <select id="dd_ho" class="date-select" onchange="updateDatum()">
+                        <option value="">Hónap</option>
+                        <option value="01">Január</option>
+                        <option value="02">Február</option>
+                        <option value="03">Március</option>
+                        <option value="04">Április</option>
+                        <option value="05">Május</option>
+                        <option value="06">Június</option>
+                        <option value="07">Július</option>
+                        <option value="08">Augusztus</option>
+                        <option value="09">Szeptember</option>
+                        <option value="10">Október</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <select id="dd_nap" class="date-select" onchange="updateDatum()">
+                        <option value="">Nap</option>
+                    </select>
+                </div>
                 <span asp-validation-for="SzuletesiDatum" class="validation-msg"></span>
             </div>
 
@@ -149,8 +215,51 @@
 </div>
 
 <script>
-function togglePassword() {
-    const input = document.getElementById("passwordInput");
-    input.type = input.type === "password" ? "text" : "password";
-}
+    function togglePassword() {
+        const input = document.getElementById("passwordInput");
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // Évek feltöltése (1940 - idei év)
+    (function() {
+        const evSelect = document.getElementById("dd_ev");
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= 1940; y--) {
+            const opt = document.createElement("option");
+            opt.value = y;
+            opt.textContent = y;
+            evSelect.appendChild(opt);
+        }
+    })();
+
+    // Napok feltöltése az év+hónap alapján
+    function updateNapok() {
+        const ev  = parseInt(document.getElementById("dd_ev").value)  || 2000;
+        const ho  = parseInt(document.getElementById("dd_ho").value)  || 1;
+        const napSelect = document.getElementById("dd_nap");
+        const elozoNap  = napSelect.value;
+
+        const napokSzama = new Date(ev, ho, 0).getDate();
+        napSelect.innerHTML = '<option value="">Nap</option>';
+        for (let d = 1; d <= napokSzama; d++) {
+            const opt = document.createElement("option");
+            opt.value = String(d).padStart(2, "0");
+            opt.textContent = d;
+            napSelect.appendChild(opt);
+        }
+        if (elozoNap && parseInt(elozoNap) <= napokSzama) napSelect.value = elozoNap;
+    }
+
+    function updateDatum() {
+        updateNapok();
+        const ev  = document.getElementById("dd_ev").value;
+        const ho  = document.getElementById("dd_ho").value;
+        const nap = document.getElementById("dd_nap").value;
+        if (ev && ho && nap) {
+            document.getElementById("szuletesiDatumHidden").value = `${ev}-${ho}-${nap}`;
+        }
+    }
+
+    // Napok első betöltése
+    updateNapok();
 </script>

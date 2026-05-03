@@ -131,30 +131,6 @@ namespace GymWebApiBackend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            var most = DateTime.Now;
-
-            var vanAktivBerlet = await _context.Berletek.AnyAsync(b =>
-                b.TagId == tag.TagId &&
-                b.Aktiv &&
-                b.KezdetDatum <= most &&
-                b.VegeDatum > most);
-
-            var marBentVan = await _context.Belepesek.AnyAsync(b =>
-                b.TagId == tag.TagId &&
-                b.KilepesIdopont == null);
-
-            if (roles.Contains("User") && !marBentVan)
-            {
-                _context.Belepesek.Add(new Belepes
-                {
-                    TagId = tag.TagId,
-                    BelepesIdopont = most,
-                    KilepesIdopont = null
-                });
-
-                await _context.SaveChangesAsync();
-            }
-
             return Ok(new
             {
                 message = "Sikeres login",
