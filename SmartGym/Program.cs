@@ -15,14 +15,11 @@ namespace GymWebApiBackend
         {
             var builder = WebApplication.CreateBuilder(args);
 
-           
+
 
             builder.Services.AddControllers();
 
-            
-            builder.Services.AddHostedService<BerletBackgroundService>();
 
-            
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -32,7 +29,7 @@ namespace GymWebApiBackend
                 )
             );
 
-            
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -46,7 +43,7 @@ namespace GymWebApiBackend
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-            
+
             var jwtKey = builder.Configuration["Jwt:Key"];
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
             var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -116,7 +113,7 @@ namespace GymWebApiBackend
 
             var app = builder.Build();
 
-            
+
 
             if (app.Environment.IsDevelopment())
             {
@@ -133,7 +130,7 @@ namespace GymWebApiBackend
 
             app.MapControllers();
 
-            
+
 
             using (var scope = app.Services.CreateScope())
             {

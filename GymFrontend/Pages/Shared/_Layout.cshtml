@@ -488,17 +488,6 @@
                 border-color: var(--border-hover);
             }
 
-        .notif-badge {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: 1.5px solid var(--bg);
-        }
-
         /* Dropdowns */
         .dropdown-wrapper {
             position: relative;
@@ -568,28 +557,6 @@
                     color: #f87171;
                 }
 
-        .notif-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            font-size: 12.5px;
-            color: var(--text-muted);
-            transition: background 0.15s;
-            cursor: default;
-        }
-
-            .notif-item:hover {
-                background: var(--bg-card-hover);
-            }
-
-        .notif-icon {
-            font-size: 14px;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
         /* ── CONTENT ── */
         .content {
             margin-left: var(--sidebar-w);
@@ -637,6 +604,77 @@
             .content {
                 margin-left: 0 !important;
             }
+
+            .footer {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            margin-left: var(--sidebar-w);
+            padding: 22px 28px;
+            border-top: 0.5px solid var(--border);
+            background: rgba(9, 9, 15, 0.6);
+            backdrop-filter: blur(12px);
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 12px;
+            transition: margin-left var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+
+            .footer.collapsed {
+                margin-left: var(--sidebar-collapsed-w);
+            }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .footer-bal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-logo {
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.04em;
+        }
+
+        .footer-logo-pont {
+            color: var(--accent);
+        }
+
+        .footer-jobb {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .footer-link:hover {
+                color: var(--text);
+            }
+
+        @@media (max-width: 600px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
         }
 
         /* ── UTILITY ── */
@@ -645,18 +683,6 @@
         }
     .dropdown-wrapper {
         position: relative;
-    }
-
-    .notif-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        font-size: 11px;
-        padding: 2px 6px;
-        font-weight: bold;
     }
 
     .dropdown-menu-custom {
@@ -680,29 +706,6 @@
         padding: 12px 16px;
         border-bottom: 1px solid rgba(255,255,255,0.08);
         color: white;
-    }
-
-    .notif-item {
-        padding: 14px 16px;
-        color: white;
-        cursor: pointer;
-        display: flex;
-        gap: 10px;
-        transition: 0.2s;
-    }
-
-    .notif-item:hover {
-        background: rgba(255,255,255,0.08);
-    }
-
-    .notif-item.unread {
-        background: rgba(59,130,246,0.15);
-    }
-
-    .notif-empty {
-        padding: 16px;
-        color: #aaa;
-        text-align: center;
     }
     </style>
 </head>
@@ -814,9 +817,6 @@
                     </div>
                 }
 
-                <!-- Értesítések -->
-                <partial name="_NotificationsPartial" />
-
                 <!-- Profil -->
                 <div class="dropdown-wrapper">
                     <button class="icon-btn" onclick="toggleDropdown('profileDropdown')" aria-label="Profil">
@@ -858,12 +858,30 @@
         @RenderBody()
     </div>
 
+    <!-- FOOTER -->
+    <footer id="footer" class="footer">
+        <div class="footer-content">
+            <div class="footer-bal">
+                <span class="footer-logo">Smart<span class="footer-logo-pont">GYM</span></span>
+                <span>© @DateTime.Now.Year — Minden jog fenntartva</span>
+            </div>
+            <div class="footer-jobb">
+                <a href="/Privacy" class="footer-link">Adatvédelem</a>
+                <a href="/Helyszinek" class="footer-link">Helyszínek</a>
+                <a href="mailto:info@smartgym.hu" class="footer-link">
+                    <i class="bi bi-envelope"></i> Kapcsolat
+                </a>
+            </div>
+        </div>
+    </footer>
+
     <script>
         // Sidebar toggle
         function toggleSidebar() {
             const sb = document.getElementById("sidebar");
             const tb = document.getElementById("topbar");
             const ct = document.getElementById("content");
+            const ft = document.getElementById("footer");
             const ov = document.getElementById("overlay");
 
             if (window.innerWidth <= 768) {
@@ -873,6 +891,7 @@
                 sb.classList.toggle("collapsed");
                 tb.classList.toggle("collapsed");
                 ct.classList.toggle("collapsed");
+                ft.classList.toggle("collapsed");
             }
         }
 
@@ -899,7 +918,6 @@
         // Active nav link
         const path = window.location.pathname.toLowerCase();
         const pageMap = {
-            "dashboard":        "menu-dashboard",
             "berletek":         "menu-berletek",
             "sajatberletek":    "menu-sajatberletek",
             "profile":          "menu-profile",
@@ -922,72 +940,6 @@
         if (activeLink) {
             document.getElementById("topbar-page-title").textContent = activeLink.textContent.trim();
         }
-
-            async function loadNotifications() {
-        try {
-            const response = await fetch('/api/Notifications');
-            const data = await response.json();
-
-            const notifList = document.getElementById("notifList");
-            const notifBadge = document.getElementById("notifBadge");
-            const notifCount = document.getElementById("notifCount");
-
-            notifList.innerHTML = "";
-
-            if (!data || data.length === 0) {
-                notifList.innerHTML = `<div class="notif-empty">Nincs értesítés</div>`;
-                notifBadge.style.display = "none";
-                notifCount.innerText = "0 olvasatlan";
-                return;
-            }
-
-            let unreadCount = data.filter(x => !x.olvasott).length;
-            notifCount.innerText = unreadCount + " olvasatlan";
-
-            if (unreadCount > 0) {
-                notifBadge.style.display = "inline-block";
-                notifBadge.innerText = unreadCount;
-            } else {
-                notifBadge.style.display = "none";
-            }
-
-            data.forEach(item => {
-                notifList.innerHTML += `
-                    <div class="notif-item ${item.olvasott ? '' : 'unread'}"
-                         onclick="markAsRead(${item.id})">
-                        <span class="notif-icon">🔔</span>
-                        <span>${item.uzenet}</span>
-                    </div>
-                `;
-            });
-
-        } catch (err) {
-            console.error("Notification hiba:", err);
-        }
-    }
-
-    async function markAsRead(id) {
-        try {
-            await fetch(`/api/Notifications/markasread/${id}`, {
-                method: 'POST'
-            });
-
-            loadNotifications();
-        } catch (err) {
-            console.error("Olvasottá jelölés hiba:", err);
-        }
-    }
-
-    function toggleNotifications() {
-        const dropdown = document.getElementById("notifDropdown");
-        dropdown.classList.toggle("show");
-    }
-
-    document.addEventListener("DOMContentLoaded", loadNotifications);
-
-    setInterval(() => {
-        location.reload();
-    }, 30000);
     </script>
 </body>
 </html>

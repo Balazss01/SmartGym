@@ -381,7 +381,7 @@
 
     <!-- Vissza és kijelentkezés gombok -->
     <div class="gombsor">
-        <a href="/SajatBerletek" class="vissza-gomb">
+        <a href="/" class="vissza-gomb" onclick="if(document.referrer && history.length > 1){event.preventDefault();history.back();}">
             <i class="bi bi-arrow-left" style="font-size:13px"></i> Vissza
         </a>
         <a href="/Logout" class="kijelentkezes-gomb">

@@ -184,6 +184,7 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
+        text-decoration: none;
     }
 
         .buy-btn:hover {
@@ -293,13 +294,10 @@
                 <div class="berlet-per-day">≈ @perNap Ft / nap</div>
             </div>
 
-            <form method="post" asp-page-handler="">
-                <input type="hidden" name="Id" value="@b.BerletTipusId" />
-                <button type="submit" class="buy-btn">
-                    <i class="bi bi-bag-check"></i>
-                    Megvásárlom
-                </button>
-            </form>
+            <a href="/Fizetes/@b.BerletTipusId" class="buy-btn">
+                <i class="bi bi-bag-check"></i>
+                Megvásárlom
+            </a>
         </div>
     }
 </div>

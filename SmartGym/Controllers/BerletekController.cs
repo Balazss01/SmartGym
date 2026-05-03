@@ -100,13 +100,7 @@ namespace GymWebApiBackend.Controllers
 
             _context.Berletek.Add(berlet);
 
-            _context.Ertesitesek.Add(new Ertesites
-            {
-                TagId = userId,
-                Uzenet = $"Új bérlet vásárolva. Kezdete: {kezdet:yyyy.MM.dd}",
-                Olvasott = false,
-                Datum = DateTime.Now
-            });
+           
 
             await _context.SaveChangesAsync();
 
