@@ -4,6 +4,10 @@
       Background="{StaticResource BgBrush}">
 
     <Grid Margin="28,24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="17*"/>
+            <ColumnDefinition Width="557*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="28"/>
@@ -15,7 +19,7 @@
         </Grid.RowDefinitions>
 
         <!-- FEJLÉC -->
-        <StackPanel Grid.Row="0">
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
             <TextBlock Text="BÉRLETKEZELÉS"
                        Foreground="#00f5c4" FontSize="11" FontWeight="SemiBold"
                        Margin="0,0,0,4"/>
@@ -25,7 +29,7 @@
         </StackPanel>
 
         <!-- STAT KÁRTYÁK -->
-        <UniformGrid Grid.Row="2" Columns="3" Margin="-6,0">
+        <UniformGrid Grid.Row="1" Columns="3" Margin="-6,28,-6,0" Grid.ColumnSpan="2" Grid.RowSpan="2">
             <Border Margin="6" Padding="22,18" CornerRadius="18"
                     Background="#0f0f1a" BorderBrush="#1f1f2e" BorderThickness="1">
                 <StackPanel>
@@ -53,7 +57,7 @@
         </UniformGrid>
 
         <!-- SZŰRŐK -->
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="3" Grid.ColumnSpan="2" Margin="0,24,0,0" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="14"/>
@@ -83,12 +87,134 @@
             <ComboBox x:Name="BerletTipusComboBox"
                       Grid.Column="6"
                       Height="42"
-                      Background="#0f0f1a"
-                      Foreground="#f0ede8"
-                      BorderBrush="#1f1f2e"
-                      BorderThickness="1"
                       FontSize="13"
                       SelectionChanged="FilterChanged">
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Setter Property="Foreground"       Value="#f0ede8"/>
+                        <Setter Property="Background"       Value="#0f0f1a"/>
+                        <Setter Property="BorderBrush"      Value="#1f1f2e"/>
+                        <Setter Property="BorderThickness"  Value="1"/>
+                        <Setter Property="Padding"          Value="12,0"/>
+                        <Setter Property="Cursor"           Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBox">
+                                    <Grid>
+                                        <!-- Lezárt állapot megjelenítése -->
+                                        <Border x:Name="MainBorder"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="32"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Kiválasztott elem szövege -->
+                                                <ContentPresenter x:Name="ContentSite"
+                                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                                  Margin="{TemplateBinding Padding}"
+                                                                  VerticalAlignment="Center"
+                                                                  HorizontalAlignment="Left"
+                                                                  IsHitTestVisible="False"
+                                                                  TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                                <!-- Legördítő nyíl -->
+                                                <Path Grid.Column="1"
+                                                      Data="M0,0 L4,4 L8,0"
+                                                      Stroke="#6b6760" StrokeThickness="1.5"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      IsHitTestVisible="False"/>
+                                                <!-- Kattintható terület -->
+                                                <ToggleButton Grid.ColumnSpan="2"
+                                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                              Background="Transparent"
+                                                              BorderThickness="0"
+                                                              Focusable="False">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border Background="Transparent"/>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                            </Grid>
+                                        </Border>
+                                        <!-- Legördülő lista -->
+                                        <Popup x:Name="Popup"
+                                               Placement="Bottom"
+                                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                                               AllowsTransparency="True"
+                                               Focusable="False"
+                                               PopupAnimation="Slide">
+                                            <Border x:Name="DropDownBorder"
+                                                    MinWidth="{TemplateBinding ActualWidth}"
+                                                    MaxHeight="240"
+                                                    Background="#0f0f1a"
+                                                    BorderBrush="#1f1f2e"
+                                                    BorderThickness="1"
+                                                    CornerRadius="10"
+                                                    Margin="0,4,0,0">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                                </Border.Effect>
+                                                <ScrollViewer SnapsToDevicePixels="True">
+                                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                                </ScrollViewer>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="#2e2e3e"/>
+                                        </Trigger>
+                                        <Trigger Property="IsDropDownOpen" Value="True">
+                                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="#00f5c4"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <!-- ComboBoxItem stílus -->
+                        <Setter Property="ItemContainerStyle">
+                            <Setter.Value>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground"   Value="#f0ede8"/>
+                                    <Setter Property="Background"   Value="Transparent"/>
+                                    <Setter Property="Padding"      Value="14,10"/>
+                                    <Setter Property="FontSize"     Value="13"/>
+                                    <Setter Property="Cursor"       Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ComboBoxItem">
+                                                <Border x:Name="ItemBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        CornerRadius="6"
+                                                        Margin="4,2">
+                                                    <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="ItemBorder" Property="Background" Value="#1a1a2e"/>
+                                                        <Setter Property="Foreground" Value="#00f5c4"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="ItemBorder" Property="Background" Value="#0d1f1c"/>
+                                                        <Setter Property="Foreground" Value="#00f5c4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ComboBox.Style>
                 <ComboBoxItem Content="Összes típus"/>
             </ComboBox>
 
@@ -100,8 +226,8 @@
         </Grid>
 
         <!-- TÁBLÁZAT -->
-        <Border Grid.Row="6" Background="#0f0f1a" CornerRadius="18"
-                BorderBrush="#1f1f2e" BorderThickness="1">
+        <Border Grid.Row="5" Background="#0f0f1a" CornerRadius="18"
+                BorderBrush="#1f1f2e" BorderThickness="1" Grid.ColumnSpan="2" Margin="0,20,0,0" Grid.RowSpan="2">
             <DataGrid x:Name="BerletekGrid"
                       Style="{StaticResource ModernDataGridStyle}"
                       AutoGenerateColumns="False"
