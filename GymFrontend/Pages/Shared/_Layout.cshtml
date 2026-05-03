@@ -497,56 +497,100 @@
             position: absolute;
             right: 0;
             top: calc(100% + 10px);
-            width: 220px;
-            background: rgba(12, 12, 20, 0.97);
-            backdrop-filter: blur(20px);
+            min-width: 240px;
+            background: rgba(12, 12, 20, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 0.5px solid var(--border);
             border-radius: var(--radius);
             padding: 8px;
             display: none;
             z-index: 9999;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6),
+                        inset 0 1px 0 rgba(255,255,255,0.04);
         }
 
             .dropdown-menu-custom.show {
                 display: block;
+                animation: dropdown-slide 0.18s ease-out;
             }
 
+        @@keyframes dropdown-slide {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .dropdown-header {
-            padding: 8px 10px 10px;
+            padding: 10px 12px 12px;
             border-bottom: 0.5px solid var(--border);
             margin-bottom: 6px;
         }
 
             .dropdown-header strong {
                 font-size: 13px;
-                font-weight: 500;
+                font-weight: 600;
                 color: var(--text);
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .dropdown-header small {
                 font-size: 11px;
                 color: var(--text-muted);
-                display: block;
-                margin-top: 2px;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                margin-top: 4px;
             }
+
+                .dropdown-header small::before {
+                    content: '';
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: var(--accent);
+                    display: inline-block;
+                    box-shadow: 0 0 8px var(--accent);
+                }
 
         .dropdown-item-custom {
             display: flex;
             align-items: center;
-            gap: 9px;
-            padding: 8px 10px;
+            gap: 10px;
+            padding: 9px 12px;
             border-radius: var(--radius-sm);
             color: var(--text-muted);
             text-decoration: none;
             font-size: 13px;
             transition: all 0.15s;
+            position: relative;
         }
+
+            .dropdown-item-custom i {
+                font-size: 14px;
+                width: 16px;
+                text-align: center;
+                opacity: 0.7;
+                transition: opacity 0.15s;
+            }
 
             .dropdown-item-custom:hover {
                 background: var(--bg-card-hover);
                 color: var(--text);
             }
+
+                .dropdown-item-custom:hover i {
+                    opacity: 1;
+                    color: var(--accent);
+                }
 
             .dropdown-item-custom.danger {
                 color: rgba(248,113,113,0.7);
@@ -556,6 +600,10 @@
                     background: rgba(248,113,113,0.1);
                     color: #f87171;
                 }
+
+                    .dropdown-item-custom.danger:hover i {
+                        color: #f87171;
+                    }
 
         /* ── CONTENT ── */
         .content {
@@ -681,68 +729,6 @@
         a {
             color: inherit;
         }
-
-        .dropdown-wrapper {
-            position: relative;
-        }
-
-    .notif-badge {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        font-size: 11px;
-        padding: 2px 6px;
-        font-weight: bold;
-    }
-
-    .dropdown-menu-custom {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 45px;
-        width: 320px;
-        background: #1e1e1e;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        z-index: 999;
-        overflow: hidden;
-    }
-
-            .dropdown-menu-custom.show {
-                display: block;
-            }
-
-    .dropdown-header {
-        padding: 12px 16px;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        color: white;
-    }
-
-    .notif-item {
-        padding: 14px 16px;
-        color: white;
-        cursor: pointer;
-        display: flex;
-        gap: 10px;
-        transition: 0.2s;
-    }
-
-    .notif-item:hover {
-        background: rgba(255,255,255,0.08);
-    }
-
-    .notif-item.unread {
-        background: rgba(59,130,246,0.15);
-    }
-
-    .notif-empty {
-        padding: 16px;
-        color: #aaa;
-        text-align: center;
-    }
     </style>
 </head>
 <body>
@@ -917,6 +903,7 @@
             const sb = document.getElementById("sidebar");
             const tb = document.getElementById("topbar");
             const ct = document.getElementById("content");
+            const ft = document.getElementById("footer");
             const ov = document.getElementById("overlay");
 
             if (window.innerWidth <= 768) {
@@ -926,33 +913,33 @@
                 sb.classList.toggle("collapsed");
                 tb.classList.toggle("collapsed");
                 ct.classList.toggle("collapsed");
+                ft.classList.toggle("collapsed");
             }
         }
 
-            function closeSidebar() {
-                document.getElementById("sidebar").classList.remove("open");
-                document.getElementById("overlay").classList.remove("active");
-            }
+        function closeSidebar() {
+            document.getElementById("sidebar").classList.remove("open");
+            document.getElementById("overlay").classList.remove("active");
+        }
 
-            // Dropdown toggle
-            function toggleDropdown(id) {
-                const all = document.querySelectorAll(".dropdown-menu-custom");
-                all.forEach(d => {
-                    if (d.id !== id) d.classList.remove("show");
-                });
-                document.getElementById(id)?.classList.toggle("show");
-            }
-
-            document.addEventListener("click", function (e) {
-                if (!e.target.closest(".dropdown-wrapper")) {
-                    document.querySelectorAll(".dropdown-menu-custom").forEach(d => d.classList.remove("show"));
-                }
+        // Dropdown toggle
+        function toggleDropdown(id) {
+            const all = document.querySelectorAll(".dropdown-menu-custom");
+            all.forEach(d => {
+                if (d.id !== id) d.classList.remove("show");
             });
+            document.getElementById(id)?.classList.toggle("show");
+        }
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".dropdown-wrapper")) {
+                document.querySelectorAll(".dropdown-menu-custom").forEach(d => d.classList.remove("show"));
+            }
+        });
 
         // Active nav link
         const path = window.location.pathname.toLowerCase();
         const pageMap = {
-            "dashboard":        "menu-dashboard",
             "berletek":         "menu-berletek",
             "sajatberletek":    "menu-sajatberletek",
             "profile":          "menu-profile",
@@ -964,83 +951,17 @@
             "galeria": "menu-galeria",
         };
 
-            for (const [key, id] of Object.entries(pageMap)) {
-                if (path.includes(key)) {
-                    document.getElementById(id)?.classList.add("active");
-                }
+        for (const [key, id] of Object.entries(pageMap)) {
+            if (path.includes(key)) {
+                document.getElementById(id)?.classList.add("active");
             }
+        }
 
         // Topbar title from active link
         const activeLink = document.querySelector(".nav-link.active .nav-label");
         if (activeLink) {
             document.getElementById("topbar-page-title").textContent = activeLink.textContent.trim();
         }
-
-            async function loadNotifications() {
-        try {
-            const response = await fetch('/api/Notifications');
-            const data = await response.json();
-
-            const notifList = document.getElementById("notifList");
-            const notifBadge = document.getElementById("notifBadge");
-            const notifCount = document.getElementById("notifCount");
-
-            notifList.innerHTML = "";
-
-            if (!data || data.length === 0) {
-                notifList.innerHTML = `<div class="notif-empty">Nincs értesítés</div>`;
-                notifBadge.style.display = "none";
-                notifCount.innerText = "0 olvasatlan";
-                return;
-            }
-
-            let unreadCount = data.filter(x => !x.olvasott).length;
-            notifCount.innerText = unreadCount + " olvasatlan";
-
-            if (unreadCount > 0) {
-                notifBadge.style.display = "inline-block";
-                notifBadge.innerText = unreadCount;
-            } else {
-                notifBadge.style.display = "none";
-            }
-
-            data.forEach(item => {
-                notifList.innerHTML += `
-                    <div class="notif-item ${item.olvasott ? '' : 'unread'}"
-                         onclick="markAsRead(${item.id})">
-                        <span class="notif-icon">🔔</span>
-                        <span>${item.uzenet}</span>
-                    </div>
-                `;
-            });
-
-        } catch (err) {
-            console.error("Notification hiba:", err);
-        }
-    }
-
-    async function markAsRead(id) {
-        try {
-            await fetch(`/api/Notifications/markasread/${id}`, {
-                method: 'POST'
-            });
-
-            loadNotifications();
-        } catch (err) {
-            console.error("Olvasottá jelölés hiba:", err);
-        }
-    }
-
-    function toggleNotifications() {
-        const dropdown = document.getElementById("notifDropdown");
-        dropdown.classList.toggle("show");
-    }
-
-    document.addEventListener("DOMContentLoaded", loadNotifications);
-
-    setInterval(() => {
-        location.reload();
-    }, 30000);
     </script>
 </body>
 </html>

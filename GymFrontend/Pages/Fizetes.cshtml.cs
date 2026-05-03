@@ -24,16 +24,16 @@ namespace GymFrontend.Pages
         public int Id { get; set; }
 
         [BindProperty]
-        public string KartyaTulajdonos { get; set; } = "";
+        public string? KartyaTulajdonos { get; set; }
 
         [BindProperty]
-        public string Kartyaszam { get; set; } = "";
+        public string? Kartyaszam { get; set; }
 
         [BindProperty]
-        public string Lejarat { get; set; } = "";
+        public string? Lejarat { get; set; }
 
         [BindProperty]
-        public string Cvc { get; set; } = "";
+        public string? Cvc { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -74,7 +74,7 @@ namespace GymFrontend.Pages
             if (!Regex.IsMatch(Lejarat ?? "", @"^(0[1-9]|1[0-2])\/\d{2}$"))
                 ModelState.AddModelError(nameof(Lejarat), "Helytelen lejárati dátum (formátum: HH/ÉÉ).");
 
-            if ((Cvc ?? "").Length != 3 || !Cvc.All(char.IsDigit))
+            if ((Cvc ?? "").Length != 3 || !(Cvc ?? "").All(char.IsDigit))
                 ModelState.AddModelError(nameof(Cvc), "A CVC 3 számjegyből álljon.");
 
             // Bérlet újra betöltése a megjelenítéshez
