@@ -1,8 +1,573 @@
 ﻿@page
 @model PrivacyModel
 @{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "ÁSZF";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    .aszf-wrapper {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 0.5rem 0 3rem;
+        color: var(--text);
+    }
+
+    /* Fejléc */
+    .aszf-fejlec {
+        margin-bottom: 28px;
+        padding-bottom: 22px;
+        border-bottom: 0.5px solid var(--border);
+    }
+
+    .aszf-cimke {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .aszf-cim {
+        font-family: 'Syne', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 12px;
+        line-height: 1.2;
+    }
+
+    .aszf-meta {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+    }
+
+    .aszf-meta-pont {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--text-muted);
+    }
+
+    /* Tartalomjegyzék */
+    .aszf-toc {
+        background: rgba(0,245,196,0.04);
+        border: 0.5px solid rgba(0,245,196,0.18);
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 32px;
+    }
+
+    .aszf-toc-cim {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+        font-family: 'Syne', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .aszf-toc-lista {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px 18px;
+    }
+
+    @@media (max-width: 600px) {
+        .aszf-toc-lista {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .aszf-toc-lista a {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+        .aszf-toc-lista a:hover {
+            color: var(--text);
+        }
+
+        .aszf-toc-lista a span {
+            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 16px;
+        }
+
+    /* Szakaszok */
+    .aszf-szakasz {
+        margin-bottom: 28px;
+        scroll-margin-top: 80px;
+    }
+
+    .aszf-szakasz-fej {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 0.5px solid var(--border);
+    }
+
+    .aszf-szakasz-szam {
+        font-family: 'Syne', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+        letter-spacing: 0.04em;
+    }
+
+    .aszf-szakasz-cim {
+        font-family: 'Syne', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+        letter-spacing: 0.01em;
+    }
+
+    .aszf-szakasz p {
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: rgba(240,237,232,0.78);
+        margin: 0 0 10px;
+    }
+
+    .aszf-szakasz strong {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .aszf-szakasz ul {
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: rgba(240,237,232,0.78);
+        padding-left: 22px;
+        margin: 0 0 10px;
+    }
+
+        .aszf-szakasz ul li {
+            margin-bottom: 5px;
+        }
+
+            .aszf-szakasz ul li::marker {
+                color: var(--accent);
+            }
+
+    /* Adatok kártya (Szolgáltató) */
+    .adatok-kartya {
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 12px;
+    }
+
+        .adatok-kartya dl {
+            margin: 0;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 8px 16px;
+            font-size: 13px;
+        }
+
+    @@media (max-width: 500px) {
+        .adatok-kartya dl {
+            grid-template-columns: 1fr;
+            gap: 2px 0;
+        }
+
+        .adatok-kartya dt {
+            margin-top: 8px;
+        }
+    }
+
+    .adatok-kartya dt {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .adatok-kartya dd {
+        color: var(--text);
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Záró doboz */
+    .aszf-zaras {
+        background: linear-gradient(135deg, rgba(0,245,196,0.06), rgba(124,106,248,0.06));
+        border: 0.5px solid rgba(0,245,196,0.2);
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin-top: 36px;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+        .aszf-zaras strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 4px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+        }
+
+        .aszf-zaras a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+            .aszf-zaras a:hover {
+                text-decoration: underline;
+            }
+
+    /* Vissza a tetejére */
+    .aszf-back-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        margin-top: 24px;
+        padding: 8px 14px;
+        border: 0.5px solid var(--border);
+        border-radius: 20px;
+        transition: all 0.2s;
+    }
+
+        .aszf-back-top:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+        }
+</style>
+
+<div class="aszf-wrapper">
+
+    <!-- Fejléc -->
+    <header class="aszf-fejlec">
+        <span class="aszf-cimke">Jogi dokumentum</span>
+        <h1 class="aszf-cim">Általános Szerződési Feltételek</h1>
+        <div class="aszf-meta">
+            <span><i class="bi bi-calendar3"></i> Hatályos: @DateTime.Now.ToString("yyyy. MM. dd.")-tól</span>
+            <span class="aszf-meta-pont"></span>
+            <span><i class="bi bi-file-text"></i> Verzió: 1.0</span>
+            <span class="aszf-meta-pont"></span>
+            <span><i class="bi bi-building"></i> SmartGYM Kft.</span>
+        </div>
+    </header>
+
+    <!-- Tartalomjegyzék -->
+    <nav class="aszf-toc">
+        <div class="aszf-toc-cim">
+            <i class="bi bi-list-ul"></i> Tartalom
+        </div>
+        <ul class="aszf-toc-lista">
+            <li><a href="#sz1"><span>1.</span> Szolgáltató adatai</a></li>
+            <li><a href="#sz2"><span>2.</span> Fogalmak</a></li>
+            <li><a href="#sz3"><span>3.</span> A szolgáltatás tárgya</a></li>
+            <li><a href="#sz4"><span>4.</span> Regisztráció és tagság</a></li>
+            <li><a href="#sz5"><span>5.</span> Bérletek és fizetés</a></li>
+            <li><a href="#sz6"><span>6.</span> Bérlet érvényessége</a></li>
+            <li><a href="#sz7"><span>7.</span> Belépés a konditerembe</a></li>
+            <li><a href="#sz8"><span>8.</span> Szekrényhasználat</a></li>
+            <li><a href="#sz9"><span>9.</span> Házirend</a></li>
+            <li><a href="#sz10"><span>10.</span> Felelősség korlátozása</a></li>
+            <li><a href="#sz11"><span>11.</span> Adatkezelés</a></li>
+            <li><a href="#sz12"><span>12.</span> Panaszkezelés</a></li>
+            <li><a href="#sz13"><span>13.</span> Elállási jog</a></li>
+            <li><a href="#sz14"><span>14.</span> Vegyes rendelkezések</a></li>
+        </ul>
+    </nav>
+
+    <!-- 1. Szolgáltató adatai -->
+    <section class="aszf-szakasz" id="sz1">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">1.</span>
+            <h2 class="aszf-szakasz-cim">A Szolgáltató adatai</h2>
+        </div>
+        <p>
+            A jelen Általános Szerződési Feltételek (a továbbiakban: <strong>ÁSZF</strong>) a SmartGYM Kft. (a továbbiakban: <strong>Szolgáltató</strong>) által üzemeltetett SmartGYM rendszer használatának feltételeit tartalmazzák.
+        </p>
+        <div class="adatok-kartya">
+            <dl>
+                <dt>Cégnév:</dt>
+                <dd>SmartGYM Kft.</dd>
+                <dt>Székhely:</dt>
+                <dd>9400 Sopron, Lackner Kristóf utca 1.</dd>
+                <dt>Cégjegyzékszám:</dt>
+                <dd>08-09-XXXXXX</dd>
+                <dt>Adószám:</dt>
+                <dd>XXXXXXXX-2-08</dd>
+                <dt>Képviselő:</dt>
+                <dd>Példa Béla ügyvezető</dd>
+                <dt>Email:</dt>
+                <dd>info@smartgym.hu</dd>
+                <dt>Telefon:</dt>
+                <dd>+36 99 123 456</dd>
+                <dt>Tárhelyszolgáltató:</dt>
+                <dd>GitHub</dd>
+            </dl>
+        </div>
+    </section>
+
+    <!-- 2. Fogalmak -->
+    <section class="aszf-szakasz" id="sz2">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">2.</span>
+            <h2 class="aszf-szakasz-cim">Fogalmak</h2>
+        </div>
+        <ul>
+            <li><strong>Felhasználó:</strong> az a természetes személy, aki a SmartGYM rendszerben regisztrált és bérletet vásárolt.</li>
+            <li><strong>Bérlet:</strong> a Szolgáltató által értékesített, meghatározott időre szóló szolgáltatási jogosultság.</li>
+            <li><strong>Tag:</strong> érvényes bérlettel rendelkező Felhasználó.</li>
+            <li><strong>Konditerem:</strong> a Szolgáltató által üzemeltetett edzőterem, amelyhez a bérlet belépést biztosít.</li>
+            <li><strong>QR-kód:</strong> a Tag azonosítására szolgáló elektronikus belépési kód.</li>
+        </ul>
+    </section>
+
+    <!-- 3. A szolgáltatás tárgya -->
+    <section class="aszf-szakasz" id="sz3">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">3.</span>
+            <h2 class="aszf-szakasz-cim">A szolgáltatás tárgya</h2>
+        </div>
+        <p>
+            A Szolgáltató a Felhasználó részére konditerem-szolgáltatást, valamint hozzá kapcsolódó kiegészítő szolgáltatásokat (szekrényfoglalás, beléptetés) nyújt érvényes bérlet birtokában.
+        </p>
+        <p>
+            A szolgáltatás magában foglalja az edzőterem berendezéseinek és eszközeinek rendeltetésszerű használatát a nyitvatartási időben.
+        </p>
+    </section>
+
+    <!-- 4. Regisztráció és tagság -->
+    <section class="aszf-szakasz" id="sz4">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">4.</span>
+            <h2 class="aszf-szakasz-cim">Regisztráció és tagság</h2>
+        </div>
+        <p>
+            A SmartGYM rendszer használatához regisztráció szükséges. A regisztráció során a Felhasználó köteles valós, érvényes adatokat megadni (név, születési dátum, e-mail cím).
+        </p>
+        <p>
+            A Felhasználó a regisztrációval kijelenti, hogy a 18. életévét betöltötte, vagy 14–18 év közötti esetén a törvényes képviselő hozzájárulásával regisztrál.
+        </p>
+        <p>
+            A Felhasználó köteles a fiókjához tartozó jelszót titokban tartani. A jelszó harmadik személy részére történő átadásából eredő károkért a Felhasználó felel.
+        </p>
+    </section>
+
+    <!-- 5. Bérletek és fizetés -->
+    <section class="aszf-szakasz" id="sz5">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">5.</span>
+            <h2 class="aszf-szakasz-cim">Bérletek és fizetés</h2>
+        </div>
+        <p>
+            A bérletek aktuális típusait és árait a SmartGYM rendszer „Bérletek” oldala tartalmazza. A feltüntetett árak az általános forgalmi adót (ÁFA) magukban foglalják.
+        </p>
+        <p>
+            A bérlet vásárlása online, bankkártyás fizetéssel történik a Szolgáltató fizetési felületén keresztül. A fizetés sikeres teljesítését követően a bérlet automatikusan aktiválódik a Felhasználó fiókjában.
+        </p>
+        <p>
+            A vásárlásról a Szolgáltató elektronikus számlát állít ki, amelyet a regisztrációkor megadott e-mail címre küld.
+        </p>
+    </section>
+
+    <!-- 6. Bérlet érvényessége -->
+    <section class="aszf-szakasz" id="sz6">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">6.</span>
+            <h2 class="aszf-szakasz-cim">Bérlet érvényessége</h2>
+        </div>
+        <p>
+            A bérlet a vásárlás napjától kezdve érvényes, és a bérlettípusban meghatározott naptári napok elteltével lejár. Lejárt bérlettel a konditerembe belépni nem lehet.
+        </p>
+        <p>
+            A bérlet személyhez kötött, másra át nem ruházható. A bérlet összege a vásárlást követően nem visszatéríthető, kivéve a 13. pontban (Elállási jog) meghatározott eseteket.
+        </p>
+        <p>
+            A Felhasználó több bérletet is megvásárolhat egyszerre; ebben az esetben a bérletek időben egymás után aktiválódnak.
+        </p>
+    </section>
+
+    <!-- 7. Belépés -->
+    <section class="aszf-szakasz" id="sz7">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">7.</span>
+            <h2 class="aszf-szakasz-cim">Belépés a konditerembe</h2>
+        </div>
+        <p>
+            A Tag a konditerembe a SmartGYM rendszer „Belépés” oldalán generált QR-kód felmutatásával léphet be. A belépés és kilépés időpontját a rendszer rögzíti.
+        </p>
+        <p>
+            A QR-kódot kizárólag a jogosult Tag használhatja. A QR-kód megosztása vagy másolása a tagság azonnali felfüggesztését vonja maga után, kártérítési igény nélkül.
+        </p>
+    </section>
+
+    <!-- 8. Szekrényhasználat -->
+    <section class="aszf-szakasz" id="sz8">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">8.</span>
+            <h2 class="aszf-szakasz-cim">Szekrényhasználat</h2>
+        </div>
+        <p>
+            A konditerem területén lévő öltözőszekrények ingyenesen igénybe vehetők a Tagok részére, a kapacitás függvényében.
+        </p>
+        <p>
+            A szekrény foglalása a SmartGYM rendszerben történik. A foglalt szekrény csak az adott Tag tartózkodási ideje alatt tartható lezárva. A Tag köteles a kilépés előtt a szekrényt kinyitni és kiüríteni.
+        </p>
+        <p>
+            Felejtett tárgyakért a Szolgáltató 14 napig vállal megőrzést, ezt követően a tárgyak megsemmisítésre kerülnek.
+        </p>
+    </section>
+
+    <!-- 9. Házirend -->
+    <section class="aszf-szakasz" id="sz9">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">9.</span>
+            <h2 class="aszf-szakasz-cim">Házirend</h2>
+        </div>
+        <p>
+            A Tag köteles a konditerem területén rendeltetésszerű magatartást tanúsítani és a házirendet betartani:
+        </p>
+        <ul>
+            <li>Minden eszközt rendeltetésszerűen használjon és edzés után tegyen vissza a helyére.</li>
+            <li>Tartsa tisztán a használt eszközöket és a saját környezetét.</li>
+            <li>Tartózkodjon a hangos zenehallgatástól és a hangos beszédtől.</li>
+            <li>Tilos a doppingszerek, drogok használata, valamint az alkoholos állapotban való tartózkodás.</li>
+            <li>Az eszközök szándékos rongálása kártérítési kötelezettséget von maga után.</li>
+        </ul>
+    </section>
+
+    <!-- 10. Felelősség -->
+    <section class="aszf-szakasz" id="sz10">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">10.</span>
+            <h2 class="aszf-szakasz-cim">Felelősség korlátozása</h2>
+        </div>
+        <p>
+            A Tag a konditermet saját felelősségére használja. A Szolgáltató nem felel a Tag által saját magának okozott testi sérülésekért, amennyiben az nem a Szolgáltató szándékos vagy súlyosan gondatlan magatartásából ered.
+        </p>
+        <p>
+            A Szolgáltató javasolja, hogy a Tag az edzések megkezdése előtt orvosi vizsgálaton vegyen részt és győződjön meg arról, hogy egészségi állapota lehetővé teszi a sportolást.
+        </p>
+        <p>
+            A Szolgáltató nem felel a szekrényben hagyott vagy a területén elveszett személyes tárgyakért.
+        </p>
+    </section>
+
+    <!-- 11. Adatkezelés -->
+    <section class="aszf-szakasz" id="sz11">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">11.</span>
+            <h2 class="aszf-szakasz-cim">Adatkezelés</h2>
+        </div>
+        <p>
+            A Szolgáltató a Felhasználó személyes adatait az Európai Parlament és a Tanács (EU) 2016/679 rendelete (<strong>GDPR</strong>), valamint az információs önrendelkezési jogról szóló 2011. évi CXII. törvény rendelkezéseinek megfelelően kezeli.
+        </p>
+        <p>
+            A kezelt adatok: vezetéknév, keresztnév, születési dátum, e-mail cím, valamint a belépési és vásárlási adatok. Az adatkezelés célja a szolgáltatás nyújtása, a Tag azonosítása és a számlázás.
+        </p>
+        <p>
+            A Felhasználó bármikor kérheti adatainak helyesbítését vagy törlését az <strong>info@smartgym.hu</strong> e-mail címen.
+        </p>
+    </section>
+
+    <!-- 12. Panaszkezelés -->
+    <section class="aszf-szakasz" id="sz12">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">12.</span>
+            <h2 class="aszf-szakasz-cim">Panaszkezelés</h2>
+        </div>
+        <p>
+            A Felhasználó panaszait az <strong>info@smartgym.hu</strong> e-mail címen vagy a Szolgáltató székhelyén írásban jelezheti. A Szolgáltató a panaszt 30 napon belül kivizsgálja és írásban válaszol.
+        </p>
+        <p>
+            Amennyiben a Felhasználó a panasz kezelésével nem ért egyet, fordulhat a területileg illetékes Békéltető Testülethez vagy a fogyasztóvédelmi hatósághoz.
+        </p>
+    </section>
+
+    <!-- 13. Elállási jog -->
+    <section class="aszf-szakasz" id="sz13">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">13.</span>
+            <h2 class="aszf-szakasz-cim">Elállási jog</h2>
+        </div>
+        <p>
+            A 45/2014. (II. 26.) Korm. rendelet alapján a Felhasználót 14 napos elállási jog illeti meg a bérlet megvásárlásától számítva, feltéve, hogy a bérletet még nem kezdte el használni (azaz a konditerembe a vásárlás után még nem lépett be).
+        </p>
+        <p>
+            Az elállási szándékot az <strong>info@smartgym.hu</strong> e-mail címen kell jelezni. A Szolgáltató az elállás elfogadását követő 14 napon belül visszatéríti a vételárat ugyanazon a fizetési módon, ahogyan a Felhasználó fizetett.
+        </p>
+    </section>
+
+    <!-- 14. Vegyes rendelkezések -->
+    <section class="aszf-szakasz" id="sz14">
+        <div class="aszf-szakasz-fej">
+            <span class="aszf-szakasz-szam">14.</span>
+            <h2 class="aszf-szakasz-cim">Vegyes rendelkezések</h2>
+        </div>
+        <p>
+            A jelen ÁSZF-ben nem szabályozott kérdésekben a Polgári Törvénykönyvről szóló 2013. évi V. törvény (Ptk.) és az egyéb hatályos magyar jogszabályok rendelkezései irányadóak.
+        </p>
+        <p>
+            A Szolgáltató fenntartja a jogot az ÁSZF egyoldalú módosítására. A módosításokról a Felhasználókat a regisztrációkor megadott e-mail címen tájékoztatja, legalább 15 nappal a hatálybalépés előtt.
+        </p>
+        <p>
+            Az ÁSZF magyar nyelven készült, a Szolgáltató és a Felhasználó közötti jogviszonyra a magyar jog az irányadó.
+        </p>
+    </section>
+
+    <!-- Záró doboz -->
+    <div class="aszf-zaras">
+        <strong>Kapcsolat</strong>
+        Az ÁSZF-fel kapcsolatos kérdéseket az <a href="mailto:info@smartgym.hu">info@smartgym.hu</a> e-mail címen várjuk.
+        Az itt feltüntetett cég- és kapcsolati adatok mintaadatok – kérjük, a hatályba léptetés előtt írja át a Szolgáltató valós adataira.
+    </div>
+
+    <a href="#" class="aszf-back-top">
+        <i class="bi bi-arrow-up"></i> Vissza a tetejére
+    </a>
+
+</div>
+
+<script>
+    // Smooth scroll a tartalomjegyzékhez
+    document.querySelectorAll('.aszf-toc-lista a, .aszf-back-top').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
