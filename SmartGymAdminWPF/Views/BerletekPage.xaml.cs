@@ -15,6 +15,7 @@ namespace SmartGymAdminWPF.Views
         private List<BerletListDto> _osszesBerlet = new();
         private readonly DispatcherTimer _timer = new();
         private bool _isUnloading = false;
+        private HashSet<string> _betoltottTipusok = new();
 
         public BerletekPage()
         {
@@ -44,7 +45,7 @@ namespace SmartGymAdminWPF.Views
             _timer.Stop();
         }
 
-        private async Task LoadBerletek()
+        private async Task LoadBerletek(bool kenyszerFrissites = false)
         {
             if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
                 return;
@@ -52,7 +53,6 @@ namespace SmartGymAdminWPF.Views
             try
             {
                 var api = new ApiService();
-
                 var json = await api.Get("api/Berletek/admin-all");
 
                 if (_isUnloading || string.IsNullOrWhiteSpace(ApiService.Token))
@@ -61,7 +61,9 @@ namespace SmartGymAdminWPF.Views
                 _osszesBerlet = JsonSerializer.Deserialize<List<BerletListDto>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
-                LoadTipusok();
+                // Csak akkor piszkáljuk a ComboBox-ot, ha tényleg új típus jelent meg
+                // – így a kiválasztás soha nem ugrik vissza timer tick hatására
+                FrissitsTipusokHaKell();
                 UpdateStats();
                 ApplyFilter();
             }
@@ -74,25 +76,40 @@ namespace SmartGymAdminWPF.Views
             }
         }
 
-        private void LoadTipusok()
+        private void FrissitsTipusokHaKell()
         {
-            if (BerletTipusComboBox == null)
-                return;
+            if (BerletTipusComboBox == null) return;
 
-            var tipusok = _osszesBerlet
+            var ujTipusok = _osszesBerlet
                 .Select(b => b.BerletTipusNev)
                 .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Distinct()
-                .OrderBy(t => t)
-                .ToList();
+                .ToHashSet();
+
+            // Ha a típuskészlet nem változott, a ComboBox-hoz NEM nyúlunk hozzá
+            if (ujTipusok.SetEquals(_betoltottTipusok)) return;
+
+            _betoltottTipusok = ujTipusok;
+
+            // Megőrizzük a kiválasztást
+            var kivalasztott = (BerletTipusComboBox.SelectedItem as ComboBoxItem)
+                               ?.Content?.ToString() ?? "Összes típus";
+
+            BerletTipusComboBox.SelectionChanged -= FilterChanged;
 
             BerletTipusComboBox.Items.Clear();
             BerletTipusComboBox.Items.Add(new ComboBoxItem { Content = "Összes típus" });
 
-            foreach (var tipus in tipusok)
+            foreach (var tipus in ujTipusok.OrderBy(t => t))
                 BerletTipusComboBox.Items.Add(new ComboBoxItem { Content = tipus });
 
-            BerletTipusComboBox.SelectedIndex = 0;
+            var visszaallitando = BerletTipusComboBox.Items
+                .OfType<ComboBoxItem>()
+                .FirstOrDefault(i => i.Content?.ToString() == kivalasztott);
+
+            BerletTipusComboBox.SelectedItem = visszaallitando
+                ?? BerletTipusComboBox.Items[0] as ComboBoxItem;
+
+            BerletTipusComboBox.SelectionChanged += FilterChanged;
         }
 
         private void UpdateStats()
@@ -145,7 +162,7 @@ namespace SmartGymAdminWPF.Views
 
         private async void FrissitesButton_Click(object sender, RoutedEventArgs e)
         {
-            await LoadBerletek();
+            await LoadBerletek(kenyszerFrissites: true);
         }
 
         private async void ToggleBerlet_Click(object sender, RoutedEventArgs e)
@@ -171,7 +188,7 @@ namespace SmartGymAdminWPF.Views
                 });
 
                 await api.Put($"api/Berletek/{berlet.BerletId}", json);
-                await LoadBerletek();
+                await LoadBerletek(kenyszerFrissites: true);
             }
             catch (Exception ex)
             {

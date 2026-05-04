@@ -12,6 +12,7 @@ namespace SmartGymAdminWPF.Views
     public partial class TagokPage : Page
     {
         private List<TagDto> _osszesTag = new List<TagDto>();
+        private HashSet<int> _aktivBerletesTagIds = new HashSet<int>();
 
         public TagokPage()
         {
@@ -36,13 +37,30 @@ namespace SmartGymAdminWPF.Views
             try
             {
                 var api = new ApiService();
-                var json = await api.Get("api/Tagok");
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                _osszesTag = JsonSerializer.Deserialize<List<TagDto>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }) ?? new List<TagDto>();
+                var tagJson = await api.Get("api/Tagok");
+                _osszesTag = JsonSerializer.Deserialize<List<TagDto>>(tagJson, opts) ?? new List<TagDto>();
+
+                // Bérletekből kiszámítjuk, melyik tagnak van jelenleg érvényes bérlete
+                try
+                {
+                    var berletJson = await api.Get("api/Berletek/admin-all");
+                    var berletek = JsonSerializer.Deserialize<List<BerletSummaryDto>>(berletJson, opts) ?? new();
+                    var most = DateTime.Now;
+                    _aktivBerletesTagIds = berletek
+                        .Where(b => b.Aktiv && b.KezdetDatum <= most && b.VegeDatum > most)
+                        .Select(b => b.TagId)
+                        .ToHashSet();
+                }
+                catch
+                {
+                    _aktivBerletesTagIds = new HashSet<int>();
+                }
+
+                // Beállítjuk minden tagnál, hogy van-e érvényes bérlete
+                foreach (var tag in _osszesTag)
+                    tag.VanAktivBerlete = _aktivBerletesTagIds.Contains(tag.TagId);
 
                 UpdateStats();
                 ApplyFilter();
@@ -56,7 +74,7 @@ namespace SmartGymAdminWPF.Views
         private void UpdateStats()
         {
             var osszes = _osszesTag.Count;
-            var aktiv = _osszesTag.Count(t => t.Aktiv);
+            var aktiv = _osszesTag.Count(t => _aktivBerletesTagIds.Contains(t.TagId));
             var inaktiv = osszes - aktiv;
 
             OsszesTagText.Text = osszes.ToString();
@@ -127,6 +145,14 @@ namespace SmartGymAdminWPF.Views
         }
     }
 
+    public class BerletSummaryDto
+    {
+        public int TagId { get; set; }
+        public bool Aktiv { get; set; }
+        public DateTime KezdetDatum { get; set; }
+        public DateTime VegeDatum { get; set; }
+    }
+
     public class TagDto
     {
         public int TagId { get; set; }
@@ -135,5 +161,7 @@ namespace SmartGymAdminWPF.Views
         public string Keresztnev { get; set; }
         public DateTime SzuletesiDatum { get; set; }
         public bool Aktiv { get; set; }
+        // Igaz, ha jelenleg érvényes (nem lejárt) bérlete van a tagnak
+        public bool VanAktivBerlete { get; set; }
     }
 }

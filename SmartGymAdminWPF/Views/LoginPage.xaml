@@ -20,7 +20,6 @@
                     </RadialGradientBrush>
                 </Ellipse.Fill>
             </Ellipse>
-
             <Ellipse Width="400" Height="400"
                      Canvas.Right="-100" Canvas.Bottom="-150"
                      Opacity="0.05">
@@ -42,100 +41,49 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 SnapsToDevicePixels="True">
-
             <Border.Effect>
-                <DropShadowEffect Color="#000000"
-                                  BlurRadius="45"
-                                  ShadowDepth="0"
-                                  Opacity="0.45"/>
+                <DropShadowEffect Color="#000000" BlurRadius="45" ShadowDepth="0" Opacity="0.45"/>
             </Border.Effect>
 
             <StackPanel>
-                <Border Width="52" Height="52"
-                        CornerRadius="14"
-                        HorizontalAlignment="Center"
-                        Margin="0,0,0,20">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#00f5c4" Offset="0"/>
-                            <GradientStop Color="#7c6af8" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.Background>
-
-                    <TextBlock Text="⚡"
-                               Foreground="#09090f"
-                               FontSize="22"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
-                </Border>
-
                 <TextBlock Text="SmartGYM Admin"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           Foreground="#ffffff"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,6"/>
-
+                           FontSize="22" FontWeight="Bold" Foreground="#ffffff"
+                           HorizontalAlignment="Center" Margin="0,0,0,6"/>
                 <TextBlock Text="Bejelentkezés az admin felületre"
-                           FontSize="13"
-                           Foreground="#9ca3af"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,28"/>
+                           FontSize="13" Foreground="#9ca3af"
+                           HorizontalAlignment="Center" Margin="0,0,0,28"/>
 
-                <TextBlock Text="EMAIL CÍM"
-                           Foreground="#9ca3af"
-                           FontSize="11"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,6"/>
+                <TextBlock Text="EMAIL CÍM" Foreground="#9ca3af" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <TextBox x:Name="EmailTextBox" Style="{StaticResource ModernTextBoxStyle}"
+                         Margin="0,0,0,14" KeyDown="LoginEnter_KeyDown"/>
 
-                <TextBox x:Name="EmailTextBox"
-                         Style="{StaticResource ModernTextBoxStyle}"
-                         Margin="0,0,0,14"
-                         KeyDown="LoginEnter_KeyDown"/>
-
-                <TextBlock Text="JELSZÓ"
-                           Foreground="#9ca3af"
-                           FontSize="11"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,6"/>
-
+                <TextBlock Text="JELSZÓ" Foreground="#9ca3af" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,6"/>
                 <Grid Margin="0,0,0,22">
-                    <PasswordBox x:Name="PasswordBox"
-                                 Style="{StaticResource ModernPasswordBoxStyle}"
+                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource ModernPasswordBoxStyle}"
                                  KeyDown="LoginEnter_KeyDown"/>
+                    <TextBox x:Name="PasswordVisibleTextBox" Style="{StaticResource ModernTextBoxStyle}"
+                             Visibility="Collapsed" KeyDown="LoginEnter_KeyDown"/>
 
-                    <TextBox x:Name="PasswordVisibleTextBox"
-                             Style="{StaticResource ModernTextBoxStyle}"
-                             Visibility="Collapsed"
-                             KeyDown="LoginEnter_KeyDown"/>
-
+                    <!-- Jelszó toggle – bi-eye (vektoros Path) -->
                     <Button x:Name="TogglePasswordButton"
-                            Width="34"
-                            Height="34"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="0,0,6,0"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Foreground="#9ca3af"
-                            Cursor="Hand"
-                            Click="TogglePassword_Click">
+                            Width="34" Height="34"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            Margin="0,0,6,0" Background="Transparent" BorderThickness="0"
+                            Foreground="#9ca3af" Cursor="Hand" Click="TogglePassword_Click">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
-                                            <Border x:Name="bd"
-                                                    CornerRadius="8"
-                                                    Background="Transparent">
-                                                <TextBlock x:Name="IconText"
-                                                           Text="⌾"
-                                                           FontSize="18"
-                                                           Foreground="{TemplateBinding Foreground}"
-                                                           HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"/>
+                                            <Border x:Name="bd" CornerRadius="8" Background="Transparent">
+                                                <Viewbox Width="16" Height="16"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center">
+                                                    <Path Data="{StaticResource Icon.Eye}"
+                                                          Fill="{TemplateBinding Foreground}"
+                                                          Stretch="Uniform"/>
+                                                </Viewbox>
                                             </Border>
-
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
                                                     <Setter TargetName="bd" Property="Background" Value="#1a1a28"/>
@@ -148,27 +96,17 @@
                             </Style>
                         </Button.Style>
                     </Button>
+
                 </Grid>
 
-                <Button Content="BEJELENTKEZÉS"
-                        Height="46"
+                <Button Content="BEJELENTKEZÉS" Height="46"
                         Style="{StaticResource ModernButtonStyle}"
-                        FontSize="13"
-                        Click="LoginButton_Click"/>
+                        FontSize="13" Click="LoginButton_Click"/>
 
                 <Border x:Name="ErrorBorder"
-                        Background="#1a0a0a"
-                        BorderBrush="#3a1515"
-                        BorderThickness="1"
-                        CornerRadius="10"
-                        Padding="14,11"
-                        Margin="0,14,0,0"
-                        Visibility="Collapsed">
-                    <TextBlock x:Name="ErrorText"
-                               Foreground="#f87171"
-                               FontSize="13"
-                               Text=""
-                               TextAlignment="Center"/>
+                        Background="#1a0a0a" BorderBrush="#3a1515" BorderThickness="1"
+                        CornerRadius="10" Padding="14,11" Margin="0,14,0,0" Visibility="Collapsed">
+                    <TextBlock x:Name="ErrorText" Foreground="#f87171" FontSize="13" Text="" TextAlignment="Center"/>
                 </Border>
             </StackPanel>
         </Border>

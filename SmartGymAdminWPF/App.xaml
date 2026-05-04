@@ -5,35 +5,66 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-       
-        
         <SolidColorBrush x:Key="BgBrush"           Color="#09090f"/>
-        <!-- card: rgba(255,255,255,0.04) ≈ #0f0f18 -->
         <SolidColorBrush x:Key="CardBrush"          Color="#0f0f1a"/>
         <SolidColorBrush x:Key="CardAltBrush"       Color="#0c0c15"/>
-        <!-- border: rgba(255,255,255,0.08) ≈ #141420 -->
         <SolidColorBrush x:Key="BorderBrushCustom"  Color="#1f1f2e"/>
-        <!-- accent: #00f5c4 -->
         <SolidColorBrush x:Key="AccentBrush"        Color="#00f5c4"/>
-        <!-- accent2: #7c6af8 -->
         <SolidColorBrush x:Key="Accent2Brush"       Color="#7c6af8"/>
-        <!-- text: #f0ede8 -->
         <SolidColorBrush x:Key="TextBrush"          Color="#f0ede8"/>
-        <!-- text-muted: rgba(240,237,232,0.4) ≈ #6b6760 -->
         <SolidColorBrush x:Key="SubTextBrush"       Color="#6b6760"/>
         <SolidColorBrush x:Key="SidebarBgBrush"     Color="#09090f"/>
         <SolidColorBrush x:Key="InputBgBrush"       Color="#0d0d15"/>
 
-        <!-- STATUS SZÍNEK -->
         <SolidColorBrush x:Key="GreenBrush"   Color="#4ade80"/>
         <SolidColorBrush x:Key="RedBrush"     Color="#f87171"/>
         <SolidColorBrush x:Key="BlueBrush"    Color="#7c6af8"/>
         <SolidColorBrush x:Key="YellowBrush"  Color="#fbbf24"/>
 
-        <!-- ═══════════════════════════════════════
-             GRADIENT ACCENT BUTTON
-             (frontend: linear-gradient(135deg, #00f5c4, #7c6af8), dark text)
-        ═══════════════════════════════════════ -->
+        <!-- ============================================================
+             Bootstrap Icons – vektoros Path geometriák (font-független)
+             Használat: <Path Data="{StaticResource Icon.Grid}" ... />
+             ============================================================ -->
+
+        <!-- bi-grid-fill  – Dashboard sidebar -->
+        <Geometry x:Key="Icon.Grid">M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z</Geometry>
+
+        <!-- bi-box-arrow-in-right – Belépések sidebar + stat kártya -->
+        <Geometry x:Key="Icon.BoxArrowInRight">M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0zm-4.854 2.646a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L2.707 8H10.5a.5.5 0 0 0 0-1H2.707l2.147-2.146a.5.5 0 1 0-.708-.708z</Geometry>
+
+        <!-- bi-door-open – Kijelentkezés -->
+        <Geometry x:Key="Icon.DoorOpen">M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H4.5A1.5 1.5 0 0 0 3 2.5V15zM11 2.5V13H5V2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5M9 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0</Geometry>
+
+        <!-- bi-eye – Jelszó megjelenítés toggle -->
+        <Geometry x:Key="Icon.Eye">M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7</Geometry>
+
+        <!-- bi-people-fill – Összes tag -->
+        <Geometry x:Key="Icon.People">M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5</Geometry>
+
+        <!-- bi-person-check-fill – Aktív tag -->
+        <Geometry x:Key="Icon.PersonCheck">M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4M8 8a5 5 0 0 0-4.546 2.916C4.204 10.362 5.05 11 6 11h3.862A3.49 3.49 0 0 1 9 9.5a3.5 3.5 0 0 1 1.604-2.967Q10.31 8 9.5 8z</Geometry>
+
+        <!-- bi-ticket-perforated-fill – Bérletek -->
+        <Geometry x:Key="Icon.Ticket">M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6zM4 5.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1zm0 2a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z</Geometry>
+
+        <!-- bi-star-fill – Aktív bérlet -->
+        <Geometry x:Key="Icon.Star">M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z</Geometry>
+
+        <!-- bi-cart-check-fill – Előre megvásárolt bérlet -->
+        <Geometry x:Key="Icon.CartCheck">M.5 1a.5.5 0 0 0 0 1h.923l2.17 9.644A1.5 1.5 0 0 0 5 13h8a1.5 1.5 0 0 0 1.496-1.364l.7-6.956A1 1 0 0 0 14.2 3.5H2.343l-.21-.937A.5.5 0 0 0 1.64 2.17.5.5 0 0 0 .5 1m12.566 4.641-3.135 3.148a.5.5 0 0 1-.708 0l-1.56-1.563a.5.5 0 0 1 .708-.707l1.206 1.208 2.78-2.793a.5.5 0 1 1 .71.707M6 15.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m7 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0</Geometry>
+
+        <!-- bi-person-standing – Jelenleg bent -->
+        <Geometry x:Key="Icon.PersonStanding">M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M6 6.75v8.5a.75.75 0 0 0 1.5 0V10h1v5.25a.75.75 0 0 0 1.5 0v-8.5l.5 1.25a.75.75 0 1 0 1.4-.56l-1.5-3.75A.75.75 0 0 0 9.5 3h-3a.75.75 0 0 0-.694.465l-1.5 3.75a.75.75 0 1 0 1.4.56z</Geometry>
+
+        <!-- bi-calendar-check-fill – Aktív foglalások -->
+        <Geometry x:Key="Icon.CalendarCheck">M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2m-5.146-5.146-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708</Geometry>
+
+        <!-- bi-tags-fill – Tagok sidebar ikon -->
+        <Geometry x:Key="Icon.Tags">M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M1.293 7.793A1 1 0 0 0 1 8.5v1.586l.006.042 6.195 6.195.908-.907L1.293 7.793z</Geometry>
+
+        <!-- bi-credit-card-fill – Bérletek sidebar ikon -->
+        <Geometry x:Key="Icon.CreditCard">M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H0zm0 3v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zm3 2h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1</Geometry>
+
         <Style x:Key="ModernButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="#09090f"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -66,7 +97,6 @@
             </Setter>
         </Style>
 
-        <!-- GHOST/OUTLINE GOMB (sidebar toggle, frissítés stb.) -->
         <Style x:Key="GhostButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#6b6760"/>
@@ -98,9 +128,6 @@
             </Setter>
         </Style>
 
-        <!-- ═══════════════════════════════════════
-             TEXTBOX  (frontend: rgba(255,255,255,0.05), border rgba(255,255,255,0.1))
-        ═══════════════════════════════════════ -->
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Padding" Value="14,0"/>
@@ -138,7 +165,6 @@
             </Setter>
         </Style>
 
-        <!-- PASSWORDBOX -->
         <Style x:Key="ModernPasswordBoxStyle" TargetType="PasswordBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Padding" Value="14,0"/>
@@ -173,7 +199,6 @@
             </Setter>
         </Style>
 
-        <!-- COMBOBOX -->
         <Style x:Key="ModernComboBoxStyle" TargetType="ComboBox">
             <Setter Property="Height" Value="42"/>
             <Setter Property="Padding" Value="12,0"/>
@@ -191,9 +216,6 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
 
-        <!-- ═══════════════════════════════════════
-             DATAGRID  (frontend card stílus)
-        ═══════════════════════════════════════ -->
         <Style x:Key="ModernDataGridStyle" TargetType="DataGrid">
             <Setter Property="Background" Value="#0f0f1a"/>
             <Setter Property="Foreground" Value="#f0ede8"/>
@@ -212,7 +234,6 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
 
-        <!-- DATAGRID COLUMN HEADER -->
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="#09090f"/>
             <Setter Property="Foreground" Value="#6b6760"/>
@@ -224,7 +245,6 @@
             <Setter Property="Height" Value="40"/>
         </Style>
 
-        <!-- DATAGRID ROW -->
         <Style TargetType="DataGridRow">
             <Setter Property="Background" Value="Transparent"/>
             <Style.Triggers>
@@ -237,7 +257,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- DATAGRID CELL -->
         <Style TargetType="DataGridCell">
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="4,0"/>
@@ -251,15 +270,73 @@
             </Style.Triggers>
         </Style>
 
-        <!-- CHECKBOX -->
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#6b6760"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground"        Value="#6b6760"/>
+            <Setter Property="FontSize"          Value="13"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Cursor"            Value="Hand"/>
+            <Setter Property="FocusVisualStyle"  Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                            <!-- A negyzet maga -->
+                            <Border x:Name="Box"
+                                    Width="18" Height="18"
+                                    CornerRadius="5"
+                                    Background="#0f0f1a"
+                                    BorderBrush="#2e2e3e"
+                                    BorderThickness="1.5"
+                                    VerticalAlignment="Center">
+                                <Viewbox x:Name="Check"
+                                         Width="10" Height="10"
+                                         Visibility="Collapsed"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center">
+                                    <Path Data="M1.5 4.5 L4 7.5 L9 2"
+                                          Stroke="#00f5c4"
+                                          StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          Fill="Transparent"/>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- Felirat -->
+                            <ContentPresenter x:Name="Label"
+                                              Margin="8,0,0,0"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </StackPanel>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="Box"   Property="Background"   Value="#0d1f1c"/>
+                                <Setter TargetName="Box"   Property="BorderBrush"  Value="#00f5c4"/>
+                                <Setter Property="Foreground" Value="#f0ede8"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#4a4a5a"/>
+                                <Setter Property="Foreground" Value="#9ca3af"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsChecked"   Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#00f5c4"/>
+                                <Setter TargetName="Box" Property="Background"  Value="#0f2a24"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <!-- PROGRESSBAR  (frontend: accent gradient) -->
         <Style TargetType="ProgressBar">
             <Setter Property="Background" Value="#1a1a28"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -284,7 +361,6 @@
             </Setter>
         </Style>
 
-        <!-- CONVERTERS -->
         <local:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter"/>
         <local:BelepesStatusConverter x:Key="BelepesStatusConverter"/>
 
