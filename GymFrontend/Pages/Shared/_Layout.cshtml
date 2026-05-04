@@ -779,6 +779,13 @@
                 </a>
             }
 
+            <span class="nav-section">Egyéb</span>
+
+            <a href="/Kapcsolat" class="nav-link" id="menu-kapcsolat">
+                <i class="bi bi-chat-dots nav-icon"></i>
+                <span class="nav-label">Kapcsolat</span>
+            </a>
+
             <span class="nav-section">Fiók</span>
 
             <a href="/Profile" class="nav-link" id="menu-profile">
@@ -805,6 +812,13 @@
         }
         else
         {
+            <span class="nav-section">Egyéb</span>
+
+            <a href="/Kapcsolat" class="nav-link" id="menu-kapcsolat">
+                <i class="bi bi-chat-dots nav-icon"></i>
+                <span class="nav-label">Kapcsolat</span>
+            </a>
+
             <div class="sidebar-divider"></div>
             <a href="/Login" class="nav-link nav-login" id="menu-login">
                 <i class="bi bi-box-arrow-in-right nav-icon"></i>
@@ -890,7 +904,7 @@
             <div class="footer-jobb">
                 <a href="/Privacy" class="footer-link">ÁSZF</a>
                 <a href="/Helyszinek" class="footer-link">Helyszínek</a>
-                <a href="mailto:info@smartgym.hu" class="footer-link">
+                <a href="/Kapcsolat" class="footer-link">
                     <i class="bi bi-envelope"></i> Kapcsolat
                 </a>
             </div>
@@ -949,6 +963,7 @@
             "belepes":          "menu-belepes",
             "helyszinek": "menu-helyszinek",
             "galeria": "menu-galeria",
+            "kapcsolat": "menu-kapcsolat",
         };
 
         for (const [key, id] of Object.entries(pageMap)) {

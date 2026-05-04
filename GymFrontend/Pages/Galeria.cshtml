@@ -367,7 +367,7 @@
     .nagyito-bezar {
         top: 24px;
         right: 24px;
-        position: fixed;
+        position: absolute;
     }
 
     .nagyito-elozo { left: -70px; top: 50%; transform: translateY(-50%); }
@@ -437,19 +437,19 @@
     <!-- SZURO -->
     <div class="szuro-sav">
         <button class="szuro-gomb aktiv" data-szuro="osszes">
-            <i class="bi bi-grid-3x3-gap"></i>
+            <i class="bi bi-grid-3x3-gap-fill"></i>
             Összes
         </button>
         <button class="szuro-gomb" data-szuro="terem">
-            <i class="bi bi-bicycle"></i>
+            <i class="bi bi-lightning-charge-fill"></i>
             Edzőterem
         </button>
         <button class="szuro-gomb" data-szuro="kozosseg">
-            <i class="bi bi-cup-hot"></i>
+            <i class="bi bi-people-fill"></i>
             Közösségi terek
         </button>
         <button class="szuro-gomb" data-szuro="wellness">
-            <i class="bi bi-droplet"></i>
+            <i class="bi bi-heart-pulse-fill"></i>
             Wellness &amp; Higiénia
         </button>
     </div>
@@ -461,7 +461,7 @@
             <img src="~/images/galeria/recepcio.png" alt="Recepció" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke lila"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <span class="kep-cimke lila"><i class="bi bi-people-fill"></i> Közösségi tér</span>
                 <div class="kep-cim">Recepció</div>
                 <div class="kep-leiras">Az első benyomás. Itt fogad téged a csapatunk a regisztrációhoz és tájékoztatáshoz.</div>
             </div>
@@ -471,7 +471,7 @@
             <img src="~/images/galeria/terem1.png" alt="Edzőterem 1" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <span class="kep-cimke"><i class="bi bi-lightning-charge-fill"></i> Edzőterem</span>
                 <div class="kep-cim">Főterem</div>
                 <div class="kep-leiras">Súlyzók, gépek és tükörfalak — minden, ami az erőedzéshez kell.</div>
             </div>
@@ -481,7 +481,7 @@
             <img src="~/images/galeria/terem2.png" alt="Edzőterem 2" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <span class="kep-cimke"><i class="bi bi-lightning-charge-fill"></i> Edzőterem</span>
                 <div class="kep-cim">Gépterem</div>
                 <div class="kep-leiras">Csúcskategóriás kardió- és erősítőgépek.</div>
             </div>
@@ -491,7 +491,7 @@
             <img src="~/images/galeria/bemelegito.png" alt="Bemelegítő terület" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <span class="kep-cimke"><i class="bi bi-lightning-charge-fill"></i> Edzőterem</span>
                 <div class="kep-cim">Bemelegítő zóna</div>
                 <div class="kep-leiras">Funkcionális tréninghez kialakított szabad terület.</div>
             </div>
@@ -501,7 +501,7 @@
             <img src="~/images/galeria/wellnes.png" alt="Wellness részleg" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Wellness</span>
+                <span class="kep-cimke zold"><i class="bi bi-heart-pulse-fill"></i> Wellness</span>
                 <div class="kep-cim">Wellness &amp; pihenő</div>
                 <div class="kep-leiras">Pezsgőfürdő, szauna és pihenőágyak az edzés utáni regenerációhoz.</div>
             </div>
@@ -511,7 +511,7 @@
             <img src="~/images/galeria/boxring.png" alt="Bokszring" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke"><i class="bi bi-bicycle"></i> Edzőterem</span>
+                <span class="kep-cimke"><i class="bi bi-lightning-charge-fill"></i> Edzőterem</span>
                 <div class="kep-cim">Bokszring</div>
                 <div class="kep-leiras">Profi méretű ring és felszerelés a küzdősportok kedvelőinek.</div>
             </div>
@@ -521,7 +521,7 @@
             <img src="~/images/galeria/bufe.png" alt="Büfé" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke lila"><i class="bi bi-cup-hot"></i> Közösségi tér</span>
+                <span class="kep-cimke lila"><i class="bi bi-people-fill"></i> Közösségi tér</span>
                 <div class="kep-cim">Büfé</div>
                 <div class="kep-leiras">Frissen préselt levek, fehérje shake-ek és egészséges falatok.</div>
             </div>
@@ -531,7 +531,7 @@
             <img src="~/images/galeria/oltozok.png" alt="Öltözők" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <span class="kep-cimke zold"><i class="bi bi-heart-pulse-fill"></i> Higiénia</span>
                 <div class="kep-cim">Öltözők</div>
                 <div class="kep-leiras">Számzáras szekrények, márvány burkolat, kényelmes tér.</div>
             </div>
@@ -541,7 +541,7 @@
             <img src="~/images/galeria/tusolok.png" alt="Tusolók" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <span class="kep-cimke zold"><i class="bi bi-heart-pulse-fill"></i> Higiénia</span>
                 <div class="kep-cim">Tusolók</div>
                 <div class="kep-leiras">Külön zuhanyfülkék, prémium kiszolgálással.</div>
             </div>
@@ -551,7 +551,7 @@
             <img src="~/images/galeria/mosdo.png" alt="Mosdó" loading="lazy" />
             <div class="kep-nagyitas"><i class="bi bi-arrows-fullscreen"></i></div>
             <div class="kep-infok">
-                <span class="kep-cimke zold"><i class="bi bi-droplet"></i> Higiénia</span>
+                <span class="kep-cimke zold"><i class="bi bi-heart-pulse-fill"></i> Higiénia</span>
                 <div class="kep-cim">Mosdó</div>
                 <div class="kep-leiras">Letisztult, márvány burkolatú mosdóhelyiség.</div>
             </div>

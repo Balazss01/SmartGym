@@ -1,0 +1,504 @@
+﻿@page
+@model GymFrontend.Pages.KapcsolatModel
+@{
+    ViewData["Title"] = "Kapcsolat";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    .kapcsolat-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0.5rem 0 2rem;
+    }
+
+    /* Fejléc */
+    .kapcsolat-fejlec {
+        text-align: center;
+        margin-bottom: 36px;
+        padding-bottom: 24px;
+        border-bottom: 0.5px solid var(--border);
+    }
+
+    .kapcsolat-cimke {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .kapcsolat-cim {
+        font-family: 'Syne', sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 10px;
+        line-height: 1.2;
+    }
+
+    .kapcsolat-bevezeto {
+        font-size: 14px;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Sikerüzenet */
+    .siker-doboz {
+        background: linear-gradient(135deg, rgba(0,245,196,0.12), rgba(124,106,248,0.12));
+        border: 0.5px solid rgba(0,245,196,0.35);
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        color: #86efac;
+        font-weight: 500;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .siker-doboz i {
+            font-size: 22px;
+        }
+
+    /* Fő layout: 1.5fr (info) | 1fr (űrlap) — vagy fordítva ízlés szerint */
+    .kapcsolat-rács {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 20px;
+    }
+
+    @@media (max-width: 900px) {
+        .kapcsolat-rács {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Bal oldal — kapcsolati infó kártyák */
+    .info-kartya {
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid var(--border);
+        border-radius: 16px;
+        padding: 20px 22px;
+        margin-bottom: 14px;
+        transition: all 0.2s;
+    }
+
+        .info-kartya:hover {
+            border-color: rgba(0,245,196,0.25);
+            background: rgba(0,245,196,0.04);
+        }
+
+    .info-kartya-fej {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .info-kartya-ikon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(0,245,196,0.12);
+        border: 0.5px solid rgba(0,245,196,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .info-kartya-cim {
+        font-family: 'Syne', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.02em;
+    }
+
+    .info-kartya-tartalom {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+        .info-kartya-tartalom a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .info-kartya-tartalom a:hover {
+                color: var(--accent);
+            }
+
+    .info-sor {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+        font-size: 13px;
+    }
+
+    .info-sor-nap {
+        color: var(--text-muted);
+    }
+
+    .info-sor-ido {
+        color: var(--text);
+        font-family: 'Syne', sans-serif;
+        font-weight: 500;
+    }
+
+    /* Közösségi média ikonsor */
+    .kozossegi-sav {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .kozossegi-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 16px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .kozossegi-link:hover {
+            background: rgba(0,245,196,0.1);
+            border-color: rgba(0,245,196,0.3);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+    /* Jobb oldal — űrlap kártya */
+    .urlap-kartya {
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid var(--border);
+        border-radius: 16px;
+        padding: 26px 28px;
+        height: fit-content;
+    }
+
+    .urlap-cim {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 6px;
+    }
+
+    .urlap-leiras {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 22px;
+    }
+
+    .mezo-csoport {
+        margin-bottom: 14px;
+    }
+
+    .mezo-cimke {
+        display: block;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+
+        .mezo-cimke .kotelezo {
+            color: #f87171;
+        }
+
+    .mezo-input,
+    .mezo-textarea {
+        width: 100%;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        padding: 11px 14px;
+        outline: none;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+        .mezo-input:focus,
+        .mezo-textarea:focus {
+            border-color: rgba(0,245,196,0.4);
+            background: rgba(0,245,196,0.04);
+            box-shadow: 0 0 0 3px rgba(0,245,196,0.06);
+        }
+
+        .mezo-input::placeholder,
+        .mezo-textarea::placeholder {
+            color: rgba(240,237,232,0.3);
+        }
+
+    .mezo-textarea {
+        resize: vertical;
+        min-height: 130px;
+        font-family: 'DM Sans', sans-serif;
+        line-height: 1.5;
+    }
+
+    .mezo-sor-ketto {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    @@media (max-width: 500px) {
+        .mezo-sor-ketto {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Hibalista */
+    .hibak {
+        background: rgba(248,113,113,0.08);
+        border: 0.5px solid rgba(248,113,113,0.25);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        color: #fca5a5;
+    }
+
+        .hibak ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+    /* Küldés gomb */
+    .kuldes-gomb {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, #00f5c4, #7c6af8);
+        border: none;
+        border-radius: 12px;
+        color: #09090f;
+        font-family: 'Syne', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.15s;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .kuldes-gomb:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+        .kuldes-gomb:active {
+            transform: scale(0.98);
+        }
+
+    .urlap-jegyzet {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 14px;
+        line-height: 1.5;
+    }
+
+        .urlap-jegyzet a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+            .urlap-jegyzet a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="kapcsolat-wrapper">
+
+    <!-- Fejléc -->
+    <header class="kapcsolat-fejlec">
+        <span class="kapcsolat-cimke">Lépj velünk kapcsolatba</span>
+        <h1 class="kapcsolat-cim">Kapcsolat</h1>
+        <p class="kapcsolat-bevezeto">
+            Kérdésed van? Bérletet vásárolnál? Visszajelzésed van a szolgáltatásunkról?
+            Bármiben segítünk — válaszd a számodra legkényelmesebb módot.
+        </p>
+    </header>
+
+    @if (TempData["Sikeres"] != null)
+    {
+        <div class="siker-doboz">
+            <i class="bi bi-check-circle-fill"></i>
+            @TempData["Sikeres"]
+        </div>
+    }
+
+    <div class="kapcsolat-rács">
+
+        <!-- BAL OLDAL — Kapcsolati infók -->
+        <div>
+
+            <!-- E-mail -->
+            <div class="info-kartya">
+                <div class="info-kartya-fej">
+                    <div class="info-kartya-ikon">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div class="info-kartya-cim">E-mail</div>
+                </div>
+                <div class="info-kartya-tartalom">
+                    Általános megkeresés:<br>
+                    <a href="mailto:info@smartgym.hu">info@smartgym.hu</a><br>
+                    <br>
+                    Ügyfélszolgálat:<br>
+                    <a href="mailto:ugyfelszolgalat@smartgym.hu">ugyfelszolgalat@smartgym.hu</a>
+                </div>
+            </div>
+
+            <!-- Telefon -->
+            <div class="info-kartya">
+                <div class="info-kartya-fej">
+                    <div class="info-kartya-ikon">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <div class="info-kartya-cim">Telefon</div>
+                </div>
+                <div class="info-kartya-tartalom">
+                    Központi szám:<br>
+                    <a href="tel:+3699123456">+36 99 123 456</a><br>
+                    <br>
+                    Hétfő – Péntek: 08:00 – 18:00<br>
+                    Hétvégén: 09:00 – 14:00
+                </div>
+            </div>
+
+            <!-- Központ -->
+            <div class="info-kartya">
+                <div class="info-kartya-fej">
+                    <div class="info-kartya-ikon">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+                    <div class="info-kartya-cim">Központi iroda</div>
+                </div>
+                <div class="info-kartya-tartalom">
+                    SmartGYM Kft.<br>
+                    9400 Sopron, Várkerület 22.<br>
+                    Magyarország
+                </div>
+            </div>
+
+            <!-- Közösségi média -->
+            <div class="info-kartya">
+                <div class="info-kartya-fej">
+                    <div class="info-kartya-ikon">
+                        <i class="bi bi-share-fill"></i>
+                    </div>
+                    <div class="info-kartya-cim">Kövess minket</div>
+                </div>
+                <div class="info-kartya-tartalom">
+                    Friss híreink, edzéstippek és akciók a közösségi felületeinken.
+                    <div class="kozossegi-sav">
+                        <a href="https://facebook.com" target="_blank" rel="noopener" class="kozossegi-link" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener" class="kozossegi-link" aria-label="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener" class="kozossegi-link" aria-label="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="https://tiktok.com" target="_blank" rel="noopener" class="kozossegi-link" aria-label="TikTok">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- JOBB OLDAL — Űrlap -->
+        <div class="urlap-kartya">
+            <h2 class="urlap-cim">Írj nekünk üzenetet</h2>
+            <p class="urlap-leiras">
+                Töltsd ki az alábbi űrlapot, és munkatársunk 1 munkanapon belül felveszi veled a kapcsolatot.
+            </p>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="hibak">
+                    <ul>
+                        @foreach (var hiba in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@hiba.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form method="post">
+                <div class="mezo-sor-ketto">
+                    <div class="mezo-csoport">
+                        <label class="mezo-cimke" asp-for="Nev">
+                            Név <span class="kotelezo">*</span>
+                        </label>
+                        <input asp-for="Nev" class="mezo-input" placeholder="Kiss Anna" />
+                    </div>
+                    <div class="mezo-csoport">
+                        <label class="mezo-cimke" asp-for="Email">
+                            E-mail cím <span class="kotelezo">*</span>
+                        </label>
+                        <input asp-for="Email" type="email" class="mezo-input" placeholder="kissanna@pelda.hu" />
+                    </div>
+                </div>
+
+                <div class="mezo-csoport">
+                    <label class="mezo-cimke" asp-for="Targy">
+                        Tárgy <span class="kotelezo">*</span>
+                    </label>
+                    <input asp-for="Targy" class="mezo-input" placeholder="Bérlet vásárlással kapcsolatos kérdés" />
+                </div>
+
+                <div class="mezo-csoport">
+                    <label class="mezo-cimke" asp-for="Uzenet">
+                        Üzenet <span class="kotelezo">*</span>
+                    </label>
+                    <textarea asp-for="Uzenet" class="mezo-textarea" placeholder="Írd le, miben tudunk segíteni..."></textarea>
+                </div>
+
+                <button type="submit" class="kuldes-gomb">
+                    <i class="bi bi-send-fill"></i>
+                    Üzenet küldése
+                </button>
+
+                <div class="urlap-jegyzet">
+                    Az üzenet küldésével elfogadod az
+                    <a href="/Privacy">ÁSZF-ben</a>
+                    foglalt adatkezelési feltételeket.
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>

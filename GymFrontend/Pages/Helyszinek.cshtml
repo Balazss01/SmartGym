@@ -239,10 +239,26 @@
     }
 
     .helyszin-emoji {
-        font-size: 28px;
-        margin-bottom: 8px;
-        display: block;
+        font-size: 56px;
+        line-height: 1;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.04);
+        border: 0.5px solid rgba(255,255,255,0.08);
+        overflow: hidden;
     }
+
+        .helyszin-emoji img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
     .helyszin-nev {
         font-size: 16px;
@@ -389,8 +405,24 @@
 
     .lista-emoji {
         font-size: 18px;
+        line-height: 1;
         flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.04);
+        overflow: hidden;
     }
+
+        .lista-emoji img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
     .lista-info { flex: 1; overflow: hidden; }
 
@@ -467,7 +499,7 @@
     <div class="terkep-panel">
         <div class="terkep-fejlec">
             <span class="terkep-cim">Magyarország térkép</span>
-            <span class="helyszin-szam-pill" id="helyszin-szam-pill">— helyszín</span>
+            <span class="helyszin-szam-pill" id="helyszin-szam-pill">- helyszín</span>
         </div>
         <div class="terkep-svg-wrap">
             <svg id="magyarorszag-svg" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
@@ -588,7 +620,16 @@
     @foreach (var h in Model.Helyszinek)
     {
         <div class="lista-elem" data-id="@h.Id" onclick="kivalaszt(@h.Id)">
-            <span class="lista-emoji">@(h.Kep ?? "📍")</span>
+            <span class="lista-emoji">
+                @if (!string.IsNullOrWhiteSpace(h.Kep) && (h.Kep.StartsWith("/") || h.Kep.StartsWith("http")))
+                {
+                    <img src="@h.Kep" alt="@h.Nev" />
+                }
+                else
+                {
+                    @(h.Kep ?? "📍")
+                }
+            </span>
             <div class="lista-info">
                 <div class="lista-nev">@h.Nev</div>
                 <div class="lista-varos">@h.Varos · @(h.Cim?.Split(',')[0])</div>
@@ -653,7 +694,14 @@
 
         document.getElementById('ures-allapot').style.display = 'none';
 
-        document.getElementById('kartya-emoji').textContent = h.Kep || '📍';
+        // Kép vagy emoji a kártya tetején
+        const emojiEl = document.getElementById('kartya-emoji');
+        const kepErtek = h.Kep || '📍';
+        if (kepErtek.startsWith('/') || kepErtek.startsWith('http')) {
+            emojiEl.innerHTML = `<img src="${kepErtek}" alt="${h.Nev}" />`;
+        } else {
+            emojiEl.textContent = kepErtek;
+        }
         document.getElementById('kartya-nev').textContent = h.Nev;
         document.getElementById('kartya-varos').textContent = h.Varos;
         document.getElementById('kartya-leiras').textContent = h.Leiras;
