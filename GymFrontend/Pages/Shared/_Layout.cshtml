@@ -786,6 +786,11 @@
                 <span class="nav-label">Kapcsolat</span>
             </a>
 
+            <a href="/Privacy" class="nav-link" id="menu-aszf">
+                <i class="bi bi-file-text nav-icon"></i>
+                <span class="nav-label">ÁSZF</span>
+            </a>
+
             <span class="nav-section">Fiók</span>
 
             <a href="/Profile" class="nav-link" id="menu-profile">
@@ -817,6 +822,11 @@
             <a href="/Kapcsolat" class="nav-link" id="menu-kapcsolat">
                 <i class="bi bi-chat-dots nav-icon"></i>
                 <span class="nav-label">Kapcsolat</span>
+            </a>
+
+            <a href="/Privacy" class="nav-link" id="menu-aszf">
+                <i class="bi bi-file-text nav-icon"></i>
+                <span class="nav-label">ÁSZF</span>
             </a>
 
             <div class="sidebar-divider"></div>
@@ -912,7 +922,7 @@
     </footer>
 
     <script>
-        // Sidebar toggle
+       
         function toggleSidebar() {
             const sb = document.getElementById("sidebar");
             const tb = document.getElementById("topbar");
@@ -936,7 +946,7 @@
             document.getElementById("overlay").classList.remove("active");
         }
 
-        // Dropdown toggle
+       
         function toggleDropdown(id) {
             const all = document.querySelectorAll(".dropdown-menu-custom");
             all.forEach(d => {
@@ -951,7 +961,7 @@
             }
         });
 
-        // Active nav link
+       
         const path = window.location.pathname.toLowerCase();
         const pageMap = {
             "berletek":         "menu-berletek",
@@ -964,6 +974,7 @@
             "helyszinek": "menu-helyszinek",
             "galeria": "menu-galeria",
             "kapcsolat": "menu-kapcsolat",
+            "privacy": "menu-aszf",
         };
 
         for (const [key, id] of Object.entries(pageMap)) {
@@ -972,7 +983,7 @@
             }
         }
 
-        // Topbar title from active link
+       
         const activeLink = document.querySelector(".nav-link.active .nav-label");
         if (activeLink) {
             document.getElementById("topbar-page-title").textContent = activeLink.textContent.trim();
