@@ -26,7 +26,6 @@ namespace SmartGymAdminWPF.Views
         private Axis[] _chartXAxes = Array.Empty<Axis>();
         private Axis[] _chartYAxes = Array.Empty<Axis>();
 
-        // A stats végpontból betöltött valódi mai belépésszám
         private int _valodiBelepesSzam = 0;
 
         public ISeries[] ChartSeries
@@ -106,7 +105,6 @@ namespace SmartGymAdminWPF.Views
                 BentLevokText.Text = stats.BentLevok.ToString();
                 SzekrenyFoglalasText.Text = stats.AktivSzekrenyFoglalasok.ToString();
 
-                // Eltároljuk a valódi mai belépésszámot a chart számára
                 _valodiBelepesSzam = stats.MaiBelepesek;
             }
             catch (Exception ex) { MessageBox.Show("Dashboard stat hiba: " + ex.Message); }
@@ -134,24 +132,19 @@ namespace SmartGymAdminWPF.Views
                 var lista = JsonSerializer.Deserialize<List<UtolsoBelepesDto>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
-                // Átadjuk a stats-ból betöltött valódi számot is
                 BuildAktivitasChart(lista, _valodiBelepesSzam);
             }
             catch (Exception ex) { MessageBox.Show("Utolsó belépések hiba: " + ex.Message); }
         }
 
-        // FIX: valodiBelepesSzam paraméter hozzáadva, hogy a stats végpont
-        // helyes értékét használjuk az összefoglaló kártyákban — az utolso-belepesek
-        // lista limitált lehet (pl. top 10/50), ezért tért el a két szám.
+       
         private void BuildAktivitasChart(List<UtolsoBelepesDto> lista, int valodiBelepesSzam)
         {
-            // Csak a mai belépések, időpont szerint rendezve
             var mai = lista
                 .Where(b => b.BelepesIdopont.Date == DateTime.Today)
                 .OrderBy(b => b.BelepesIdopont)
                 .ToList();
 
-            // Kumulált lépcsős vonal: X = percek éjféltől, Y = kumulált belépésszám
             var pontok = new List<ObservablePoint>();
             pontok.Add(new ObservablePoint(0, 0));
 
@@ -214,8 +207,7 @@ namespace SmartGymAdminWPF.Views
                 }
             };
 
-            // FIX: valodiBelepesSzam-ot használjuk mai.Count helyett,
-            // mert az utolso-belepesek lista limitált lehet
+            
             AtlagBentletText.Text = $"{valodiBelepesSzam} fő";
             OsszesBelepesHintText.Text = $"{valodiBelepesSzam} belépés ma";
 
@@ -289,7 +281,6 @@ namespace SmartGymAdminWPF.Views
         private void AutoRefreshCheckBox_Unchecked(object sender, RoutedEventArgs e) => _timer.Stop();
     }
 
-    // ── DTOs ──
 
     public class DashboardStatsDto
     {

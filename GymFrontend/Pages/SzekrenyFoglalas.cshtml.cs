@@ -76,7 +76,7 @@ namespace GymFrontend.Pages
             var userId = GetUserIdFromToken(token);
             AktualisFelhasznaloId = userId;
 
-            //  100 szekrény felépítése
+           
             for (int i = 1; i <= 100; i++)
             {
                 var foglalas = foglalasok.FirstOrDefault(f => f.SzekrenyId == i);
@@ -107,7 +107,6 @@ namespace GymFrontend.Pages
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
-            //  foglalás elküldése
             var dto = new
             {
                 SzekrenyId = szekrenyId,
@@ -139,7 +138,6 @@ namespace GymFrontend.Pages
             return RedirectToPage();
         }
 
-        //  ZÁR / NYIT
         public async Task<IActionResult> OnPostToggleAsync(int szekrenyId)
         {
             using var client = new HttpClient();

@@ -151,7 +151,6 @@
 
             <div class="field-group">
                 <label class="field-label">Születési dátum</label>
-                <!-- Hidden input amit a model binding olvas -->
                 <input asp-for="SzuletesiDatum" type="hidden" id="szuletesiDatumHidden" />
                 <div class="date-row">
                     <select id="dd_ev" class="date-select" onchange="updateDatum()">
@@ -220,7 +219,6 @@
         input.type = input.type === "password" ? "text" : "password";
     }
 
-    // Évek feltöltése (1940 - idei év)
     (function() {
         const evSelect = document.getElementById("dd_ev");
         const currentYear = new Date().getFullYear();
@@ -232,7 +230,6 @@
         }
     })();
 
-    // Napok feltöltése az év+hónap alapján
     function updateNapok() {
         const ev  = parseInt(document.getElementById("dd_ev").value)  || 2000;
         const ho  = parseInt(document.getElementById("dd_ho").value)  || 1;
@@ -260,6 +257,5 @@
         }
     }
 
-    // Napok első betöltése
     updateNapok();
 </script>

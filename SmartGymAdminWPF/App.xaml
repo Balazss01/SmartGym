@@ -21,11 +21,6 @@
         <SolidColorBrush x:Key="BlueBrush"    Color="#7c6af8"/>
         <SolidColorBrush x:Key="YellowBrush"  Color="#fbbf24"/>
 
-        <!-- ============================================================
-             Bootstrap Icons – vektoros Path geometriák (font-független)
-             Használat: <Path Data="{StaticResource Icon.Grid}" ... />
-             ============================================================ -->
-
         <!-- bi-grid-fill  – Dashboard sidebar -->
         <Geometry x:Key="Icon.Grid">M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z</Geometry>
 
@@ -281,7 +276,6 @@
                     <ControlTemplate TargetType="CheckBox">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-                            <!-- A negyzet maga -->
                             <Border x:Name="Box"
                                     Width="18" Height="18"
                                     CornerRadius="5"
@@ -304,7 +298,6 @@
                                 </Viewbox>
                             </Border>
 
-                            <!-- Felirat -->
                             <ContentPresenter x:Name="Label"
                                               Margin="8,0,0,0"
                                               VerticalAlignment="Center"

@@ -12,10 +12,10 @@ namespace SmartGym.Models
         public string NyitvatartasHetfo { get; set; } = string.Empty;
         public string NyitvatartasHeto { get; set; } = string.Empty;
         public string NyitvatartasVasarnap { get; set; } = string.Empty;
-        public double Szelesseg { get; set; }   // latitude
-        public double Hosszusag { get; set; }   // longitude
+        public double Szelesseg { get; set; }   
+        public double Hosszusag { get; set; }   
         public bool Aktiv { get; set; } = true;
         public List<string> Szolgaltatasok { get; set; } = new();
-        public string Kep { get; set; } = string.Empty;   // emoji vagy URL
+        public string Kep { get; set; } = string.Empty;   
     }
 }

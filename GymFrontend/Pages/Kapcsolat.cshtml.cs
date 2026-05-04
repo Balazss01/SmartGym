@@ -41,8 +41,7 @@ namespace GymFrontend.Pages
             if (!ModelState.IsValid)
                 return Page();
 
-            // Itt küldhetnénk valódi e-mailt vagy menthetnénk az adatbázisba.
-            // Mivel ez iskolai projekt, csak egy sikerüzenetet adunk vissza.
+            
 
             TempData["Sikeres"] = "Köszönjük az üzenetet! Hamarosan válaszolunk.";
             return RedirectToPage();

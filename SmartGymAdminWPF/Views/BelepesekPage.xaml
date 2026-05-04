@@ -19,7 +19,6 @@
                    FontWeight="Bold"
                    Foreground="White"/>
 
-        <!-- STATOK -->
         <UniformGrid Grid.Row="2" Columns="3">
             <Border Background="{StaticResource CardBrush}" CornerRadius="12" Margin="6" Padding="16">
                 <StackPanel>
@@ -43,7 +42,6 @@
             </Border>
         </UniformGrid>
 
-        <!-- SZŰRŐK -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
@@ -81,7 +79,6 @@
                     Click="FrissitesButton_Click"/>
         </Grid>
 
-        <!-- TÁBLA -->
         <DataGrid x:Name="BelepesekGrid"
                   Grid.Row="6"
                   Style="{StaticResource ModernDataGridStyle}"

@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    /* ── PROFIL OLDAL STÍLUSOK ── */
 
     .profil-wrapper {
         max-width: 520px;
@@ -13,7 +12,6 @@
         padding: 0.5rem 0 2rem;
     }
 
-    /* ── AVATAR SZEKCIÓ ── */
     .avatar-szekció {
         display: flex;
         align-items: center;
@@ -79,7 +77,6 @@
         50%       { opacity: 0.3; }
     }
 
-    /* ── SZEKCIÓ KÁRTYÁK ── */
     .szekció-kártya {
         background: var(--bg-card);
         border: 0.5px solid var(--border);
@@ -102,7 +99,6 @@
         font-family: var(--font-head);
     }
 
-    /* ── MEZŐK ── */
     .mezősor {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -151,7 +147,6 @@
         color: var(--text-muted);
     }
 
-    /* ── MENTÉS GOMB ── */
     .mentes-gomb {
         width: 100%;
         padding: 11px;
@@ -177,7 +172,6 @@
         transform: scale(0.98);
     }
 
-    /* ── VISSZA / KIJELENTKEZÉS GOMBOK ── */
     .gombsor {
         display: flex;
         gap: 10px;
@@ -234,7 +228,6 @@
         border-color: rgba(248, 113, 113, 0.5);
     }
 
-    /* ── EGYÉB ── */
     .jelszo-tipp {
         font-size: 11px;
         color: var(--text-muted);
@@ -247,7 +240,6 @@
         margin-top: 10px;
     }
 
-    /* ── FLATPICKR TÉMA ILLESZTÉS ── */
     .flatpickr-calendar {
         background: #0f0f1a !important;
         border: 0.5px solid var(--border) !important;
@@ -267,7 +259,6 @@
 </style>
 
 @{
-    /*Teljes név összeállítása a modellből */
     var elsoNev   = Model.Vezeteknev  ?? "";
     var utolsoNev = Model.Keresztnev  ?? "";
 
@@ -284,7 +275,6 @@
 
 <div class="profil-wrapper">
 
-    <!-- Avatar szekció->
     <div class="avatar-szekció">
         <div class="avatar-kör">
             @initialek
@@ -293,14 +283,13 @@
         <div>
             <div class="avatar-nev">@teljesNev</div>
             <div class="avatar-alfelirat">
-                <span class="avatar-pont"></span> Aktív tag
+                <span class="avatar-pont"></span> 
             </div>
         </div>
     </div>
 
     <form method="post">
 
-        <!-- Személyes adatok szekció -->
         <div class="szekció-kártya">
             <div class="szekció-cím">Személyes adatok</div>
 
@@ -338,7 +327,6 @@
             </div>
         </div>
 
-        <!-- Jelszó módosítás szekció -->
         <div class="szekció-kártya">
             <div class="szekció-cím">Jelszó módosítása</div>
 
@@ -371,15 +359,12 @@
             </div>
         </div>
 
-        <!-- Validációs hibaüzenetek -->
         <div asp-validation-summary="All" class="hibak-listaja"></div>
 
-        <!-- Mentés gomb -->
         <button type="submit" class="mentes-gomb">Módosítások mentése</button>
 
     </form>
 
-    <!-- Vissza és kijelentkezés gombok -->
     <div class="gombsor">
         <a href="/" class="vissza-gomb" onclick="if(document.referrer && history.length > 1){event.preventDefault();history.back();}">
             <i class="bi bi-arrow-left" style="font-size:13px"></i> Vissza

@@ -61,8 +61,7 @@ namespace SmartGymAdminWPF.Views
                 _osszesBerlet = JsonSerializer.Deserialize<List<BerletListDto>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
-                // Csak akkor piszkáljuk a ComboBox-ot, ha tényleg új típus jelent meg
-                // – így a kiválasztás soha nem ugrik vissza timer tick hatására
+                
                 FrissitsTipusokHaKell();
                 UpdateStats();
                 ApplyFilter();
@@ -85,12 +84,10 @@ namespace SmartGymAdminWPF.Views
                 .Where(t => !string.IsNullOrWhiteSpace(t))
                 .ToHashSet();
 
-            // Ha a típuskészlet nem változott, a ComboBox-hoz NEM nyúlunk hozzá
             if (ujTipusok.SetEquals(_betoltottTipusok)) return;
 
             _betoltottTipusok = ujTipusok;
 
-            // Megőrizzük a kiválasztást
             var kivalasztott = (BerletTipusComboBox.SelectedItem as ComboBoxItem)
                                ?.Content?.ToString() ?? "Összes típus";
 
@@ -213,7 +210,6 @@ namespace SmartGymAdminWPF.Views
         }
     }
 
-    // ── DTOs ──
 
     public class BerletListDto
     {

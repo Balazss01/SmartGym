@@ -14,7 +14,7 @@ namespace GymWebApiBackend.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // --- SZEREPKÖRÖK ---
+            // ROLE
             string[] roles = { "Admin", "User" };
             foreach (var role in roles)
             {
@@ -24,7 +24,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
-            // --- ADMIN FELHASZNÁLÓ ---
+            // ADMIN
             var adminEmail = "admin@smartgym.hu";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
@@ -43,7 +43,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
-            // --- TESZT USER ÉS TAG ---
+            // TESZT FELHASZNÁLÓK
             var userEmail = "user@smartgym.hu";
             var normalUser = await userManager.FindByEmailAsync(userEmail);
             if (normalUser == null)
@@ -74,7 +74,7 @@ namespace GymWebApiBackend.Data
                 }
             }
 
-            // --- BÉRLET TÍPUSOK ---
+            // BÉRLETEK
             if (!dbContext.BerletTipusok.Any())
             {
                 var berletTipusok = new[]
@@ -90,7 +90,7 @@ namespace GymWebApiBackend.Data
                 await dbContext.SaveChangesAsync();
             }
 
-            // --- SZEKRÉNYEK ---
+            // SZEKRÉNYEK
             if (!dbContext.Szekrenyek.Any())
             {
                 var szekrenyek = new List<Szekreny>();
@@ -102,7 +102,7 @@ namespace GymWebApiBackend.Data
                 await dbContext.SaveChangesAsync();
             }
 
-            // --- HELYSZÍNEK (Konditermek) ---
+            // HELYSZÍNEK
             if (!dbContext.Helyszinek.Any())
             {
                 var helyszinek = new List<Helyszin>
