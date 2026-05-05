@@ -102,8 +102,8 @@ Heti bérlet:  2025.04.30 → 2025.05.07   ← automatikusan indul
 
 ### 1. Adatbázis beállítása
 
-- Létre kell hozni egy adatbázst smartgym néven
-- Visual Studioban Package Manager Consoleban ki kell adni az alábbi parancsot: "Update-database"
+- Létre kell hozni egy adatbázist smartgym néven
+- Visual Studioban, Package Manager Consoleban ki kell adni az alábbi parancsot: "Update-database"
 
 ### 2. Connection string beállítása
 
