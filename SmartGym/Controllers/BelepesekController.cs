@@ -19,7 +19,6 @@ namespace GymWebApiBackend.Controllers
             _context = context;
         }
 
-        // Admin: összes belépés lekérése
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
@@ -40,7 +39,6 @@ namespace GymWebApiBackend.Controllers
             return Ok(belepesek);
         }
 
-        // Admin: egy adott belépés lekérése
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Get(int id)
@@ -66,7 +64,6 @@ namespace GymWebApiBackend.Controllers
             return Ok(belepes);
         }
 
-        // User: saját státusz lekérése
         [HttpGet("statusz")]
         public async Task<IActionResult> GetStatusz()
         {
@@ -91,7 +88,6 @@ namespace GymWebApiBackend.Controllers
             });
         }
 
-        // User: belépés a konditerembe
         [HttpPost("belep")]
         public async Task<IActionResult> Belep()
         {
@@ -153,7 +149,6 @@ namespace GymWebApiBackend.Controllers
             return Ok(new { message = "Sikeres belépés!" });
         }
 
-        // User: kilépés a konditeremből
         [HttpPost("kilep")]
         public async Task<IActionResult> Kilep()
         {
@@ -164,7 +159,6 @@ namespace GymWebApiBackend.Controllers
                 return Unauthorized();
             }
 
-            // VAN-E AKTÍV SZEKRÉNYFOGLALÁS?
             var vanAktivSzekreny = await _context.SzekrenyFoglalasok
                 .AnyAsync(x => x.TagId == userId && x.Zarva);
 
@@ -197,7 +191,6 @@ namespace GymWebApiBackend.Controllers
             });
         }
 
-        // Admin: törlés
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)

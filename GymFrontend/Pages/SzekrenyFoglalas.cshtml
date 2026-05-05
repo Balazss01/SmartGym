@@ -192,15 +192,14 @@
 <div class="szekreny-grid">
     @foreach (var sz in Model.Szekrenyek)
     {
-        // Feltételezzük, hogy van egy 'Sajat' bool tulajdonság a modellben,
-        // vagy összehasonlítjuk a bejelentkezett felhasználó ID-jával
+        
         var isSajat = sz.Foglalt && sz.FelhasznaloId == Model.AktualisFelhasznaloId;
 
         var allapotClass = isSajat ? "sajat" : (sz.Foglalt ? "foglalt" : "szabad");
         var allapotSzoveg = isSajat ? "Saját / Leadás" : (sz.Foglalt ? "Foglalt" : "Szabad");
         var ikon = isSajat ? "bi-person-check-fill" : (sz.Foglalt ? "bi-lock-fill" : "bi-unlock-fill");
 
-        // A gomb csak akkor legyen 'disabled', ha foglalt ÉS nem a miénk
+       
         var isDisabled = sz.Foglalt && !isSajat;
 
         <form method="post" asp-page-handler="Toggle">

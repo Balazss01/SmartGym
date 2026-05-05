@@ -16,10 +16,8 @@ namespace GymFrontend.Pages
             _httpClientFactory = httpClientFactory;
         }
 
-        // Bérlet adatok (megjelenítéshez)
         public BerletTipus? Berlet { get; set; }
 
-        // Form mezők
         [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
 
@@ -62,7 +60,6 @@ namespace GymFrontend.Pages
             if (string.IsNullOrEmpty(token))
                 return RedirectToPage("/Login");
 
-            // Validációk
             var kartyaTiszta = (Kartyaszam ?? "").Replace(" ", "");
 
             if (string.IsNullOrWhiteSpace(KartyaTulajdonos))
@@ -77,7 +74,6 @@ namespace GymFrontend.Pages
             if ((Cvc ?? "").Length != 3 || !(Cvc ?? "").All(char.IsDigit))
                 ModelState.AddModelError(nameof(Cvc), "A CVC 3 számjegyből álljon.");
 
-            // Bérlet újra betöltése a megjelenítéshez
             await BerletBetolteseAsync(token);
 
             if (!ModelState.IsValid)
@@ -89,7 +85,6 @@ namespace GymFrontend.Pages
                 return RedirectToPage("/Berletek");
             }
 
-            // Bérlet vásárlás API hívás
             var client = _httpClientFactory.CreateClient("Api");
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);

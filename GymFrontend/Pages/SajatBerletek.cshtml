@@ -298,7 +298,6 @@
 </style>
 
 @{
-    /* Aktív bérlet keresése */
     var aktivBerlet = Model.Berletek
     .FirstOrDefault(b => b.Aktiv 
         && b.KezdetDatum <= DateTime.Now 
@@ -310,7 +309,6 @@
     .OrderBy(b => b.KezdetDatum)
     .FirstOrDefault();
 
-    /* Alap statisztikák */
     int osszesBerlet = Model.Berletek.Count;
 
     int aktivDb = Model.Berletek.Count(b =>
@@ -327,13 +325,11 @@
 
 <div class="sajat-berletek sb-container container-fluid px-0" style="max-width: 980px;">
 
-    <!-- Oldal cím -->
     <div class="mb-4">
         <div class="oldal-cim">Saját bérletek</div>
         <div class="oldal-alcim">Bérleteid áttekintése és aktuális állapota</div>
     </div>
 
-    <!-- Aktív bérlet kártya (csak ha van) -->
     @if (aktivBerlet != null)
     {
         var teljesIdo = aktivBerlet.VegeDatum - aktivBerlet.KezdetDatum;
@@ -407,7 +403,6 @@
 }
     }
 
-    <!-- Statisztika kártyák -->
     <div class="row g-3 mb-3">
         <div class="col-4">
             <div class="card p-3">
@@ -435,7 +430,6 @@
         </div>
     </div>
 
-    <!-- Bérletek táblázat -->
     <div class="card">
         <div class="tablazat-fejlec">
             <span class="szekciocim mb-0">Bérlet előzmények</span>

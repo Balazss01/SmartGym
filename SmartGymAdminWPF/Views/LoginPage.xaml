@@ -64,7 +64,6 @@
                     <TextBox x:Name="PasswordVisibleTextBox" Style="{StaticResource ModernTextBoxStyle}"
                              Visibility="Collapsed" KeyDown="LoginEnter_KeyDown"/>
 
-                    <!-- Jelszó toggle – bi-eye (vektoros Path) -->
                     <Button x:Name="TogglePasswordButton"
                             Width="34" Height="34"
                             HorizontalAlignment="Right" VerticalAlignment="Center"

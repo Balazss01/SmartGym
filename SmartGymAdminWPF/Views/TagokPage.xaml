@@ -14,7 +14,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- FEJLÉC -->
         <StackPanel Grid.Row="0">
             <TextBlock Text="TAGKEZELÉS"
                        Foreground="#00f5c4" FontSize="11" FontWeight="SemiBold"
@@ -24,7 +23,6 @@
                        Foreground="#f0ede8"/>
         </StackPanel>
 
-        <!-- STAT KÁRTYÁK -->
         <UniformGrid Grid.Row="2" Columns="3" Margin="-6,0">
             <Border Margin="6" Padding="22,18" CornerRadius="18"
                     Background="#0f0f1a" BorderBrush="#1f1f2e" BorderThickness="1">
@@ -52,7 +50,6 @@
             </Border>
         </UniformGrid>
 
-        <!-- SZŰRŐK -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -82,7 +79,6 @@
                     Click="FrissitesButton_Click"/>
         </Grid>
 
-        <!-- TÁBLÁZAT -->
         <Border Grid.Row="6" Background="#0f0f1a" CornerRadius="18"
                 BorderBrush="#1f1f2e" BorderThickness="1">
             <DataGrid x:Name="TagokGrid"

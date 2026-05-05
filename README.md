@@ -22,11 +22,6 @@ Lehetővé teszi bérletek kezelését, vásárlását, valamint felhasználói 
 - Automatikus státusz (nyitott / zárt)
 - Felhasználóhoz kötött foglalások
 
-### Értesítések
-- Értesítések megjelenítése
-- Olvasott / olvasatlan állapot
-- UI badge
-
 ---
 
 ## Bérlet logika
@@ -97,9 +92,8 @@ SmartGymAdminWPF
 
 - Automatikus bérlet aktiválás
 - Real-time értesítések (SignalR)
-- Fizetés integráció
-- Admin felület
-
+- Fizetés
+- Értesítések megoldása
 ---
 
 ## Készítette

@@ -19,7 +19,7 @@ namespace GymWebApiBackend.Controllers
             _context = context;
         }
 
-        // Összes foglalás lekérdezése
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,26 +27,24 @@ namespace GymWebApiBackend.Controllers
             return Ok(foglalasok);
         }
 
-        // Foglalás / feloldás
+        
         [HttpPost("toggle/{szekrenyId}")]
         public async Task<IActionResult> Toggle(int szekrenyId)
         {
             var tagId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            // 🔥 VAN-E MÁR FOGLALÁSA ENNEK A USERNEK?
+            
             var sajatFoglalas = await _context.SzekrenyFoglalasok
                 .FirstOrDefaultAsync(x => x.TagId == tagId);
 
-            // 🔥 MEGNÉZZÜK A KATTINTOTT SZEKRÉNYT
+            
             var foglalas = await _context.SzekrenyFoglalasok
                 .FirstOrDefaultAsync(x => x.SzekrenyId == szekrenyId);
 
-            // =========================
-            // 1. HA NINCS FOGLALVA → FOGLALÁS
-            // =========================
+            
             if (foglalas == null)
             {
-                // ❌ már van másik szekrénye
+                
                 if (sajatFoglalas != null)
                 {
                     return BadRequest("Már van lefoglalt szekrényed!");
@@ -67,9 +65,7 @@ namespace GymWebApiBackend.Controllers
                 return Ok("Lefoglalva");
             }
 
-            // =========================
-            // 2. HA SAJÁT → FELOLDÁS
-            // =========================
+            
             if (foglalas.TagId == tagId)
             {
                 foglalas.FoglalvaVege = DateTime.Now;
@@ -80,9 +76,7 @@ namespace GymWebApiBackend.Controllers
                 return Ok("Feloldva");
             }
 
-            // =========================
-            // 3. HA MÁSÉ
-            // =========================
+            
             return BadRequest("Ez a szekrény már foglalt!");
         }
     }

@@ -18,7 +18,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- FEJLÉC -->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -38,10 +37,8 @@
                           Checked="AutoRefreshCheckBox_Checked" Unchecked="AutoRefreshCheckBox_Unchecked"/>
             </Grid>
 
-            <!-- STAT KÁRTYÁK -->
             <UniformGrid Grid.Row="2" Columns="4" Margin="-6,0">
 
-                <!-- Összes tag – bi-people -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#0d1f1c">
@@ -56,7 +53,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Aktív tag – bi-person-check -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#0d1f14">
@@ -71,7 +67,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Összes bérlet – bi-ticket-perforated -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#13101f">
@@ -86,7 +81,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Aktív bérlet – bi-star -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#13101f">
@@ -101,7 +95,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Előre megvásárolt – bi-cart-check -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#13101f">
@@ -116,7 +109,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Mai belépések – bi-box-arrow-in-right -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#0d1f14">
@@ -131,7 +123,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Jelenleg bent – bi-person-standing -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#1f1508">
@@ -146,7 +137,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Aktív foglalások – bi-calendar-check -->
                 <Border Margin="6" Padding="22,18" CornerRadius="18" BorderBrush="#1f1f2e" BorderThickness="1" Background="#0f0f1a">
                     <StackPanel>
                         <Border Width="36" Height="36" CornerRadius="10" HorizontalAlignment="Left" Margin="0,0,0,12" Background="#13101f">
@@ -162,7 +152,6 @@
                 </Border>
             </UniformGrid>
 
-            <!-- GRAFIKON SOR -->
             <Grid Grid.Row="4" Margin="-6,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
@@ -212,7 +201,6 @@
                 </Border>
             </Grid>
 
-            <!-- BENT LÉVŐK -->
             <Border Grid.Row="6" Background="#0f0f1a" CornerRadius="18" Padding="22" BorderBrush="#1f1f2e" BorderThickness="1">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
@@ -241,7 +229,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- AKTIVITÁS CHART -->
             <Border Grid.Row="8" Background="#0f0f1a" CornerRadius="18" Padding="22" BorderBrush="#1f1f2e" BorderThickness="1">
                 <StackPanel>
                     <Grid Margin="0,0,0,20">

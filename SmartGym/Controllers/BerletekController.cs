@@ -25,16 +25,15 @@ namespace GymWebApiBackend.Controllers
         public class BerletListDto
         {
             public int BerletId { get; set; }
-            public int TagId { get; set; }          // FIX: hozzáadva
-            public string TeljesNev { get; set; } = "";    // FIX: hozzáadva
+            public int TagId { get; set; }          
+            public string TeljesNev { get; set; } = "";    
             public DateTime KezdetDatum { get; set; }
             public DateTime VegeDatum { get; set; }
             public bool Aktiv { get; set; }
             public string BerletTipusNev { get; set; } = "";
-            public int BerletTipusId { get; set; }          // FIX: hozzáadva (WPF toggle-hoz kell)
+            public int BerletTipusId { get; set; }          
         }
 
-        // ── ADMIN: összes bérlet (TagId + TeljesNev is benne) ───────
 
         [HttpGet("admin-all")]
         [Authorize(Roles = "Admin")]
@@ -60,7 +59,6 @@ namespace GymWebApiBackend.Controllers
             return Ok(berletek);
         }
 
-        // ── USER: saját bérletek ─────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> Get()

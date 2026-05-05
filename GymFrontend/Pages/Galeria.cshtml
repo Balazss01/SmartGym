@@ -2,7 +2,6 @@
 @model GymFrontend.Pages.GaleriaModel
 
 <style>
-    /* ── OLDAL FEJLEC ── */
     .galeria-keret {
         max-width: 1280px;
         margin: 0 auto;
@@ -59,7 +58,6 @@
         max-width: 580px;
     }
 
-    /* ── SZURO SAV ── */
     .szuro-sav {
         display: flex;
         flex-wrap: wrap;
@@ -101,7 +99,6 @@
         font-size: 13px;
     }
 
-    /* ── GALERIA RACS ── */
     .galeria-racs {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -265,7 +262,6 @@
 
     .kep-doboz.rejtett { display: none; }
 
-    /* ── NAGYITO ── */
     .nagyito {
         position: fixed;
         inset: 0;
@@ -373,7 +369,6 @@
     .nagyito-elozo { left: -70px; top: 50%; transform: translateY(-50%); }
     .nagyito-kovetkezo { right: -70px; top: 50%; transform: translateY(-50%); }
 
-    /* ── RESZPONZIV ── */
     @@media (max-width: 1024px) {
         .galeria-racs {
             grid-template-columns: repeat(2, 1fr);
@@ -419,7 +414,6 @@
 
 <div class="galeria-keret">
 
-    <!-- FEJLEC -->
     <div class="oldal-fejlec">
         <div class="oldal-cimke">
             <span class="oldal-cimke-pont"></span>
@@ -434,7 +428,6 @@
         </p>
     </div>
 
-    <!-- SZURO -->
     <div class="szuro-sav">
         <button class="szuro-gomb aktiv" data-szuro="osszes">
             <i class="bi bi-grid-3x3-gap-fill"></i>
@@ -454,7 +447,6 @@
         </button>
     </div>
 
-    <!-- RACS -->
     <div class="galeria-racs">
 
         <figure class="kep-doboz nagy" data-kategoria="kozosseg" data-sorszam="0">
@@ -560,7 +552,6 @@
     </div>
 </div>
 
-<!-- NAGYITO -->
 <div class="nagyito" id="nagyito" aria-hidden="true">
     <button class="nagyito-gomb nagyito-bezar" id="nagyito-bezar" aria-label="Bezárás">
         <i class="bi bi-x-lg"></i>
@@ -586,7 +577,6 @@
 
 <script>
     (function () {
-        // ── SZURES ──
         const szuroGombok = document.querySelectorAll('.szuro-gomb');
         const kepDobozok  = document.querySelectorAll('.kep-doboz');
 
@@ -603,7 +593,6 @@
             });
         });
 
-        // ── NAGYITO ──
         const nagyito          = document.getElementById('nagyito');
         const nagyitoKep       = document.getElementById('nagyito-kep');
         const nagyitoCim       = document.getElementById('nagyito-cim');
@@ -683,7 +672,6 @@
             if (esemeny.key === 'ArrowRight') lepes(1);
         });
 
-        // ── BELEPESI ANIMACIO GORGETESKOR ──
         if ('IntersectionObserver' in window) {
             const figyelo = new IntersectionObserver((bejegyzesek) => {
                 bejegyzesek.forEach(bej => {

@@ -42,7 +42,6 @@ namespace SmartGymAdminWPF.Views
                 var tagJson = await api.Get("api/Tagok");
                 _osszesTag = JsonSerializer.Deserialize<List<TagDto>>(tagJson, opts) ?? new List<TagDto>();
 
-                // Bérletekből kiszámítjuk, melyik tagnak van jelenleg érvényes bérlete
                 try
                 {
                     var berletJson = await api.Get("api/Berletek/admin-all");
@@ -58,7 +57,6 @@ namespace SmartGymAdminWPF.Views
                     _aktivBerletesTagIds = new HashSet<int>();
                 }
 
-                // Beállítjuk minden tagnál, hogy van-e érvényes bérlete
                 foreach (var tag in _osszesTag)
                     tag.VanAktivBerlete = _aktivBerletesTagIds.Contains(tag.TagId);
 
@@ -161,7 +159,6 @@ namespace SmartGymAdminWPF.Views
         public string Keresztnev { get; set; }
         public DateTime SzuletesiDatum { get; set; }
         public bool Aktiv { get; set; }
-        // Igaz, ha jelenleg érvényes (nem lejárt) bérlete van a tagnak
         public bool VanAktivBerlete { get; set; }
     }
 }

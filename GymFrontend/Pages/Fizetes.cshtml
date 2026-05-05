@@ -31,7 +31,6 @@
         margin: 0;
     }
 
-    /* Bérlet összegzés kártya */
     .osszegzes-kartya {
         background: linear-gradient(135deg, rgba(0,245,196,0.08), rgba(124,106,248,0.08));
         border: 0.5px solid rgba(0,245,196,0.25);
@@ -91,7 +90,6 @@
             padding-top: 14px;
         }
 
-    /* Fizetési kártya forma */
     .fizetes-kartya {
         background: rgba(255,255,255,0.04);
         border: 0.5px solid rgba(255,255,255,0.08);
@@ -161,7 +159,6 @@
             color: rgba(240,237,232,0.25);
         }
 
-    /* Gombok */
     .fizetes-gomb {
         width: 100%;
         padding: 13px;
@@ -255,7 +252,6 @@
             ? (int)Math.Round((double)Model.Berlet.Ar / Model.Berlet.IdotartamNapok)
             : (int)Model.Berlet.Ar;
 
-        <!-- Bérlet összegzés -->
         <div class="osszegzes-kartya">
             <div class="osszegzes-fej">
                 <div>
@@ -285,7 +281,6 @@
     <form method="post">
         <input type="hidden" asp-for="Id" />
 
-        <!-- Validációs hibák -->
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="hibak-listaja">
@@ -298,7 +293,6 @@
             </div>
         }
 
-        <!-- Kártya adatok form -->
         <div class="fizetes-kartya">
             <div class="szekcio-cim">
                 <i class="bi bi-credit-card-2-front"></i> Bankkártya adatok
@@ -361,7 +355,6 @@
 </div>
 
 <script>
-    // Kártyaszám: csoportosítás 4-esével
     const kartyaszamInput = document.getElementById('kartyaszamInput');
 
     kartyaszamInput.addEventListener('input', function(e) {
@@ -369,7 +362,6 @@
         e.target.value = v.match(/.{1,4}/g)?.join(' ') ?? '';
     });
 
-    // Lejárat: HH/ÉÉ automatikus formázás
     const lejaratInput = document.getElementById('lejaratInput');
 
     lejaratInput.addEventListener('input', function(e) {
