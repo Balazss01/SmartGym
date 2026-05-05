@@ -1,46 +1,30 @@
-#  SmartGym
-
-**SmartGym** egy ASP.NET Core alapú edzőtermi menedzsment rendszer, amely lehetővé teszi bérletek kezelését és vásárlását, szekrényfoglalások nyomon követését. A projekt három fő komponensből áll: egy RESTful backend API-ból, egy Razor Pages alapú webes frontendből, és egy WPF-alapú adminisztrációs asztali alkalmazásból.
-
----
-
-##  Tartalomjegyzék
-
-- [Funkciók](#-funkciók)
-- [Technológiák](#-technológiák)
-- [Projekt struktúra](#-projekt-struktúra)
-- [Bérlet logika](#-bérlet-logika)
-- [Telepítés és futtatás](#-telepítés-és-futtatás)
-- [Adatbázis](#-adatbázis)
-- [További fejlesztések](#-további-fejlesztések)
-- [Készítők](#-készítők)
+# SmartGym
+SmartGym egy ASP.NET Core alapú edzőtermi menedzsment rendszer. Lehetővé teszi bérletek kezelését és vásárlását, szekrényfoglalások nyomon követését, valamint felhasználói értesítések megjelenítését. A projekt három komponensből áll: egy RESTful backend API-ból, egy Razor Pages alapú webes frontendből, és egy WPF-alapú adminisztrációs asztali alkalmazásból.
 
 ---
 
-##  Funkciók
+## Funkciók
 
-###  Felhasználók
+**Felhasználók**
 - Regisztráció és bejelentkezés (JWT alapú hitelesítés)
 - Profil megtekintése és kezelése
 
-###  Bérletek
+**Bérletek**
 - Bérlet vásárlása (heti, havi stb.)
-- Több bérlet egyidejű kezelése
-- **Stackelt bérletek** támogatása — a bérletek egymás után indulnak
+- Stackelt bérletek támogatása — a bérletek egymás után indulnak
 - Aktív, jövőbeli és lejárt bérletek áttekintése
 
-###  Szekrények
+**Szekrények**
 - Aktív foglalás ellenőrzése
 - Automatikus státuszkezelés (nyitott / zárt)
 - Felhasználóhoz kötött foglalások
 
-###  Admin felület (WPF)
+**Admin felület (WPF)**
 - Asztali adminisztrációs alkalmazás Windows platformon
-- Felhasználók, bérletek és szekrények kezelése
 
 ---
 
-##  Technológiák
+## Technológiák
 
 | Réteg | Technológia |
 |---|---|
@@ -53,39 +37,34 @@
 
 ---
 
-##  Projekt struktúra
+## Projekt struktúra
 
 ```
 SmartGym/
-├── SmartGym/                  
-│   ├── Controllers/           
-│   ├── Models/                
-│   ├── Data/                  
-│   └── Services/             
-│
-├── GymFrontend/              
-│   ├── Pages/                
-│   ├── Shared/                
-│   └── wwwroot/               
-│
-├── SmartGymAdminWPF/          
-│   ├── Services/              
-│   ├── Views/                
-│   ├── App.xaml              
-│   └── MainWindow.xaml        
-│
-├── SmartGym.slnx             
-├── SwaggerTesztek             
+├── SmartGym/                  # ASP.NET Core Web API (backend)
+│   ├── Controllers/
+│   ├── Models/
+│   ├── Data/
+│   └── Services/
+├── GymFrontend/               # Razor Pages webes frontend
+│   ├── Pages/
+│   ├── Shared/
+│   └── wwwroot/
+├── SmartGymAdminWPF/          # WPF admin asztali alkalmazás
+│   ├── Services/
+│   ├── Views/
+│   ├── App.xaml
+│   └── MainWindow.xaml
+├── SmartGym.slnx
 └── README.md
 ```
 
 ---
 
-##  Bérlet logika
+## Bérlet logika
 
-A rendszer **stackelt bérleteket** támogat: ha a felhasználónak már van aktív bérlete, az új bérlet nem azonnal, hanem az aktuális bérlet lejárta után kezdődik.
+A rendszer stackelt bérleteket támogat: ha a felhasználónak már van aktív bérlete, az új bérlet nem azonnal, hanem az aktuális bérlet lejárta után kezdődik.
 
-**Példa:**
 ```
 Havi bérlet:  2025.04.01 → 2025.04.30
 Heti bérlet:  2025.04.30 → 2025.05.07   ← automatikusan indul
@@ -93,21 +72,21 @@ Heti bérlet:  2025.04.30 → 2025.05.07   ← automatikusan indul
 
 ---
 
-##  Telepítés és futtatás
+## Telepítés és futtatás
 
-### Előfeltételek
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- MySQL szerver (pl. XAMPP, MySQL Workbench)
-- Visual Studio 2022+ (ajánlott)
+### 1. Adatbázis létrehozása
 
-### 1. Adatbázis beállítása
+Hozz létre egy üres `smartgym` nevű adatbázist MySQL-ben, majd a Package Manager Console-ban futtasd:
 
-- Létre kell hozni egy adatbázist smartgym néven
-- Visual Studioban, Package Manager Consoleban ki kell adni az alábbi parancsot: "Update-database"
+```
+Update-Database
+```
+
+Ez létrehozza a szükséges táblákat az Entity Framework migrációk alapján.
 
 ### 2. Connection string beállítása
 
-Az `appsettings.json` fájlban add meg a saját adatbázis-kapcsolatot:
+Az `appsettings.json`-ban add meg a saját adatbázis-kapcsolatot:
 
 ```json
 "ConnectionStrings": {
@@ -115,44 +94,30 @@ Az `appsettings.json` fájlban add meg a saját adatbázis-kapcsolatot:
 }
 ```
 
-### 3. Backend indítása
+### 3. Multiple Startup Projects beállítása
 
-```bash
-cd SmartGym
-dotnet run
-```
+A projekt kizárólag Visual Studio-ban futtatható, Multiple Startup Projects konfigurációval.
 
-Az API alapértelmezés szerint a `https://localhost:7XXX` címen fut. A Swagger UI elérhető: `/swagger`
-
-### 4. Frontend indítása
-
-```bash
-cd GymFrontend
-dotnet run
-```
-
-### 5. Admin felület indítása
-
-Nyisd meg a `SmartGymAdminWPF` projektet Visual Studio-ban, és futtasd.
+1. Nyisd meg a `SmartGym.slnx` solution fájlt Visual Studio-ban
+2. Jobb klikk a **Solution**-re a Solution Explorerben → **Set Startup Projects...**
+3. Válaszd a **Multiple startup projects** opciót
+4. Mindhárom projektet állítsd **Start** értékre:
+   - `SmartGym` *(backend API)*
+   - `GymFrontend` *(webes frontend)*
+   - `SmartGymAdminWPF` *(admin felület)*
+5. Kattints **OK**-ra, majd indítsd el **F5**-tel
 
 ---
 
-##  További fejlesztések
+## Tervezett fejlesztések
 
--  Automatikus bérlet aktiválás (háttérfolyamat / Hangfire)
--  Valós idejű értesítések (SignalR)
--  Online fizetési integráció
--  E-mail értesítések
--  Mobilbarát dizájn fejlesztése
-
----
-
-##  Készítők
-
-| Magyar Balázs |
-| Imre Gábor |
-| Tóth Martin |
+- [ ] Automatikus bérlet aktiválás
+- [ ] Real-time értesítések (SignalR)
+- [ ] Online fizetési integráció
+- [ ] E-mail értesítések
 
 ---
 
-> *Vizsgaremek projekt – SmartGym edzőtermi menedzsment rendszer*
+## Készítők
+
+Magyar Balázs · Imre Gábor · Tóth Martin
